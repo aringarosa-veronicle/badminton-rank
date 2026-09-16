@@ -1578,29 +1578,45 @@
     let currentPlayers = [...DEFAULT_PLAYERS];
     let chartInstances = {};
 
-    window.addEventListener('DOMContentLoaded', () => {
+    // Khởi chạy ứng dụng ngay lập tức dù DOM đã tải xong trước hay chưa
+    function initApp() {
       renderPlayerList(currentPlayers);
       updateSummaryKPIs(currentPlayers);
       setupExcelUpload();
-    });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
 
     function showToast(message) {
       const toast = document.getElementById('toastMessage');
       const text = document.getElementById('toastText');
-      text.innerText = message;
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3500);
+      if (text) text.innerText = message;
+      if (toast) {
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3500);
+      }
     }
 
     function resetToInitialData() {
       currentPlayers = [...DEFAULT_PLAYERS];
-      document.getElementById('searchInput').value = '';
-      document.getElementById('rankFilter').value = 'all';
-      document.getElementById('genderFilter').value = 'all';
-      document.getElementById('regFilter').value = 'all';
-      document.getElementById('sortFilter').value = 'default';
+      const searchEl = document.getElementById('searchInput');
+      const rankEl = document.getElementById('rankFilter');
+      const genderEl = document.getElementById('genderFilter');
+      const regEl = document.getElementById('regFilter');
+      const sortEl = document.getElementById('sortFilter');
+      
+      if (searchEl) searchEl.value = '';
+      if (rankEl) rankEl.value = 'all';
+      if (genderEl) genderEl.value = 'all';
+      if (regEl) regEl.value = 'all';
+      if (sortEl) sortEl.value = 'default';
+
       renderPlayerList(currentPlayers);
       updateSummaryKPIs(currentPlayers);
       showToast('Đã khôi phục danh sách người chơi ban đầu!');
@@ -1608,6 +1624,8 @@
 
     function setupExcelUpload() {
       const input = document.getElementById('excelFileInput');
+      if (!input) return;
+
       input.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -1666,247 +1684,105 @@
           }
         };
         reader.readAsArrayBuffer(file);
-    });
-  }
-
-  function updateSummaryKPIs(players) {
-    const setSafeText = (id, text) => {
-      const el = document.getElementById(id);
-      if (el) el.innerText = text;
-    };
-
-    setSafeText('statTotalPlayers', players.length);
-    
-    const regCount = players.filter(p => p.registered === 'Có' || (p.registered && p.registered.toLowerCase().includes('đã'))).length;
-    setSafeText('statRegistered', regCount);
-
-    // Tách riêng số lượng Nam và Nữ
-    const maleCount = players.filter(p => p.gender && p.gender.toLowerCase() === 'nam').length;
-    const femaleCount = players.filter(p => p.gender && p.gender.toLowerCase().includes('nữ')).length;
-    setSafeText('statMale', maleCount);
-    setSafeText('statFemale', femaleCount);
-
-    // Tách riêng số lượng từng hạng S, A+, A, B, C, D
-    const countS = players.filter(p => p.tier === 'S').length;
-    const countAplus = players.filter(p => p.tier === 'A+').length;
-    const countA = players.filter(p => p.tier === 'A').length;
-    const countB = players.filter(p => p.tier === 'B').length;
-    const countC = players.filter(p => p.tier === 'C').length;
-    const countD = players.filter(p => p.tier === 'D').length;
-
-    setSafeText('statTierS', countS);
-    setSafeText('statTierAplus', countAplus);
-    setSafeText('statTierA', countA);
-    setSafeText('statTierB', countB);
-    setSafeText('statTierC', countC);
-    setSafeText('statTierD', countD);
-
-    // Số lượng tham gia After Party
-    const partyCount = players.filter(p => p.party && (p.party.toLowerCase() === 'yes' || p.party.toLowerCase() === 'có')).length;
-    setSafeText('statParty', partyCount);
-  }
-
-  // Lọc nhanh khi click vào thẻ Hạng
-  function quickFilterTier(tier) {
-    const rankSelect = document.getElementById('rankFilter');
-    if (rankSelect.value === tier) {
-      rankSelect.value = 'all';
-    } else {
-      rankSelect.value = tier;
+      });
     }
-    handleFilterChange();
-  }
-
-  // Lọc nhanh khi click vào thẻ Nam / Nữ
-  function quickFilterGender(gender) {
-    const genderSelect = document.getElementById('genderFilter');
-    if (genderSelect.value === gender) {
-      genderSelect.value = 'all';
-    } else {
-      genderSelect.value = gender;
-    }
-    handleFilterChange();
-  }
-
-  function handleFilterChange() {
-    const q = document.getElementById('searchInput').value.toLowerCase().trim();
-    const rankVal = document.getElementById('rankFilter').value;
-    const genderVal = document.getElementById('genderFilter').value;
-    const regVal = document.getElementById('regFilter').value;
-    const sortVal = document.getElementById('sortFilter').value;
-
-    // Cập nhật viền active cho các nút lọc nhanh Hạng
-    const tierMap = { 'S': 'btnTierQuick-S', 'A+': 'btnTierQuick-Aplus', 'A': 'btnTierQuick-A', 'B': 'btnTierQuick-B', 'C': 'btnTierQuick-C', 'D': 'btnTierQuick-D' };
-    Object.keys(tierMap).forEach(t => {
-      const el = document.getElementById(tierMap[t]);
-      if (el) {
-        if (rankVal === t) {
-          el.classList.add('ring-2', 'ring-[#C70000]', 'border-transparent', 'bg-red-50/60');
-        } else {
-          el.classList.remove('ring-2', 'ring-[#C70000]', 'border-transparent', 'bg-red-50/60');
-        }
-      }
-    });
-
-    // Cập nhật viền active cho các nút lọc nhanh Giới tính
-    const maleBtn = document.getElementById('btnGenderMale');
-    const femaleBtn = document.getElementById('btnGenderFemale');
-    if (maleBtn) {
-      if (genderVal === 'Nam') maleBtn.classList.add('ring-2', 'ring-blue-600', 'border-transparent', 'bg-blue-50/60');
-      else maleBtn.classList.remove('ring-2', 'ring-blue-600', 'border-transparent', 'bg-blue-50/60');
-    }
-    if (femaleBtn) {
-      if (genderVal === 'Nữ') femaleBtn.classList.add('ring-2', 'ring-pink-600', 'border-transparent', 'bg-pink-50/60');
-      else femaleBtn.classList.remove('ring-2', 'ring-pink-600', 'border-transparent', 'bg-pink-50/60');
-    }
-
-    let result = currentPlayers.filter(p => {
-      const matchSearch = p.name.toLowerCase().includes(q) ||
-                          p.nick.toLowerCase().includes(q) ||
-                          p.email.toLowerCase().includes(q);
-
-      const matchRank = (rankVal === 'all') || (p.tier === rankVal);
-      const matchGender = (genderVal === 'all') || (p.gender === genderVal);
-      const matchReg = (regVal === 'all') || (p.registered === regVal);
-
-      return matchSearch && matchRank && matchGender && matchReg;
-    });
-
-    // Sorting
-    if (sortVal === 'score-desc') {
-      result.sort((a, b) => (b.score || 0) - (a.score || 0));
-    } else if (sortVal === 'score-asc') {
-      result.sort((a, b) => (a.score || 0) - (b.score || 0));
-    } else if (sortVal === 'name-asc') {
-      result.sort((a, b) => a.name.localeCompare(b.name, 'vi'));
-    } else {
-      // default by bxh
-      result.sort((a, b) => (a.bxh || 999) - (b.bxh || 999));
-    }
-
-    renderPlayerList(result);
-  }
-
-  function toggleAllVisuals() {
-    const showSkills = document.getElementById('chkShowSkills').checked;
-    const showProfile = document.getElementById('chkShowProfile').checked;
-
-    document.querySelectorAll('.skill-box-container').forEach(el => {
-      el.style.display = showSkills ? 'grid' : 'none';
-    });
-    document.querySelectorAll('.profile-box-container').forEach(el => {
-      el.style.display = showProfile ? 'grid' : 'none';
-    });
-  }
-  }
-
-  // Lọc nhanh khi click vào thẻ Hạng
-  function quickFilterTier(tier) {
-    const rankSelect = document.getElementById('rankFilter');
-    if (rankSelect.value === tier) {
-      rankSelect.value = 'all';
-    } else {
-      rankSelect.value = tier;
-    }
-    handleFilterChange();
-  }
-
-  // Lọc nhanh khi click vào thẻ Nam / Nữ
-  function quickFilterGender(gender) {
-    const genderSelect = document.getElementById('genderFilter');
-    if (genderSelect.value === gender) {
-      genderSelect.value = 'all';
-    } else {
-      genderSelect.value = gender;
-    }
-    handleFilterChange();
-  }
-
-  function handleFilterChange() {
-    const q = document.getElementById('searchInput').value.toLowerCase().trim();
-    const rankVal = document.getElementById('rankFilter').value;
-    const genderVal = document.getElementById('genderFilter').value;
-    const regVal = document.getElementById('regFilter').value;
-    const sortVal = document.getElementById('sortFilter').value;
-
-    // Cập nhật viền active cho các nút lọc nhanh Hạng
-    const tierMap = { 'S': 'btnTierQuick-S', 'A+': 'btnTierQuick-Aplus', 'A': 'btnTierQuick-A', 'B': 'btnTierQuick-B', 'C': 'btnTierQuick-C', 'D': 'btnTierQuick-D' };
-    Object.keys(tierMap).forEach(t => {
-      const el = document.getElementById(tierMap[t]);
-      if (el) {
-        if (rankVal === t) {
-          el.classList.add('ring-2', 'ring-[#C70000]', 'border-transparent', 'bg-red-50/60');
-        } else {
-          el.classList.remove('ring-2', 'ring-[#C70000]', 'border-transparent', 'bg-red-50/60');
-        }
-      }
-    });
-
-    // Cập nhật viền active cho các nút lọc nhanh Giới tính
-    const maleBtn = document.getElementById('btnGenderMale');
-    const femaleBtn = document.getElementById('btnGenderFemale');
-    if (maleBtn) {
-      if (genderVal === 'Nam') maleBtn.classList.add('ring-2', 'ring-blue-600', 'border-transparent', 'bg-blue-50/60');
-      else maleBtn.classList.remove('ring-2', 'ring-blue-600', 'border-transparent', 'bg-blue-50/60');
-    }
-    if (femaleBtn) {
-      if (genderVal === 'Nữ') femaleBtn.classList.add('ring-2', 'ring-pink-600', 'border-transparent', 'bg-pink-50/60');
-      else femaleBtn.classList.remove('ring-2', 'ring-pink-600', 'border-transparent', 'bg-pink-50/60');
-    }
-
-    let result = currentPlayers.filter(p => {
-      const matchSearch = p.name.toLowerCase().includes(q) ||
-                          p.nick.toLowerCase().includes(q) ||
-                          p.email.toLowerCase().includes(q);
-
-      const matchRank = (rankVal === 'all') || (p.tier === rankVal);
-      const matchGender = (genderVal === 'all') || (p.gender === genderVal);
-      const matchReg = (regVal === 'all') || (p.registered === regVal);
-
-      return matchSearch && matchRank && matchGender && matchReg;
-    });
-
-    // Sorting
-    if (sortVal === 'score-desc') {
-      result.sort((a, b) => (b.score || 0) - (a.score || 0));
-    } else if (sortVal === 'score-asc') {
-      result.sort((a, b) => (a.score || 0) - (b.score || 0));
-    } else if (sortVal === 'name-asc') {
-      result.sort((a, b) => a.name.localeCompare(b.name, 'vi'));
-    } else {
-      // default by bxh
-      result.sort((a, b) => (a.bxh || 999) - (b.bxh || 999));
-    }
-
-    renderPlayerList(result);
-  }
 
     function updateSummaryKPIs(players) {
-      document.getElementById('statTotalPlayers').innerText = players.length;
+      const setSafeText = (id, text) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = text;
+      };
+
+      setSafeText('statTotalPlayers', players.length);
       
-      const regCount = players.filter(p => p.registered === 'Có' || p.registered.toLowerCase().includes('đã')).length;
-      document.getElementById('statRegistered').innerText = regCount;
+      const regCount = players.filter(p => p.registered === 'Có' || (p.registered && p.registered.toLowerCase().includes('đã'))).length;
+      setSafeText('statRegistered', regCount);
 
-      const topTierCount = players.filter(p => p.tier === 'S' || p.tier === 'A+').length;
-      document.getElementById('statTopTier').innerText = topTierCount;
+      // Thống kê giới tính Nam và Nữ
+      const maleCount = players.filter(p => p.gender && p.gender.toLowerCase() === 'nam').length;
+      const femaleCount = players.filter(p => p.gender && p.gender.toLowerCase().includes('nữ')).length;
+      setSafeText('statMale', maleCount);
+      setSafeText('statFemale', femaleCount);
 
-      const tierBCount = players.filter(p => p.tier === 'B').length;
-      document.getElementById('statTierB').innerText = tierBCount;
+      // Thống kê từng hạng kỹ năng S, A+, A, B, C, D
+      const countS = players.filter(p => p.tier === 'S').length;
+      const countAplus = players.filter(p => p.tier === 'A+').length;
+      const countA = players.filter(p => p.tier === 'A').length;
+      const countB = players.filter(p => p.tier === 'B').length;
+      const countC = players.filter(p => p.tier === 'C').length;
+      const countD = players.filter(p => p.tier === 'D').length;
 
-      const maleCount = players.filter(p => p.gender.toLowerCase() === 'nam').length;
-      const femaleCount = players.filter(p => p.gender.toLowerCase().includes('nữ')).length;
-      document.getElementById('statGenderRatio').innerText = `${maleCount} / ${femaleCount}`;
+      setSafeText('statTierS', countS);
+      setSafeText('statTierAplus', countAplus);
+      setSafeText('statTierA', countA);
+      setSafeText('statTierB', countB);
+      setSafeText('statTierC', countC);
+      setSafeText('statTierD', countD);
 
+      // Số lượng tham gia After Party
       const partyCount = players.filter(p => p.party && (p.party.toLowerCase() === 'yes' || p.party.toLowerCase() === 'có')).length;
-      document.getElementById('statParty').innerText = partyCount;
+      setSafeText('statParty', partyCount);
+    }
+
+    function quickFilterTier(tier) {
+      const rankSelect = document.getElementById('rankFilter');
+      if (!rankSelect) return;
+      if (rankSelect.value === tier) {
+        rankSelect.value = 'all';
+      } else {
+        rankSelect.value = tier;
+      }
+      handleFilterChange();
+    }
+
+    function quickFilterGender(gender) {
+      const genderSelect = document.getElementById('genderFilter');
+      if (!genderSelect) return;
+      if (genderSelect.value === gender) {
+        genderSelect.value = 'all';
+      } else {
+        genderSelect.value = gender;
+      }
+      handleFilterChange();
     }
 
     function handleFilterChange() {
-      const q = document.getElementById('searchInput').value.toLowerCase().trim();
-      const rankVal = document.getElementById('rankFilter').value;
-      const genderVal = document.getElementById('genderFilter').value;
-      const regVal = document.getElementById('regFilter').value;
-      const sortVal = document.getElementById('sortFilter').value;
+      const searchInput = document.getElementById('searchInput');
+      const rankFilter = document.getElementById('rankFilter');
+      const genderFilter = document.getElementById('genderFilter');
+      const regFilter = document.getElementById('regFilter');
+      const sortFilter = document.getElementById('sortFilter');
+
+      const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+      const rankVal = rankFilter ? rankFilter.value : 'all';
+      const genderVal = genderFilter ? genderFilter.value : 'all';
+      const regVal = regFilter ? regFilter.value : 'all';
+      const sortVal = sortFilter ? sortFilter.value : 'default';
+
+      // Cập nhật viền active cho các nút lọc nhanh Hạng
+      const tierMap = { 'S': 'btnTierQuick-S', 'A+': 'btnTierQuick-Aplus', 'A': 'btnTierQuick-A', 'B': 'btnTierQuick-B', 'C': 'btnTierQuick-C', 'D': 'btnTierQuick-D' };
+      Object.keys(tierMap).forEach(t => {
+        const el = document.getElementById(tierMap[t]);
+        if (el) {
+          if (rankVal === t) {
+            el.classList.add('ring-2', 'ring-[#C70000]', 'border-transparent', 'bg-red-50/60');
+          } else {
+            el.classList.remove('ring-2', 'ring-[#C70000]', 'border-transparent', 'bg-red-50/60');
+          }
+        }
+      });
+
+      // Cập nhật viền active cho các nút lọc nhanh Giới tính
+      const maleBtn = document.getElementById('btnGenderMale');
+      const femaleBtn = document.getElementById('btnGenderFemale');
+      if (maleBtn) {
+        if (genderVal === 'Nam') maleBtn.classList.add('ring-2', 'ring-blue-600', 'border-transparent', 'bg-blue-50/60');
+        else maleBtn.classList.remove('ring-2', 'ring-blue-600', 'border-transparent', 'bg-blue-50/60');
+      }
+      if (femaleBtn) {
+        if (genderVal === 'Nữ') femaleBtn.classList.add('ring-2', 'ring-pink-600', 'border-transparent', 'bg-pink-50/60');
+        else femaleBtn.classList.remove('ring-2', 'ring-pink-600', 'border-transparent', 'bg-pink-50/60');
+      }
 
       let result = currentPlayers.filter(p => {
         const matchSearch = p.name.toLowerCase().includes(q) ||
@@ -1936,8 +1812,11 @@
     }
 
     function toggleAllVisuals() {
-      const showSkills = document.getElementById('chkShowSkills').checked;
-      const showProfile = document.getElementById('chkShowProfile').checked;
+      const chkSkills = document.getElementById('chkShowSkills');
+      const chkProfile = document.getElementById('chkShowProfile');
+
+      const showSkills = chkSkills ? chkSkills.checked : true;
+      const showProfile = chkProfile ? chkProfile.checked : true;
 
       document.querySelectorAll('.skill-box-container').forEach(el => {
         el.style.display = showSkills ? 'grid' : 'none';
