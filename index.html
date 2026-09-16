@@ -7,6 +7,7 @@
   
   <!-- Favicon ngôi sao đỏ NAB 7 cánh -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpolygon points='32.0,2.0 37.6,20.3 55.5,13.3 44.7,29.1 61.2,38.7 42.2,40.1 45.0,59.0 32.0,45.0 19.0,59.0 21.8,40.1 2.8,38.7 19.3,29.1 8.5,13.3 26.4,20.3' fill='%23C70000'/%3E%3C/svg%3E">
+
   <!-- Font & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -203,7 +204,7 @@
 
     .filter-input {
       flex: 2;
-      min-width: 220px;
+      min-width: 200px;
       position: relative;
     }
 
@@ -231,7 +232,7 @@
 
     .filter-select {
       flex: 1;
-      min-width: 140px;
+      min-width: 130px;
       padding: 8px 12px;
       font-size: 13.5px;
       border: 1px solid var(--nab-border);
@@ -317,6 +318,20 @@
     .player-nick {
       font-size: 12px;
       color: var(--nab-text-muted);
+    }
+
+    /* Tag Non-NAB */
+    .tag-non-nab {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1.5px 6px;
+      border-radius: 4px;
+      background: #F1F5F9;
+      color: #475569;
+      border: 1px solid #CBD5E1;
+      letter-spacing: 0.3px;
+      display: inline-flex;
+      align-items: center;
     }
 
     .icon-has-note {
@@ -463,6 +478,10 @@
       font-size: 16px;
       font-weight: 700;
       color: var(--nab-black);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     .detail-header-title span.tag-tier {
@@ -630,7 +649,7 @@
   </header>
 
   <div class="container">
-    <!-- Top Stats Cards: Bấm Tổng số để reset tất cả -->
+    <!-- Top Stats Cards -->
     <div class="stats-grid">
       <div class="stat-card active" id="cardTotal" onclick="resetAllFilters()">
         <div class="stat-title"><i class="fa-solid fa-users"></i> Tổng số</div>
@@ -695,6 +714,12 @@
           <option value="all">Đăng ký giải: tất cả</option>
           <option value="Đã đăng ký">Đã đăng ký</option>
           <option value="Chưa đăng ký">Chưa đăng ký</option>
+        </select>
+        <!-- Bộ lọc Nhân viên của NAB -->
+        <select class="filter-select" id="orgFilter" onchange="applyFilters()">
+          <option value="all">Nhân viên của NAB: Tất cả</option>
+          <option value="nab">NAB</option>
+          <option value="non-nab">Non-NAB</option>
         </select>
         <select class="filter-select" id="sortFilter" onchange="applyFilters()">
           <option value="default">Hạng & điểm (mặc định)</option>
@@ -767,6 +792,10 @@
           currentPlayers = JSON.parse(cached);
           currentPlayers.forEach(p => {
             if (p.note && !isValidNote(p.note)) p.note = '';
+            if (p.isNAB === undefined) {
+              const em = String(p.email || '').trim().toLowerCase();
+              p.isNAB = em.endsWith('@nab.com.au');
+            }
           });
           updateKPIs(currentPlayers);
           applyFilters();
@@ -874,6 +903,11 @@
               noteClean = '';
             }
 
+            // Email & Kiểm tra nhân viên NAB
+            const rawEmail = getValSmart(r, ['Email', 'Mail']) || 'Chưa cập nhật';
+            const emailClean = String(rawEmail).trim();
+            const isNAB = emailClean.toLowerCase().endsWith('@nab.com.au');
+
             const skills = {
               "Phát": parseNumeric(getValSmart(r, ['Phát cầu', 'Phát', 'Serve'], ['phát'])),
               "Phông": parseNumeric(getValSmart(r, ['Phông & khống chế', 'Phông', 'Clear'], ['phông'])),
@@ -898,7 +932,8 @@
               score: score,
               gender: getValSmart(r, ['Giới tính', 'Gender']) || 'Nam',
               status: isRegClean ? 'Đã đăng ký' : 'Chưa đăng ký',
-              email: getValSmart(r, ['Email', 'Mail']) || 'Chưa cập nhật',
+              email: emailClean,
+              isNAB: isNAB,
               updatedAt: getValSmart(r, ['Ngày đăng ký giải', 'Ngày tự đánh giá', 'Cập nhật']) || '16/09/2026',
               experience: getValSmart(r, ['Đã chơi được bao lâu?', 'Thâm niên', 'Kinh nghiệm'], ['chơi được bao lâu']) || 'Chưa có',
               frequency: getValSmart(r, ['Tần suất tập', 'Tần suất']) || 'Chưa có',
@@ -939,16 +974,15 @@
       document.getElementById('statTierD').innerText = data.filter(p => p.rank === 'D').length;
     }
 
-    // Reset toàn bộ bộ lọc và hiển thị tất cả người chơi
     function resetAllFilters() {
       document.getElementById('searchInput').value = '';
       document.getElementById('rankFilter').value = 'all';
       document.getElementById('genderFilter').value = 'all';
       document.getElementById('statusFilter').value = 'all';
+      document.getElementById('orgFilter').value = 'all';
       applyFilters();
     }
 
-    // Toggle lọc nhanh theo hạng (bấm lần nữa để tắt lọc)
     function quickFilterTier(tier) {
       const rankSelect = document.getElementById('rankFilter');
       if (rankSelect.value === tier) {
@@ -960,7 +994,6 @@
       applyFilters();
     }
 
-    // Toggle lọc nhanh theo giới tính (bấm lần nữa để tắt lọc)
     function quickFilterGender(gender) {
       const genderSelect = document.getElementById('genderFilter');
       if (genderSelect.value === gender) {
@@ -972,17 +1005,17 @@
       applyFilters();
     }
 
-    // Cập nhật trạng thái viền đỏ active cho thẻ KPI tương ứng
     function updateActiveStatCards() {
       const rank = document.getElementById('rankFilter').value;
       const gender = document.getElementById('genderFilter').value;
+      const org = document.getElementById('orgFilter').value;
 
       document.querySelectorAll('.stats-grid .stat-card').forEach(c => c.classList.remove('active'));
 
-      if (rank === 'all' && gender === 'all') {
+      if (rank === 'all' && gender === 'all' && org === 'all') {
         const totalCard = document.getElementById('cardTotal');
         if (totalCard) totalCard.classList.add('active');
-      } else if (rank !== 'all' && gender === 'all') {
+      } else if (rank !== 'all' && gender === 'all' && org === 'all') {
         const tierMap = {
           'S': 'cardTierS',
           'A+': 'cardTierAplus',
@@ -995,7 +1028,7 @@
         if (cardId && document.getElementById(cardId)) {
           document.getElementById(cardId).classList.add('active');
         }
-      } else if (gender !== 'all' && rank === 'all') {
+      } else if (gender !== 'all' && rank === 'all' && org === 'all') {
         const cardId = gender === 'Nam' ? 'cardMale' : 'cardFemale';
         if (document.getElementById(cardId)) {
           document.getElementById(cardId).classList.add('active');
@@ -1008,6 +1041,7 @@
       const rank = document.getElementById('rankFilter').value;
       const gender = document.getElementById('genderFilter').value;
       const status = document.getElementById('statusFilter').value;
+      const org = document.getElementById('orgFilter').value;
       const sort = document.getElementById('sortFilter').value;
 
       updateActiveStatCards();
@@ -1020,7 +1054,10 @@
         const matchRank = (rank === 'all') || (p.rank === rank);
         const matchGender = (gender === 'all') || (p.gender === gender);
         const matchStatus = (status === 'all') || (p.status === status);
-        return matchQ && matchRank && matchGender && matchStatus;
+        const matchOrg = (org === 'all') || 
+                         (org === 'nab' && p.isNAB) || 
+                         (org === 'non-nab' && !p.isNAB);
+        return matchQ && matchRank && matchGender && matchStatus && matchOrg;
       });
 
       if (sort === 'score-desc') filtered.sort((a,b) => parseFloat(b.score) - parseFloat(a.score));
@@ -1057,6 +1094,7 @@
             <div class="player-identity">
               <div class="player-name-line">
                 <span class="player-name">${p.name}</span>
+                ${!p.isNAB ? `<span class="tag-non-nab">Non-NAB</span>` : ''}
                 ${p.note ? `<i class="fa-regular fa-comment-dots icon-has-note" title="Có lời nhắn cho BTC: “${p.note.replace(/"/g, '&quot;')}”"></i>` : ''}
               </div>
               ${p.nickname ? `<span class="player-nick">${p.nickname}</span>` : ''}
@@ -1072,7 +1110,10 @@
             <div class="badge-score">${p.score}</div>
             <div>${p.gender}</div>
             <div><span class="badge-status ${p.status === 'Đã đăng ký' ? 'status-reg' : 'status-not'}">${p.status}</span></div>
-            <div class="player-email">${p.email}</div>
+            <div class="player-email">
+              <div>${p.email}</div>
+              ${!p.isNAB ? `<span class="tag-non-nab" style="font-size:9.5px; margin-top:2px;">Non-NAB</span>` : ''}
+            </div>
             <div class="player-date">${p.updatedAt}</div>
             <div style="text-align: right;">
               <button class="btn-detail" id="btn-toggle-${p.id}" onclick="toggleDetail(${p.id})">Chi tiết</button>
@@ -1087,6 +1128,7 @@
             <div class="detail-info">
               <div class="detail-header-title">
                 ${p.name} – <span class="tag-tier">Hạng ${p.rank}</span> (${p.score} điểm)
+                ${!p.isNAB ? `<span class="tag-non-nab" style="font-size:11px;">Non-NAB</span>` : ''}
               </div>
 
               <!-- Lời nhắn vui vẻ gửi BTC -->
@@ -1139,6 +1181,7 @@
               </div>
 
               <div class="detail-footer-info">
+                <div><strong>Tổ chức:</strong> ${p.isNAB ? 'NAB' : 'Non-NAB'}</div>
                 <div><strong>Nội dung:</strong> ${p.events}</div>
                 <div><strong>Lệ phí:</strong> ${p.fee}</div>
                 <div><strong>After Party:</strong> ${p.party}</div>
