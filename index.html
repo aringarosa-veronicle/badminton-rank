@@ -293,6 +293,13 @@
       gap: 3px;
     }
 
+    .player-name-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
     .player-name {
       font-weight: 700;
       font-size: 14.5px;
@@ -304,7 +311,13 @@
       color: var(--nab-text-muted);
     }
 
-    /* Tags Nguồn điểm: Xanh cho Admin đã duyệt, Cam cho Tự đánh giá */
+    .icon-has-note {
+      color: #D97706;
+      font-size: 13px;
+      cursor: help;
+    }
+
+    /* Tags Nguồn điểm */
     .tag-source {
       display: inline-flex;
       align-items: center;
@@ -435,7 +448,7 @@
     .detail-info {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
 
     .detail-header-title {
@@ -449,11 +462,53 @@
       font-weight: 800;
     }
 
+    /* Khung ghi chú vui gửi BTC */
+    .note-callout {
+      background: #FEF9C3;
+      border: 1px solid #FDE047;
+      border-left: 4px solid #EAB308;
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .note-callout-icon {
+      color: #CA8A04;
+      font-size: 16px;
+      margin-top: 1px;
+    }
+
+    .note-callout-body {
+      flex: 1;
+    }
+
+    .note-callout-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #854D0E;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .note-callout-text {
+      font-size: 13.5px;
+      color: #713F12;
+      line-height: 1.45;
+      font-style: italic;
+      font-weight: 500;
+    }
+
     .detail-quote {
       font-size: 13px;
       color: #4B5563;
       line-height: 1.5;
-      font-style: italic;
     }
 
     .detail-meta-grid {
@@ -533,6 +588,11 @@
       100% { transform: rotate(360deg); }
     }
 
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     @media (max-width: 992px) {
       .list-header { display: none; }
       .player-main-row {
@@ -608,7 +668,7 @@
       <div class="filter-row">
         <div class="filter-input">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="searchInput" placeholder="Tìm tên, nickname, email..." oninput="applyFilters()" />
+          <input type="text" id="searchInput" placeholder="Tìm tên, nickname, email, nội dung lời nhắn..." oninput="applyFilters()" />
         </div>
         <select class="filter-select" id="rankFilter" onchange="applyFilters()">
           <option value="all">Tất cả các hạng</option>
@@ -671,11 +731,46 @@
     let currentPlayers = [];
     const chartInstances = {};
 
+    // Bộ lọc thông minh loại bỏ các ghi chú rỗng, từ chối hoặc điền tượng trưng
+    function isValidNote(raw) {
+      if (!raw) return false;
+      const s = String(raw).trim().toLowerCase();
+      if (!s || ['nan', 'null', 'undefined', '-', '--', '...', '.', '0'].includes(s)) {
+        return false;
+      }
+
+      // Làm sạch ký tự đặc biệt, dấu câu, khoảng trắng để so khớp
+      const clean = s.replace(/[\(\)\[\]\{\}\.,:;!_\-\s\/\\]/g, '');
+      const exactNegatives = new Set([
+        'na', 'none', 'no', 'nope', 'k', 'ko', 'khong', 'khongco', 'không', 'khôngcó', 
+        'chua', 'chưa', 'chuaco', 'chưacó', 'nothing', 'nil', 'nothanks', 'nothankyou', 
+        'noidont', 'noidon’t', 'noidon’t', 'notnow', 'notyet'
+      ]);
+
+      if (exactNegatives.has(clean)) {
+        return false;
+      }
+
+      // Kiểm tra các tiền tố từ chối ngắn
+      const rejectionPrefixes = ['no thanks', 'no thank you', 'no, thanks', "no i don't", "no i dont", 'không có', 'khong co', 'not now'];
+      for (const p of rejectionPrefixes) {
+        if (s.startsWith(p) && s.length <= p.length + 6) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       const cached = localStorage.getItem('nab_badminton_players');
       if (cached) {
         try {
           currentPlayers = JSON.parse(cached);
+          // Đảm bảo dữ liệu trong cache cũng được lọc sạch ghi chú rỗng
+          currentPlayers.forEach(p => {
+            if (p.note && !isValidNote(p.note)) p.note = '';
+          });
           updateKPIs(currentPlayers);
           applyFilters();
           document.getElementById('loadingSpinner').style.display = 'none';
@@ -684,11 +779,11 @@
       syncFromGoogleSheet();
     });
 
-    // Hàm đối soát tên cột thông minh có cơ chế loại trừ
+    // Hàm lấy dữ liệu chính xác kèm loại trừ cột cấm
     function getValSmart(row, exactKeys, fallbackKeywords = [], excludeKeywords = []) {
       const keys = Object.keys(row);
       
-      // 1. Khớp chính xác tên cột
+      // 1. Khớp chính xác tuyệt đối tên cột
       for (const k of keys) {
         const kClean = k.trim().toLowerCase();
         for (const ek of exactKeys) {
@@ -701,7 +796,7 @@
         }
       }
 
-      // 2. Khớp từ khóa dự phòng (sau khi đã loại trừ các cột cấm)
+      // 2. Khớp từ khóa dự phòng sau khi loại trừ
       for (const k of keys) {
         const kClean = k.trim().toLowerCase();
         const isExcluded = excludeKeywords.some(ex => kClean.includes(ex.toLowerCase()));
@@ -725,7 +820,7 @@
       return isNaN(num) ? fallback : num;
     }
 
-    // Tự động đồng bộ từ Google Sheets
+    // Tự động đồng bộ từ Google Sheets qua GViz JSON
     function syncFromGoogleSheet() {
       const spinner = document.getElementById('loadingSpinner');
       spinner.style.display = 'block';
@@ -751,7 +846,7 @@
           });
 
           currentPlayers = rows.map((r, idx) => {
-            // Hạng kỹ năng (LOẠI TRỪ Hạng BXH)
+            // Hạng kỹ năng (loại trừ BXH)
             let tier = getValSmart(r, ['Hạng kỹ năng', 'Tier', 'Hạng', 'Rank'], ['kỹ năng', 'tier'], ['bxh', 'xếp hạng', 'thứ tự']);
             tier = String(tier).toUpperCase().trim();
             if (tier.includes('S')) tier = 'S';
@@ -762,11 +857,11 @@
             else if (tier.includes('D')) tier = 'D';
             else tier = 'Chưa xếp';
 
-            // Điểm số (LOẠI TRỪ Nguồn điểm)
+            // Điểm số (loại trừ nguồn điểm)
             const rawScore = getValSmart(r, ['Điểm', 'Score'], ['điểm'], ['nguồn']);
             const score = parseNumeric(rawScore, 0).toFixed(2);
 
-            // Nguồn điểm: Admin đã khóa -> Admin đã duyệt (Xanh) | Theo excel -> Người chơi tự đánh giá (Cam)
+            // Nguồn điểm
             const rawSource = getValSmart(r, ['Nguồn điểm', 'Nguồn'], ['nguồn điểm']);
             const srcClean = String(rawSource).trim().toLowerCase();
             let sourceTag = null;
@@ -785,7 +880,14 @@
               };
             }
 
-            // 8 Kỹ năng: Đánh đôi loại trừ 'vai trò'
+            // Ghi chú đăng ký: áp dụng bộ lọc thông minh loại bỏ NA, no, nope,...
+            const rawNote = getValSmart(r, ['Ghi chú đăng ký', 'Ghi chú', 'Lời nhắn', 'Note'], ['ghi chú', 'lời nhắn', 'note']);
+            let noteClean = String(rawNote).trim();
+            if (!isValidNote(noteClean)) {
+              noteClean = '';
+            }
+
+            // 8 Kỹ năng (Đánh đôi loại trừ vai trò)
             const skills = {
               "Phát": parseNumeric(getValSmart(r, ['Phát cầu', 'Phát', 'Serve'], ['phát'])),
               "Phông": parseNumeric(getValSmart(r, ['Phông & khống chế', 'Phông', 'Clear'], ['phông'])),
@@ -805,6 +907,7 @@
               name: getValSmart(r, ['Họ và tên', 'Họ tên', 'Name', 'Player']) || `VĐV ${idx + 1}`,
               nickname: getValSmart(r, ['Nickname', 'Nick name', 'Biệt danh']) || '',
               sourceTag: sourceTag,
+              note: noteClean,
               rank: tier,
               score: score,
               gender: getValSmart(r, ['Giới tính', 'Gender']) || 'Nam',
@@ -870,7 +973,8 @@
       let filtered = currentPlayers.filter(p => {
         const matchQ = p.name.toLowerCase().includes(q) || 
                        p.nickname.toLowerCase().includes(q) || 
-                       p.email.toLowerCase().includes(q);
+                       p.email.toLowerCase().includes(q) ||
+                       (p.note && p.note.toLowerCase().includes(q));
         const matchRank = (rank === 'all') || (p.rank === rank);
         const matchGender = (gender === 'all') || (p.gender === gender);
         const matchStatus = (status === 'all') || (p.status === status);
@@ -909,7 +1013,10 @@
           <div class="player-main-row">
             <div class="player-index">${index + 1}</div>
             <div class="player-identity">
-              <span class="player-name">${p.name}</span>
+              <div class="player-name-line">
+                <span class="player-name">${p.name}</span>
+                ${p.note ? `<i class="fa-regular fa-comment-dots icon-has-note" title="Có lời nhắn cho BTC: “${p.note.replace(/"/g, '&quot;')}”"></i>` : ''}
+              </div>
               ${p.nickname ? `<span class="player-nick">${p.nickname}</span>` : ''}
               ${p.sourceTag ? `
                 <span class="tag-source ${p.sourceTag.className}">
@@ -939,6 +1046,22 @@
               <div class="detail-header-title">
                 ${p.name} – <span class="tag-tier">Hạng ${p.rank}</span> (${p.score} điểm)
               </div>
+
+              <!-- Khung lời nhắn gửi BTC (chỉ hiện khi có lời nhắn thực tế) -->
+              ${p.note ? `
+                <div class="note-callout">
+                  <div class="note-callout-icon">
+                    <i class="fa-solid fa-envelope-open-text"></i>
+                  </div>
+                  <div class="note-callout-body">
+                    <div class="note-callout-label">
+                      <i class="fa-solid fa-paper-plane"></i> Lời nhắn gửi Ban tổ chức:
+                    </div>
+                    <div class="note-callout-text">“${p.note}”</div>
+                  </div>
+                </div>
+              ` : ''}
+
               <div class="detail-quote">
                 ${p.rank === 'S' ? 'Nhóm mạnh nhất trong CLB phong trào: đánh chắc, đọc trận tốt, thường được xếp gánh đội hoặc đi đánh giải.' : 'Vận động viên thi đấu giải NAB Hanoi Badminton Championship 2026.'}
               </div>
