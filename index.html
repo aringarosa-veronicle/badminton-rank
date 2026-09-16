@@ -4,9 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Danh sách người chơi NAB HANOI BADMINTON CHAMPIONSHIP 2026</title>
+  
   <!-- Favicon ngôi sao đỏ NAB 6 cánh -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpolygon points='32,2 38.5,20.7 58,17 45,32 58,47 38.5,43.3 32,62 25.5,43.3 6,47 19,32 6,17 25.5,20.7' fill='%23C70000'/%3E%3C/svg%3E">
-  
+
   <!-- Font & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -145,18 +146,24 @@
       position: relative;
     }
 
-    .stat-card:hover, .stat-card.active {
+    .stat-card:hover {
       border-color: var(--nab-red);
       transform: translateY(-2px);
       box-shadow: 0 4px 10px rgba(199, 0, 0, 0.08);
+    }
+
+    .stat-card.active {
+      border-color: var(--nab-red);
+      background: #FFFDFD;
+      box-shadow: 0 0 0 1px var(--nab-red);
     }
 
     .stat-card.active::after {
       content: '';
       position: absolute;
       bottom: 0;
-      left: 10%;
-      right: 10%;
+      left: 12%;
+      right: 12%;
       height: 3px;
       background: var(--nab-red);
       border-radius: 3px 3px 0 0;
@@ -464,7 +471,6 @@
       font-weight: 800;
     }
 
-    /* Khung ghi chú vui gửi BTC */
     .note-callout {
       background: #FEF9C3;
       border: 1px solid #FDE047;
@@ -625,9 +631,9 @@
   </header>
 
   <div class="container">
-    <!-- Top Stats Cards -->
+    <!-- Top Stats Cards: Bấm Tổng số để reset tất cả -->
     <div class="stats-grid">
-      <div class="stat-card" id="cardTotal" onclick="quickFilterTier('all')">
+      <div class="stat-card active" id="cardTotal" onclick="resetAllFilters()">
         <div class="stat-title"><i class="fa-solid fa-users"></i> Tổng số</div>
         <div class="stat-num" id="statTotal">0</div>
       </div>
@@ -733,34 +739,25 @@
     let currentPlayers = [];
     const chartInstances = {};
 
-    // Bộ lọc thông minh loại bỏ các ghi chú rỗng, từ chối hoặc điền tượng trưng
     function isValidNote(raw) {
       if (!raw) return false;
       const s = String(raw).trim().toLowerCase();
       if (!s || ['nan', 'null', 'undefined', '-', '--', '...', '.', '0'].includes(s)) {
         return false;
       }
-
-      // Làm sạch ký tự đặc biệt, dấu câu, khoảng trắng để so khớp
       const clean = s.replace(/[\(\)\[\]\{\}\.,:;!_\-\s\/\\]/g, '');
       const exactNegatives = new Set([
         'na', 'none', 'no', 'nope', 'k', 'ko', 'khong', 'khongco', 'không', 'khôngcó', 
         'chua', 'chưa', 'chuaco', 'chưacó', 'nothing', 'nil', 'nothanks', 'nothankyou', 
-        'noidont', 'noidon’t', 'noidon’t', 'notnow', 'notyet'
+        'noidont', 'noidon’t', 'notnow', 'notyet'
       ]);
 
-      if (exactNegatives.has(clean)) {
-        return false;
-      }
+      if (exactNegatives.has(clean)) return false;
 
-      // Kiểm tra các tiền tố từ chối ngắn
       const rejectionPrefixes = ['no thanks', 'no thank you', 'no, thanks', "no i don't", "no i dont", 'không có', 'khong co', 'not now'];
       for (const p of rejectionPrefixes) {
-        if (s.startsWith(p) && s.length <= p.length + 6) {
-          return false;
-        }
+        if (s.startsWith(p) && s.length <= p.length + 6) return false;
       }
-
       return true;
     }
 
@@ -769,7 +766,6 @@
       if (cached) {
         try {
           currentPlayers = JSON.parse(cached);
-          // Đảm bảo dữ liệu trong cache cũng được lọc sạch ghi chú rỗng
           currentPlayers.forEach(p => {
             if (p.note && !isValidNote(p.note)) p.note = '';
           });
@@ -781,11 +777,8 @@
       syncFromGoogleSheet();
     });
 
-    // Hàm lấy dữ liệu chính xác kèm loại trừ cột cấm
     function getValSmart(row, exactKeys, fallbackKeywords = [], excludeKeywords = []) {
       const keys = Object.keys(row);
-      
-      // 1. Khớp chính xác tuyệt đối tên cột
       for (const k of keys) {
         const kClean = k.trim().toLowerCase();
         for (const ek of exactKeys) {
@@ -797,8 +790,6 @@
           }
         }
       }
-
-      // 2. Khớp từ khóa dự phòng sau khi loại trừ
       for (const k of keys) {
         const kClean = k.trim().toLowerCase();
         const isExcluded = excludeKeywords.some(ex => kClean.includes(ex.toLowerCase()));
@@ -822,7 +813,6 @@
       return isNaN(num) ? fallback : num;
     }
 
-    // Tự động đồng bộ từ Google Sheets qua GViz JSON
     function syncFromGoogleSheet() {
       const spinner = document.getElementById('loadingSpinner');
       spinner.style.display = 'block';
@@ -848,7 +838,6 @@
           });
 
           currentPlayers = rows.map((r, idx) => {
-            // Hạng kỹ năng (loại trừ BXH)
             let tier = getValSmart(r, ['Hạng kỹ năng', 'Tier', 'Hạng', 'Rank'], ['kỹ năng', 'tier'], ['bxh', 'xếp hạng', 'thứ tự']);
             tier = String(tier).toUpperCase().trim();
             if (tier.includes('S')) tier = 'S';
@@ -859,11 +848,9 @@
             else if (tier.includes('D')) tier = 'D';
             else tier = 'Chưa xếp';
 
-            // Điểm số (loại trừ nguồn điểm)
             const rawScore = getValSmart(r, ['Điểm', 'Score'], ['điểm'], ['nguồn']);
             const score = parseNumeric(rawScore, 0).toFixed(2);
 
-            // Nguồn điểm
             const rawSource = getValSmart(r, ['Nguồn điểm', 'Nguồn'], ['nguồn điểm']);
             const srcClean = String(rawSource).trim().toLowerCase();
             let sourceTag = null;
@@ -882,14 +869,12 @@
               };
             }
 
-            // Ghi chú đăng ký: áp dụng bộ lọc thông minh loại bỏ NA, no, nope,...
             const rawNote = getValSmart(r, ['Ghi chú đăng ký', 'Ghi chú', 'Lời nhắn', 'Note'], ['ghi chú', 'lời nhắn', 'note']);
             let noteClean = String(rawNote).trim();
             if (!isValidNote(noteClean)) {
               noteClean = '';
             }
 
-            // 8 Kỹ năng (Đánh đôi loại trừ vai trò)
             const skills = {
               "Phát": parseNumeric(getValSmart(r, ['Phát cầu', 'Phát', 'Serve'], ['phát'])),
               "Phông": parseNumeric(getValSmart(r, ['Phông & khống chế', 'Phông', 'Clear'], ['phông'])),
@@ -955,14 +940,68 @@
       document.getElementById('statTierD').innerText = data.filter(p => p.rank === 'D').length;
     }
 
-    function quickFilterTier(tier) {
-      document.getElementById('rankFilter').value = tier;
+    // Reset toàn bộ bộ lọc và hiển thị tất cả người chơi
+    function resetAllFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('rankFilter').value = 'all';
+      document.getElementById('genderFilter').value = 'all';
+      document.getElementById('statusFilter').value = 'all';
       applyFilters();
     }
 
-    function quickFilterGender(gender) {
-      document.getElementById('genderFilter').value = gender;
+    // Toggle lọc nhanh theo hạng (bấm lần nữa để tắt lọc)
+    function quickFilterTier(tier) {
+      const rankSelect = document.getElementById('rankFilter');
+      if (rankSelect.value === tier) {
+        rankSelect.value = 'all';
+      } else {
+        rankSelect.value = tier;
+        document.getElementById('genderFilter').value = 'all';
+      }
       applyFilters();
+    }
+
+    // Toggle lọc nhanh theo giới tính (bấm lần nữa để tắt lọc)
+    function quickFilterGender(gender) {
+      const genderSelect = document.getElementById('genderFilter');
+      if (genderSelect.value === gender) {
+        genderSelect.value = 'all';
+      } else {
+        genderSelect.value = gender;
+        document.getElementById('rankFilter').value = 'all';
+      }
+      applyFilters();
+    }
+
+    // Cập nhật trạng thái viền đỏ active cho thẻ KPI tương ứng
+    function updateActiveStatCards() {
+      const rank = document.getElementById('rankFilter').value;
+      const gender = document.getElementById('genderFilter').value;
+
+      document.querySelectorAll('.stats-grid .stat-card').forEach(c => c.classList.remove('active'));
+
+      if (rank === 'all' && gender === 'all') {
+        const totalCard = document.getElementById('cardTotal');
+        if (totalCard) totalCard.classList.add('active');
+      } else if (rank !== 'all' && gender === 'all') {
+        const tierMap = {
+          'S': 'cardTierS',
+          'A+': 'cardTierAplus',
+          'A': 'cardTierA',
+          'B': 'cardTierB',
+          'C': 'cardTierC',
+          'D': 'cardTierD'
+        };
+        const cardId = tierMap[rank];
+        if (cardId && document.getElementById(cardId)) {
+          document.getElementById(cardId).classList.add('active');
+        }
+      } else if (gender !== 'all' && rank === 'all') {
+        const cardId = gender === 'Nam' ? 'cardMale' : 'cardFemale';
+        if (document.getElementById(cardId)) {
+          document.getElementById(cardId).classList.add('active');
+        }
+      }
     }
 
     function applyFilters() {
@@ -971,6 +1010,8 @@
       const gender = document.getElementById('genderFilter').value;
       const status = document.getElementById('statusFilter').value;
       const sort = document.getElementById('sortFilter').value;
+
+      updateActiveStatCards();
 
       let filtered = currentPlayers.filter(p => {
         const matchQ = p.name.toLowerCase().includes(q) || 
@@ -1049,7 +1090,7 @@
                 ${p.name} – <span class="tag-tier">Hạng ${p.rank}</span> (${p.score} điểm)
               </div>
 
-              <!-- Khung lời nhắn gửi BTC (chỉ hiện khi có lời nhắn thực tế) -->
+              <!-- Lời nhắn vui vẻ gửi BTC -->
               ${p.note ? `
                 <div class="note-callout">
                   <div class="note-callout-icon">
