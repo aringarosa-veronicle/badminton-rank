@@ -5,1585 +5,1017 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Danh sách người chơi NAB HANOI BADMINTON CHAMPIONSHIP 2026</title>
   
-  <!-- Font chữ Inter chuẩn nhận diện doanh nghiệp -->
+  <!-- Font & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            nab: {
-              red: '#C70000',
-              redHover: '#A50000',
-              redLight: 'rgba(199, 0, 0, 0.08)',
-              black: '#1A1A1A',
-              cardBg: '#FFFFFF',
-              grayBg: '#F4F5F7',
-              border: '#E5E7EB',
-              muted: '#6B7280'
-            }
-          },
-          fontFamily: {
-            sans: ['Inter', 'sans-serif']
-          }
-        }
-      }
-    }
-  </script>
-
-  <!-- SheetJS và Chart.js cho Radar Chart -->
+  <!-- SheetJS & Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    body {
-      background-color: #F4F5F7;
-      color: #1A1A1A;
+    :root {
+      --nab-red: #C70000;
+      --nab-red-dark: #9E0000;
+      --nab-red-light: #FDE8E8;
+      --nab-black: #1A1A1A;
+      --nab-gray-bg: #F4F5F7;
+      --nab-card-bg: #FFFFFF;
+      --nab-border: #E5E7EB;
+      --nab-text-muted: #6B7280;
+      --nab-green-badge: #E6F4EA;
+      --nab-green-text: #137333;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
       font-family: 'Inter', sans-serif;
-      -webkit-font-smoothing: antialiased;
     }
 
-    /* Radar Chart container animation */
-    .radar-wrapper {
-      position: relative;
-      width: 100%;
-      max-width: 380px;
-      aspect-ratio: 1 / 1;
-      margin: 0 auto;
+    body {
+      background-color: var(--nab-gray-bg);
+      color: var(--nab-black);
+      padding-bottom: 60px;
     }
 
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+    /* Top Brand Bar */
+    header {
+      background: #FFFFFF;
+      border-bottom: 3px solid var(--nab-red);
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
-    ::-webkit-scrollbar-track {
-      background: #F1F1F1;
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
-    ::-webkit-scrollbar-thumb {
-      background: #C70000;
+
+    .nab-star {
+      background: var(--nab-red);
+      color: white;
+      font-weight: 800;
+      font-size: 14px;
+      padding: 5px 10px;
       border-radius: 4px;
+      letter-spacing: 0.5px;
     }
 
-    /* Tier Badges */
-    .tier-badge {
+    h1 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--nab-black);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-header {
+      padding: 7px 13px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
+      gap: 6px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .btn-sync {
+      background: var(--nab-red);
+      color: #fff;
+    }
+
+    .btn-sync:hover {
+      background: var(--nab-red-dark);
+    }
+
+    .btn-sheet {
+      background: #FFFFFF;
+      color: #374151;
+      border-color: #D1D5DB;
+    }
+
+    .btn-sheet:hover {
+      background: #F9FAFB;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1240px;
+      margin: 20px auto;
+      padding: 0 16px;
+    }
+
+    /* Stats KPI Bar */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .stat-card {
+      background: #FFFFFF;
+      border: 1px solid var(--nab-border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .stat-card:hover, .stat-card.active {
+      border-color: var(--nab-red);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(199, 0, 0, 0.08);
+    }
+
+    .stat-card.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 10%;
+      right: 10%;
+      height: 3px;
+      background: var(--nab-red);
+      border-radius: 3px 3px 0 0;
+    }
+
+    .stat-title {
+      font-size: 11.5px;
+      color: var(--nab-text-muted);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .stat-num {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--nab-black);
+      margin-top: 4px;
+    }
+
+    /* Filters Card */
+    .filter-card {
+      background: var(--nab-card-bg);
+      border-radius: 10px;
+      padding: 16px;
+      border: 1px solid var(--nab-border);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      margin-bottom: 16px;
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .filter-input {
+      flex: 2;
+      min-width: 220px;
+      position: relative;
+    }
+
+    .filter-input input {
+      width: 100%;
+      padding: 8px 12px 8px 34px;
+      font-size: 13.5px;
+      border: 1px solid var(--nab-border);
+      border-radius: 6px;
+      outline: none;
+    }
+
+    .filter-input input:focus {
+      border-color: var(--nab-red);
+    }
+
+    .filter-input i {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--nab-text-muted);
+      font-size: 13px;
+    }
+
+    .filter-select {
+      flex: 1;
+      min-width: 140px;
+      padding: 8px 12px;
+      font-size: 13.5px;
+      border: 1px solid var(--nab-border);
+      border-radius: 6px;
+      background-color: white;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .filter-select:focus {
+      border-color: var(--nab-red);
+    }
+
+    .filter-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid #F0F2F5;
+      font-size: 13px;
+      color: var(--nab-text-muted);
+    }
+
+    /* List Table Header */
+    .list-header {
+      display: grid;
+      grid-template-columns: 45px 2.2fr 75px 80px 90px 130px 1.8fr 100px 90px;
+      padding: 10px 16px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--nab-text-muted);
+      align-items: center;
+    }
+
+    /* Player Card */
+    .player-card {
+      background: var(--nab-card-bg);
+      border: 1px solid var(--nab-border);
+      border-radius: 8px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+      transition: border-color 0.2s;
+    }
+
+    .player-card:hover {
+      border-color: #D1D5DB;
+    }
+
+    .player-main-row {
+      display: grid;
+      grid-template-columns: 45px 2.2fr 75px 80px 90px 130px 1.8fr 100px 90px;
+      padding: 14px 16px;
+      align-items: center;
+      font-size: 13.5px;
+    }
+
+    .player-index {
+      color: var(--nab-text-muted);
+      font-weight: 600;
+    }
+
+    .player-identity {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .player-name {
+      font-weight: 700;
+      font-size: 14.5px;
+      color: var(--nab-black);
+    }
+
+    .player-nick {
+      font-size: 12px;
+      color: var(--nab-text-muted);
+    }
+
+    .admin-approved {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: #15803D;
+      background: #F0FDF4;
+      padding: 2px 6px;
+      border-radius: 4px;
+      width: fit-content;
+      margin-top: 3px;
+      font-weight: 500;
+    }
+
+    /* Rank Badges */
+    .badge-rank {
       width: 32px;
       height: 32px;
       border-radius: 50%;
-      font-weight: 700;
+      color: white;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       font-size: 13px;
-      color: #FFFFFF;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.12);
-      transition: transform 0.2s ease;
-    }
-    .tier-badge:hover {
-      transform: scale(1.1);
-    }
-    .tier-S  { background: linear-gradient(135deg, #C70000, #900000); }
-    .tier-Aplus { background: linear-gradient(135deg, #E65100, #C70000); }
-    .tier-A  { background: linear-gradient(135deg, #F59E0B, #D97706); }
-    .tier-B  { background: linear-gradient(135deg, #2563EB, #1D4ED8); }
-    .tier-C  { background: linear-gradient(135deg, #0D9488, #0F766E); }
-    .tier-D  { background: linear-gradient(135deg, #6B7280, #4B5563); }
-    .tier-none { background: #9CA3AF; }
-
-    /* Animated Accordion Drawer */
-    .player-drawer {
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
-    }
-    .player-drawer.is-open {
-      max-height: 1200px;
-      opacity: 1;
     }
 
-    /* Toast Notification */
-    #toastMessage {
-      transform: translateY(150%);
-      transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    .rank-S  { background: #C70000; box-shadow: 0 2px 5px rgba(199, 0, 0, 0.35); }
+    .rank-A_plus { background: #D9381E; }
+    .rank-A  { background: #E65100; }
+    .rank-B  { background: #1976D2; }
+    .rank-C  { background: #00897B; }
+    .rank-D  { background: #546E7A; }
+    .rank-other { background: #9E9E9E; }
+
+    .badge-score {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--nab-black);
     }
-    #toastMessage.show {
-      transform: translateY(0);
+
+    .badge-status {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 12px;
+      display: inline-block;
+    }
+
+    .status-reg {
+      background: var(--nab-green-badge);
+      color: var(--nab-green-text);
+    }
+
+    .status-not {
+      background: #F3F4F6;
+      color: #6B7280;
+    }
+
+    .player-email {
+      color: var(--nab-text-muted);
+      font-size: 13px;
+      word-break: break-all;
+    }
+
+    .player-date {
+      color: var(--nab-text-muted);
+      font-size: 12.5px;
+    }
+
+    .btn-detail {
+      background: #FFFFFF;
+      border: 1px solid #D1D5DB;
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-detail:hover {
+      background: #F9FAFB;
+      border-color: #9CA3AF;
+    }
+
+    .btn-detail.active {
+      background: #1A1A1A;
+      color: white;
+      border-color: #1A1A1A;
+    }
+
+    /* Detail Drawer Panel */
+    .player-detail-panel {
+      display: none;
+      background: #FAFAFA;
+      border-top: 1px solid var(--nab-border);
+      padding: 24px;
+    }
+
+    .player-detail-panel.open {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .radar-container {
+      width: 100%;
+      max-width: 340px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid #E5E7EB;
+    }
+
+    .detail-info {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .detail-header-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--nab-black);
+    }
+
+    .detail-header-title span.tag-tier {
+      color: var(--nab-red);
+      font-weight: 800;
+    }
+
+    .detail-quote {
+      font-size: 13px;
+      color: #4B5563;
+      line-height: 1.5;
+      font-style: italic;
+    }
+
+    .detail-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      background: white;
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid #E5E7EB;
+    }
+
+    .meta-box span {
+      display: block;
+      font-size: 11.5px;
+      color: var(--nab-text-muted);
+      margin-bottom: 3px;
+    }
+
+    .meta-box strong {
+      font-size: 13.5px;
+      color: var(--nab-black);
+    }
+
+    .skills-score-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 24px;
+      padding-top: 4px;
+    }
+
+    .skill-score-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding-bottom: 5px;
+      border-bottom: 1px dashed #E5E7EB;
+    }
+
+    .skill-score-row span {
+      color: #374151;
+    }
+
+    .skill-score-row strong {
+      color: var(--nab-black);
+    }
+
+    .detail-footer-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 12.5px;
+      color: #4B5563;
+      padding-top: 10px;
+      border-top: 1px solid #E5E7EB;
+    }
+
+    /* Loading Spinner */
+    #loadingSpinner {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6B7280;
+    }
+
+    .spinner {
+      border: 3px solid #E5E7EB;
+      border-top: 3px solid var(--nab-red);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 992px) {
+      .list-header { display: none; }
+      .player-main-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .player-detail-panel.open {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased text-gray-900">
+<body>
 
-  <!-- Top Corporate Navbar -->
-  <header class="bg-white border-b-4 border-[#C70000] sticky top-0 z-40 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3 flex flex-wrap items-center justify-between gap-3">
-      
-      <!-- Brand Logo & Title -->
-      <div class="flex items-center space-x-3">
-        <div class="bg-[#C70000] text-white px-3 py-1.5 rounded font-black text-sm tracking-wider shadow-sm flex items-center gap-1.5">
-          <i class="fa-solid fa-star text-xs"></i>
-          <span>NAB</span>
-        </div>
-        <div>
-          <h1 class="text-base sm:text-lg font-bold text-gray-900 leading-tight">
-            Danh sách người chơi NAB HANOI BADMINTON CHAMPIONSHIP 2026
-          </h1>
-          <p class="text-xs text-gray-500 hidden sm:block">Bảng xếp hạng kỹ năng & hồ sơ đăng ký thi đấu chính thức</p>
-        </div>
-      </div>
-
-      <!-- Quick Action Buttons: Live Google Sheets Sync & Tools -->
-      <div class="flex items-center flex-wrap gap-2">
-        <!-- Live Google Sheet Status Pill -->
-        <div id="syncStatusBadge" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-green-50 border border-green-200 text-green-700 text-xs font-medium">
-          <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-          <span id="syncStatusText">Google Sheets Live</span>
-        </div>
-
-        <!-- Sync Button -->
-        <button id="btnSyncGSheet" onclick="syncFromGoogleSheet(true)" class="inline-flex items-center gap-1.5 bg-[#C70000] hover:bg-[#A50000] text-white text-xs sm:text-sm font-semibold px-3.5 py-2 rounded-lg shadow-sm transition-all duration-150 active:scale-95">
-          <i id="syncIcon" class="fa-solid fa-arrows-rotate text-xs"></i>
-          <span>Đồng bộ Sheet</span>
-        </button>
-
-        <!-- Open Sheet External Link -->
-        <a id="btnOpenSheetLink" href="https://docs.google.com/spreadsheets/d/18NLI0v073EIZezHwbwKx5zfrHNTarPx899hNCJBqSBg/edit?usp=sharing" target="_blank" rel="noopener noreferrer" title="Mở Google Spreadsheet trên tab mới" class="p-2 text-gray-700 hover:text-green-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-xs sm:text-sm flex items-center gap-1">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i>
-          <span class="hidden md:inline">Mở Sheet</span>
-        </a>
-
-        <!-- Settings Modal Button for Sheet URL -->
-        <button onclick="openSheetConfigModal()" title="Cài đặt link Google Sheets" class="p-2 text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-xs sm:text-sm">
-          <i class="fa-solid fa-gear"></i>
-        </button>
-
-        <!-- Excel File Upload Fallback -->
-        <input type="file" id="excelFileInput" accept=".xlsx, .xls" class="hidden" />
-        <button onclick="document.getElementById('excelFileInput').click()" title="Nhập thủ công từ file Excel dự phòng" class="p-2 text-gray-600 hover:text-emerald-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-xs sm:text-sm">
-          <i class="fa-solid fa-file-excel"></i>
-        </button>
-
-        <!-- Paste Modal Fallback -->
-        <button onclick="openPasteModal()" title="Dán dữ liệu từ bảng tính hoặc JSON" class="p-2 text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-xs sm:text-sm">
-          <i class="fa-solid fa-paste"></i>
-        </button>
-
-        <!-- Reset Button -->
-        <button onclick="resetToInitialData()" title="Khôi phục dữ liệu mặc định ban đầu" class="p-2 text-gray-500 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-xs sm:text-sm">
-          <i class="fa-solid fa-rotate-right"></i>
-        </button>
-      </div>
-
+  <header>
+    <div class="brand-title">
+      <span class="nab-star">NAB</span>
+      <h1>Danh sách người chơi NAB HANOI BADMINTON CHAMPIONSHIP 2026</h1>
+    </div>
+    <div class="header-actions">
+      <a href="https://docs.google.com/spreadsheets/d/18NLI0v073EIZezHwbwKx5zfrHNTarPx899hNCJBqSBg/edit" target="_blank" class="btn-header btn-sheet">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i> Mở Google Sheet
+      </a>
+      <button class="btn-header btn-sync" onclick="syncFromGoogleSheet()">
+        <i class="fa-solid fa-rotate"></i> Đồng bộ Sheet
+      </button>
     </div>
   </header>
 
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
-
-    <!-- KPI Summary: Overview & Gender Stats -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-      <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-xs flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-lg bg-red-50 text-[#C70000] flex items-center justify-center font-bold text-lg shrink-0">
-          <i class="fa-solid fa-users"></i>
-        </div>
-        <div class="min-w-0">
-          <div class="text-xs text-gray-500 font-medium truncate">Tổng người chơi</div>
-          <div class="text-lg font-bold text-gray-900" id="statTotalPlayers">56</div>
-        </div>
+  <div class="container">
+    <!-- Top Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card" id="cardTotal" onclick="quickFilterTier('all')">
+        <div class="stat-title"><i class="fa-solid fa-users"></i> Tổng số</div>
+        <div class="stat-num" id="statTotal">0</div>
       </div>
-
-      <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-xs flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-lg bg-green-50 text-green-700 flex items-center justify-center font-bold text-lg shrink-0">
-          <i class="fa-solid fa-clipboard-check"></i>
-        </div>
-        <div class="min-w-0">
-          <div class="text-xs text-gray-500 font-medium truncate">Đã đăng ký giải</div>
-          <div class="text-lg font-bold text-green-700" id="statRegistered">56</div>
-        </div>
+      <div class="stat-card" id="cardMale" onclick="quickFilterGender('Nam')">
+        <div class="stat-title"><i class="fa-solid fa-mars" style="color:#2563EB;"></i> Nam</div>
+        <div class="stat-num" id="statMale">0</div>
       </div>
-
-      <!-- VĐV Nam (Tách riêng & bấm để lọc nhanh) -->
-      <div onclick="quickFilterGender('Nam')" id="btnGenderMale" class="bg-white p-3 rounded-xl border border-gray-200 hover:border-blue-400 hover:bg-blue-50/30 shadow-xs flex items-center space-x-3 cursor-pointer transition group select-none" title="Bấm để lọc danh sách Nam">
-        <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-lg shrink-0 group-hover:scale-105 transition-transform">
-          <i class="fa-solid fa-mars"></i>
-        </div>
-        <div class="min-w-0">
-          <div class="text-xs text-gray-500 font-medium flex items-center gap-1 truncate">
-            <span>VĐV Nam</span>
-            <i class="fa-solid fa-filter text-[10px] text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
-          </div>
-          <div class="text-lg font-bold text-blue-700" id="statMale">52</div>
-        </div>
+      <div class="stat-card" id="cardFemale" onclick="quickFilterGender('Nữ')">
+        <div class="stat-title"><i class="fa-solid fa-venus" style="color:#DB2777;"></i> Nữ</div>
+        <div class="stat-num" id="statFemale">0</div>
       </div>
-
-      <!-- VĐV Nữ (Tách riêng & bấm để lọc nhanh) -->
-      <div onclick="quickFilterGender('Nữ')" id="btnGenderFemale" class="bg-white p-3 rounded-xl border border-gray-200 hover:border-pink-400 hover:bg-pink-50/30 shadow-xs flex items-center space-x-3 cursor-pointer transition group select-none" title="Bấm để lọc danh sách Nữ">
-        <div class="w-10 h-10 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center font-bold text-lg shrink-0 group-hover:scale-105 transition-transform">
-          <i class="fa-solid fa-venus"></i>
-        </div>
-        <div class="min-w-0">
-          <div class="text-xs text-gray-500 font-medium flex items-center gap-1 truncate">
-            <span>VĐV Nữ</span>
-            <i class="fa-solid fa-filter text-[10px] text-pink-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
-          </div>
-          <div class="text-lg font-bold text-pink-700" id="statFemale">4</div>
-        </div>
+      <div class="stat-card" id="cardTierS" onclick="quickFilterTier('S')">
+        <div class="stat-title"><i class="fa-solid fa-crown" style="color:#C70000;"></i> Hạng S</div>
+        <div class="stat-num" id="statTierS">0</div>
       </div>
-
-      <!-- After Party -->
-      <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-xs flex items-center space-x-3 col-span-2 sm:col-span-1">
-        <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-lg shrink-0">
-          <i class="fa-solid fa-wine-glass"></i>
-        </div>
-        <div class="min-w-0">
-          <div class="text-xs text-gray-500 font-medium truncate">After Party</div>
-          <div class="text-lg font-bold text-emerald-700" id="statParty">38</div>
-        </div>
+      <div class="stat-card" id="cardTierAplus" onclick="quickFilterTier('A+')">
+        <div class="stat-title"><i class="fa-solid fa-medal" style="color:#D9381E;"></i> Hạng A+</div>
+        <div class="stat-num" id="statTierAplus">0</div>
+      </div>
+      <div class="stat-card" id="cardTierA" onclick="quickFilterTier('A')">
+        <div class="stat-title"><i class="fa-solid fa-medal" style="color:#E65100;"></i> Hạng A</div>
+        <div class="stat-num" id="statTierA">0</div>
+      </div>
+      <div class="stat-card" id="cardTierB" onclick="quickFilterTier('B')">
+        <div class="stat-title"><i class="fa-solid fa-star" style="color:#1976D2;"></i> Hạng B</div>
+        <div class="stat-num" id="statTierB">0</div>
+      </div>
+      <div class="stat-card" id="cardTierC" onclick="quickFilterTier('C')">
+        <div class="stat-title"><i class="fa-solid fa-shield-halved" style="color:#00897B;"></i> Hạng C</div>
+        <div class="stat-num" id="statTierC">0</div>
+      </div>
+      <div class="stat-card" id="cardTierD" onclick="quickFilterTier('D')">
+        <div class="stat-title"><i class="fa-solid fa-circle-dot" style="color:#546E7A;"></i> Hạng D</div>
+        <div class="stat-num" id="statTierD">0</div>
       </div>
     </div>
 
-    <!-- Phân bố số lượng từng Hạng kỹ năng: S, A+, A, B, C, D -->
-    <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-xs space-y-2">
-      <div class="flex items-center justify-between text-xs text-gray-500 font-medium px-1">
-        <span class="flex items-center gap-1.5 text-gray-800 font-semibold">
-          <i class="fa-solid fa-chart-simple text-[#C70000]"></i>
-          <span>Thống kê theo từng Hạng kỹ năng</span>
-        </span>
-        <span class="text-[11px] text-gray-400 hidden sm:inline"><i class="fa-solid fa-hand-pointer mr-1 text-[10px]"></i>Bấm vào từng hạng để lọc nhanh danh sách</span>
+    <!-- Filter Bar -->
+    <div class="filter-card">
+      <div class="filter-row">
+        <div class="filter-input">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="searchInput" placeholder="Tìm tên, nickname, email..." oninput="applyFilters()" />
+        </div>
+        <select class="filter-select" id="rankFilter" onchange="applyFilters()">
+          <option value="all">Tất cả các hạng</option>
+          <option value="S">Hạng S</option>
+          <option value="A+">Hạng A+</option>
+          <option value="A">Hạng A</option>
+          <option value="B">Hạng B</option>
+          <option value="C">Hạng C</option>
+          <option value="D">Hạng D</option>
+        </select>
+        <select class="filter-select" id="genderFilter" onchange="applyFilters()">
+          <option value="all">Nam và nữ</option>
+          <option value="Nam">Nam</option>
+          <option value="Nữ">Nữ</option>
+        </select>
+        <select class="filter-select" id="statusFilter" onchange="applyFilters()">
+          <option value="all">Đăng ký giải: tất cả</option>
+          <option value="Đã đăng ký">Đã đăng ký</option>
+          <option value="Chưa đăng ký">Chưa đăng ký</option>
+        </select>
+        <select class="filter-select" id="sortFilter" onchange="applyFilters()">
+          <option value="default">Hạng & điểm (mặc định)</option>
+          <option value="score-desc">Điểm: Cao đến thấp</option>
+          <option value="score-asc">Điểm: Thấp đến cao</option>
+          <option value="name-asc">Tên: A - Z</option>
+        </select>
       </div>
-      
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
-        <!-- Hạng S -->
-        <button id="btnTierQuick-S" onclick="quickFilterTier('S')" class="flex items-center space-x-2.5 p-2.5 rounded-xl border border-gray-200 hover:border-red-400 hover:bg-red-50/40 transition text-left group shadow-2xs">
-          <span class="tier-badge tier-S w-8 h-8 text-xs shrink-0 group-hover:scale-110">S</span>
-          <div class="min-w-0">
-            <div class="text-[11px] text-gray-500 font-medium">Hạng S</div>
-            <div class="text-base font-bold text-gray-900 leading-tight" id="statTierS">4</div>
-          </div>
-        </button>
 
-        <!-- Hạng A+ -->
-        <button id="btnTierQuick-Aplus" onclick="quickFilterTier('A+')" class="flex items-center space-x-2.5 p-2.5 rounded-xl border border-gray-200 hover:border-orange-400 hover:bg-orange-50/40 transition text-left group shadow-2xs">
-          <span class="tier-badge tier-Aplus w-8 h-8 text-xs shrink-0 group-hover:scale-110">A+</span>
-          <div class="min-w-0">
-            <div class="text-[11px] text-gray-500 font-medium">Hạng A+</div>
-            <div class="text-base font-bold text-gray-900 leading-tight" id="statTierAplus">9</div>
-          </div>
-        </button>
-
-        <!-- Hạng A -->
-        <button id="btnTierQuick-A" onclick="quickFilterTier('A')" class="flex items-center space-x-2.5 p-2.5 rounded-xl border border-gray-200 hover:border-amber-400 hover:bg-amber-50/40 transition text-left group shadow-2xs">
-          <span class="tier-badge tier-A w-8 h-8 text-xs shrink-0 group-hover:scale-110">A</span>
-          <div class="min-w-0">
-            <div class="text-[11px] text-gray-500 font-medium">Hạng A</div>
-            <div class="text-base font-bold text-gray-900 leading-tight" id="statTierA">7</div>
-          </div>
-        </button>
-
-        <!-- Hạng B -->
-        <button id="btnTierQuick-B" onclick="quickFilterTier('B')" class="flex items-center space-x-2.5 p-2.5 rounded-xl border border-gray-200 hover:border-blue-400 hover:bg-blue-50/40 transition text-left group shadow-2xs">
-          <span class="tier-badge tier-B w-8 h-8 text-xs shrink-0 group-hover:scale-110">B</span>
-          <div class="min-w-0">
-            <div class="text-[11px] text-gray-500 font-medium">Hạng B</div>
-            <div class="text-base font-bold text-gray-900 leading-tight" id="statTierB">21</div>
-          </div>
-        </button>
-
-        <!-- Hạng C -->
-        <button id="btnTierQuick-C" onclick="quickFilterTier('C')" class="flex items-center space-x-2.5 p-2.5 rounded-xl border border-gray-200 hover:border-teal-400 hover:bg-teal-50/40 transition text-left group shadow-2xs">
-          <span class="tier-badge tier-C w-8 h-8 text-xs shrink-0 group-hover:scale-110">C</span>
-          <div class="min-w-0">
-            <div class="text-[11px] text-gray-500 font-medium">Hạng C</div>
-            <div class="text-base font-bold text-gray-900 leading-tight" id="statTierC">10</div>
-          </div>
-        </button>
-
-        <!-- Hạng D -->
-        <button id="btnTierQuick-D" onclick="quickFilterTier('D')" class="flex items-center space-x-2.5 p-2.5 rounded-xl border border-gray-200 hover:border-gray-400 hover:bg-gray-100/60 transition text-left group shadow-2xs">
-          <span class="tier-badge tier-D w-8 h-8 text-xs shrink-0 group-hover:scale-110">D</span>
-          <div class="min-w-0">
-            <div class="text-[11px] text-gray-500 font-medium">Hạng D</div>
-            <div class="text-base font-bold text-gray-900 leading-tight" id="statTierD">4</div>
-          </div>
-        </button>
+      <div class="filter-meta">
+        <div><i class="fa-solid fa-bolt" style="color:var(--nab-red);"></i> Dữ liệu đồng bộ trực tiếp từ Google Sheets</div>
+        <div id="playerCounter" style="font-weight: 600;">Đang hiển thị: 0 người</div>
       </div>
     </div>
 
-    <!-- Filter Controls Card -->
-    <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-xs space-y-3">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
-        
-        <!-- Search Input -->
-        <div class="lg:col-span-4 relative">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-            <i class="fa-solid fa-magnifying-glass text-sm"></i>
-          </div>
-          <input 
-            type="text" 
-            id="searchInput" 
-            placeholder="Tìm tên, nickname, email..." 
-            oninput="handleFilterChange()"
-            class="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C70000] focus:border-transparent outline-none transition"
-          />
-        </div>
-
-        <!-- Filter Tier -->
-        <div class="lg:col-span-2">
-          <select id="rankFilter" onchange="handleFilterChange()" class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C70000] outline-none bg-white">
-            <option value="all">Tất cả các hạng</option>
-            <option value="S">Hạng S</option>
-            <option value="A+">Hạng A+</option>
-            <option value="A">Hạng A</option>
-            <option value="B">Hạng B</option>
-            <option value="C">Hạng C</option>
-            <option value="D">Hạng D</option>
-          </select>
-        </div>
-
-        <!-- Filter Gender -->
-        <div class="lg:col-span-2">
-          <select id="genderFilter" onchange="handleFilterChange()" class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C70000] outline-none bg-white">
-            <option value="all">Nam và nữ</option>
-            <option value="Nam">Nam</option>
-            <option value="Nữ">Nữ</option>
-          </select>
-        </div>
-
-        <!-- Filter Registration Status -->
-        <div class="lg:col-span-2">
-          <select id="regFilter" onchange="handleFilterChange()" class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C70000] outline-none bg-white">
-            <option value="all">Đăng ký giải: tất cả</option>
-            <option value="Có">Đã đăng ký</option>
-            <option value="Không">Chưa đăng ký</option>
-          </select>
-        </div>
-
-        <!-- Sort Select -->
-        <div class="lg:col-span-2">
-          <select id="sortFilter" onchange="handleFilterChange()" class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C70000] outline-none bg-white font-medium">
-            <option value="default">Hạng & điểm (mặc định)</option>
-            <option value="score-desc">Điểm: Cao đến thấp</option>
-            <option value="score-asc">Điểm: Thấp đến cao</option>
-            <option value="name-asc">Tên người chơi: A - Z</option>
-          </select>
-        </div>
-
-      </div>
-
-      <!-- Filter Metadata Bar -->
-      <div class="pt-3 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3 text-xs text-gray-500">
-        <div class="flex items-center space-x-5">
-          <label class="inline-flex items-center gap-1.5 cursor-pointer select-none">
-            <input type="checkbox" id="chkShowSkills" checked onchange="toggleAllVisuals()" class="rounded text-[#C70000] focus:ring-[#C70000]" />
-            <span class="text-gray-700 font-medium">Điểm 8 kỹ năng</span>
-          </label>
-          <label class="inline-flex items-center gap-1.5 cursor-pointer select-none">
-            <input type="checkbox" id="chkShowProfile" checked onchange="toggleAllVisuals()" class="rounded text-[#C70000] focus:ring-[#C70000]" />
-            <span class="text-gray-700 font-medium">Hồ sơ người chơi</span>
-          </label>
-        </div>
-        <div class="font-semibold text-gray-700" id="playerCountDisplay">
-          Hiện 56/56 người
-        </div>
-      </div>
+    <!-- Table Header -->
+    <div class="list-header">
+      <div>#</div>
+      <div>Người chơi</div>
+      <div>Hạng</div>
+      <div>Điểm</div>
+      <div>Giới tính</div>
+      <div>Đã đăng ký giải</div>
+      <div>Email</div>
+      <div>Cập nhật</div>
+      <div style="text-align: right;">Thao tác</div>
     </div>
 
-    <!-- Table Header for Desktop -->
-  <div class="hidden md:grid grid-cols-12 gap-3 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500 items-center">
-    <div class="col-span-1 text-center">#</div>
-    <div class="col-span-3">Người chơi</div>
-    <div class="col-span-1 text-center">Hạng</div>
-    <div class="col-span-1 text-center">Điểm</div>
-    <div class="col-span-1 text-center">Giới tính</div>
-    <div class="col-span-2 text-center">Đã đăng ký giải</div>
-    <div class="col-span-2">Email</div>
-    <div class="col-span-1 text-right">Thao tác</div>
-  </div>
-
-  <!-- Player Cards / List Container -->
-  <div id="playerListContainer" class="space-y-2.5">
-    <!-- Injected dynamically by JavaScript -->
-  </div>
-
-</main>
-
-  <!-- Modal cấu hình Google Spreadsheet -->
-  <div id="sheetConfigModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-gray-200 space-y-4">
-      <div class="flex items-center justify-between border-b pb-3">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-lg bg-green-100 text-green-700 flex items-center justify-center font-bold text-sm">
-            <i class="fa-solid fa-table"></i>
-          </div>
-          <h3 class="font-bold text-gray-900 text-base sm:text-lg">Cấu hình Google Spreadsheet trực tiếp</h3>
-        </div>
-        <button onclick="closeSheetConfigModal()" class="text-gray-400 hover:text-gray-600 p-1">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-
-      <div class="space-y-3 text-xs text-gray-600">
-        <p>
-          Hệ thống lấy dữ liệu trực tiếp và cập nhật thời gian thực từ Google Sheets có quyền chia sẻ <strong>"Bất kỳ ai có đường liên kết đều có thể xem" (Anyone with link can view)</strong>.
-        </p>
-
-        <div>
-          <label class="block text-xs font-semibold text-gray-700 mb-1">Đường dẫn Google Spreadsheet:</label>
-          <input 
-            type="text" 
-            id="sheetUrlInput" 
-            placeholder="https://docs.google.com/spreadsheets/d/..."
-            class="w-full text-xs font-mono p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C70000] outline-none"
-          />
-        </div>
-
-        <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-800 text-[11px] space-y-1">
-          <div class="font-semibold flex items-center gap-1">
-            <i class="fa-solid fa-circle-info text-amber-600"></i>
-            <span>Lưu ý về quyền xem:</span>
-          </div>
-          <p>Trên Google Sheets, vào nút <strong>Chia sẻ (Share)</strong> ➔ Chuyển quyền chung sang <strong>"Bất kỳ ai có đường liên kết"</strong> (Quyền: Người xem).</p>
-        </div>
-
-        <div class="flex items-center justify-between pt-1 text-[11px] text-gray-500">
-          <span id="lastSyncedTimeDisplay">Chưa đồng bộ</span>
-          <a href="https://docs.google.com/spreadsheets/d/18NLI0v073EIZezHwbwKx5zfrHNTarPx899hNCJBqSBg/edit?usp=sharing" target="_blank" class="text-blue-600 hover:underline">
-            Mở Sheet hiện tại <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
-          </a>
-        </div>
-      </div>
-
-      <div class="flex items-center justify-end gap-2 pt-2 border-t">
-        <button onclick="closeSheetConfigModal()" class="px-4 py-2 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg">
-          Đóng
-        </button>
-        <button onclick="saveAndSyncSheetConfig()" class="px-4 py-2 text-xs font-semibold text-white bg-[#C70000] hover:bg-[#A50000] rounded-lg shadow-sm flex items-center gap-1.5">
-          <i class="fa-solid fa-arrows-rotate text-xs"></i>
-          <span>Lưu & Đồng bộ ngay</span>
-        </button>
-      </div>
+    <!-- Loading State -->
+    <div id="loadingSpinner">
+      <div class="spinner"></div>
+      <div>Đang đồng bộ dữ liệu từ Google Sheets...</div>
     </div>
+
+    <!-- List Container -->
+    <div id="playerListContainer"></div>
   </div>
-
-  <!-- Modal dán dữ liệu nhanh từ Excel / Google Sheets hoặc JSON -->
-  <div id="pasteModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-gray-200 space-y-4">
-      <div class="flex items-center justify-between border-b pb-3">
-        <div class="flex items-center gap-2">
-          <i class="fa-solid fa-clipboard-list text-[#C70000] text-lg"></i>
-          <h3 class="font-bold text-gray-900 text-base sm:text-lg">Dán dữ liệu danh sách người chơi</h3>
-        </div>
-        <button onclick="closePasteModal()" class="text-gray-400 hover:text-gray-600 p-1">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-
-      <p class="text-xs text-gray-600 leading-relaxed">
-        Bạn có thể <strong>copy các dòng từ Excel / Google Sheets</strong> (bao gồm cả dòng tiêu đề cột) rồi nhấn <kbd class="px-1.5 py-0.5 bg-gray-100 border rounded font-mono text-[11px]">Ctrl + V</kbd> vào ô bên dưới, hoặc dán mảng dữ liệu định dạng <strong>JSON</strong>.
-      </p>
-
-      <textarea 
-        id="pasteTextarea" 
-        rows="9" 
-        placeholder="Sao chép các dòng trong Excel và dán (Ctrl+V) vào đây..."
-        class="w-full text-xs font-mono p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#C70000] outline-none"
-      ></textarea>
-
-      <div class="flex items-center justify-between pt-2">
-        <button onclick="copySampleTemplate()" class="text-xs text-blue-600 hover:underline flex items-center gap-1">
-          <i class="fa-regular fa-copy"></i>
-          <span>Sao chép mẫu JSON chuẩn</span>
-        </button>
-        <div class="flex items-center gap-2">
-          <button onclick="closePasteModal()" class="px-4 py-2 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg">
-            Hủy
-          </button>
-          <button onclick="applyPastedData()" class="px-4 py-2 text-xs font-semibold text-white bg-[#C70000] hover:bg-[#A50000] rounded-lg shadow-sm">
-            Áp dụng dữ liệu
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast alert box for user messages (no window.alert) -->
-  <div id="toastMessage" class="fixed bottom-6 right-6 z-50 bg-gray-900 text-white px-4 py-3 rounded-lg shadow-xl border-l-4 border-[#C70000] flex items-center space-x-3">
-    <i class="fa-solid fa-circle-info text-[#C70000]"></i>
-    <span id="toastText" class="text-sm font-medium">Thông báo</span>
-  </div>
-
-  <footer class="mt-auto border-t border-gray-200 bg-white py-4 text-center text-xs text-gray-500">
-    <p>© 2026 National Australia Bank (NAB) Hanoi Badminton Club • Giải đấu thường niên NAB Championship</p>
-  </footer>
 
   <script>
-    // =========================================================================================
-    // CẤU HÌNH DỮ LIỆU ĐỘNG: 100% DỮ LIỆU ĐƯỢC LẤY TRỰC TIẾP TỪ GOOGLE SPREADSHEET
-    // Không còn bất kỳ dữ liệu mẫu (mock data) nào trong mã nguồn.
-    // =========================================================================================
-    const DEFAULT_GSHEET_URL = "https://docs.google.com/spreadsheets/d/18NLI0v073EIZezHwbwKx5zfrHNTarPx899hNCJBqSBg/edit?usp=sharing";
-    const CACHE_KEY = "nab_badminton_sheet_players_cache";
-    let activeGoogleSheetUrl = localStorage.getItem('nab_badminton_sheet_url') || DEFAULT_GSHEET_URL;
-
-    // Danh sách người chơi thực tế, khởi tạo rỗng
+    const SPREADSHEET_ID = "18NLI0v073EIZezHwbwKx5zfrHNTarPx899hNCJBqSBg";
     let currentPlayers = [];
-    let chartInstances = {};
+    const chartInstances = {};
 
-    // Khởi chạy ứng dụng
-    function initApp() {
-      setupExcelUpload();
-
-      const urlInput = document.getElementById('sheetUrlInput');
-      if (urlInput) urlInput.value = activeGoogleSheetUrl;
-
-      // Thử đọc dữ liệu đã đồng bộ từ phiên làm việc trước trong LocalStorage (nếu có) để hiển thị tức thì
-      let hasCachedData = false;
-      try {
-        const cachedRaw = localStorage.getItem(CACHE_KEY);
-        if (cachedRaw) {
-          const cachedPlayers = JSON.parse(cachedRaw);
-          if (Array.isArray(cachedPlayers) && cachedPlayers.length > 0) {
-            currentPlayers = cachedPlayers;
-            renderPlayerList(currentPlayers);
-            updateSummaryKPIs(currentPlayers);
-            hasCachedData = true;
-          }
-        }
-      } catch (e) {
-        console.warn("Lỗi đọc cache LocalStorage:", e);
-      }
-
-      // Nếu chưa có dữ liệu nào trong cache, hiển thị hiệu ứng đang tải
-      if (!hasCachedData) {
-        showLoadingState();
-      }
-
-      // Tự động kéo dữ liệu mới nhất từ Google Spreadsheet về máy
-      syncFromGoogleSheet(false);
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initApp);
-    } else {
-      initApp();
-    }
-
-    function showLoadingState() {
-      const container = document.getElementById('playerListContainer');
-      const counter = document.getElementById('playerCountDisplay');
-      if (counter) counter.innerText = 'Đang tải dữ liệu...';
-
-      if (container) {
-        container.innerHTML = `
-          <div class="bg-white rounded-xl border border-gray-200 p-12 text-center space-y-4 shadow-xs">
-            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-50 text-[#C70000]">
-              <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
-            </div>
-            <div class="space-y-1">
-              <h3 class="text-base font-bold text-gray-900">Đang kết nối Google Spreadsheet...</h3>
-              <p class="text-xs text-gray-500 max-w-md mx-auto">
-                Hệ thống đang tải danh sách người chơi, điểm kỹ năng và tình trạng đăng ký giải đấu.
-              </p>
-            </div>
-          </div>
-        `;
-      }
-    }
-
-    function showErrorState(message) {
-      const container = document.getElementById('playerListContainer');
-      if (container && currentPlayers.length === 0) {
-        container.innerHTML = `
-          <div class="bg-white rounded-xl border border-red-200 p-10 text-center space-y-3 shadow-xs">
-            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 text-[#C70000]">
-              <i class="fa-solid fa-triangle-exclamation text-xl"></i>
-            </div>
-            <div class="space-y-1">
-              <h3 class="text-base font-bold text-gray-900">Chưa thể tải dữ liệu từ Google Sheets</h3>
-              <p class="text-xs text-gray-500 max-w-md mx-auto">${message}</p>
-            </div>
-            <div class="pt-2 flex items-center justify-center gap-2">
-              <button onclick="syncFromGoogleSheet(true)" class="px-4 py-2 bg-[#C70000] text-white text-xs font-semibold rounded-lg hover:bg-[#A50000] transition">
-                <i class="fa-solid fa-rotate-right mr-1.5"></i>Thử lại
-              </button>
-              <button onclick="openSheetConfigModal()" class="px-4 py-2 bg-gray-100 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-200 transition">
-                <i class="fa-solid fa-gear mr-1.5"></i>Kiểm tra liên kết
-              </button>
-            </div>
-          </div>
-        `;
-      }
-    }
-
-    // Phân tích link Sheet để lấy Sheet ID và GID
-    function parseGoogleSheetUrl(url) {
-      if (!url) return null;
-      const idMatch = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-      if (!idMatch || !idMatch[1]) return null;
-      
-      const sheetId = idMatch[1];
-      const gidMatch = url.match(/[#&?]gid=([0-9]+)/);
-      const gid = gidMatch ? gidMatch[1] : null;
-
-      return { sheetId, gid };
-    }
-
-    // Đồng bộ trực tiếp từ Google Sheets qua Visualization API & JSONP
-    async function syncFromGoogleSheet(isUserTriggered = false) {
-      const parsed = parseGoogleSheetUrl(activeGoogleSheetUrl);
-      if (!parsed) {
-        if (isUserTriggered) showToast("Đường dẫn Google Spreadsheet không đúng định dạng!");
-        showErrorState("Đường dẫn Google Spreadsheet không hợp lệ.");
-        return;
-      }
-
-      const syncIcon = document.getElementById('syncIcon');
-      const statusBadge = document.getElementById('syncStatusBadge');
-      const statusText = document.getElementById('syncStatusText');
-
-      if (syncIcon) syncIcon.classList.add('fa-spin');
-      if (statusText) statusText.innerText = "Đang đồng bộ...";
-
-      try {
-        let gvizData = null;
-        const gidParam = parsed.gid ? `&gid=${parsed.gid}` : '';
-
-        // Phương thức 1: Fetch trực tiếp JSON
-        const gvizUrl = `https://docs.google.com/spreadsheets/d/${parsed.sheetId}/gviz/tq?tqx=out:json${gidParam}`;
+    window.addEventListener('DOMContentLoaded', () => {
+      // Ưu tiên nạp cache cũ nếu có để load tức thì
+      const cached = localStorage.getItem('nab_badminton_players');
+      if (cached) {
         try {
-          const res = await fetch(gvizUrl);
-          if (res.ok) {
-            const rawText = await res.text();
-            const jsonMatch = rawText.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?/);
-            if (jsonMatch && jsonMatch[1]) {
-              gvizData = JSON.parse(jsonMatch[1]);
+          currentPlayers = JSON.parse(cached);
+          updateKPIs(currentPlayers);
+          applyFilters();
+          document.getElementById('loadingSpinner').style.display = 'none';
+        } catch (e) {}
+      }
+      // Luôn tự động kéo dữ liệu mới nhất
+      syncFromGoogleSheet();
+    });
+
+    // Hàm lấy giá trị chính xác với cơ chế loại trừ (Exclusion Rules)
+    function getValSmart(row, exactKeys, fallbackKeywords = [], excludeKeywords = []) {
+      const keys = Object.keys(row);
+      
+      // 1. Đối soát chính xác tuyệt đối (không phân biệt hoa thường)
+      for (const k of keys) {
+        const kClean = k.trim().toLowerCase();
+        for (const ek of exactKeys) {
+          if (kClean === ek.trim().toLowerCase()) {
+            const val = row[k];
+            if (val !== undefined && val !== null && String(val).trim() !== '') {
+              return val;
             }
           }
-        } catch (fetchErr) {
-          console.warn("Direct fetch gặp hạn chế, chuyển sang chế độ JSONP...", fetchErr);
         }
+      }
 
-        // Phương thức 2: JSONP Script injection (vượt qua mọi giới hạn CORS)
-        if (!gvizData || !gvizData.table) {
-          gvizData = await fetchGoogleSheetJSONP(parsed.sheetId, parsed.gid);
-        }
+      // 2. Đối soát từ khóa dự phòng nếu có loại trừ (Exclusion)
+      for (const k of keys) {
+        const kClean = k.trim().toLowerCase();
+        // Bỏ qua nếu cột chứa các từ cấm loại trừ
+        const isExcluded = excludeKeywords.some(ex => kClean.includes(ex.toLowerCase()));
+        if (isExcluded) continue;
 
-        if (gvizData && gvizData.table) {
-          const parsedPlayers = parseGvizTableToPlayers(gvizData.table);
-          if (parsedPlayers.length > 0) {
-            currentPlayers = parsedPlayers;
-
-            // Lưu vào cache LocalStorage để mở lần sau không phải đợi
-            try {
-              localStorage.setItem(CACHE_KEY, JSON.stringify(parsedPlayers));
-            } catch (cacheErr) {}
-
-            handleFilterChange();
-            updateSummaryKPIs(currentPlayers);
-
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            
-            if (statusText) statusText.innerText = `Đã đồng bộ (${timeStr})`;
-            if (statusBadge) statusBadge.classList.remove('hidden');
-
-            const lastSyncEl = document.getElementById('lastSyncedTimeDisplay');
-            if (lastSyncEl) lastSyncEl.innerText = `Đồng bộ lần cuối: ${timeStr} (${parsedPlayers.length} người)`;
-
-            showToast(`Đã tải thành công ${parsedPlayers.length} người chơi từ Google Sheet!`);
-            return;
+        for (const fk of fallbackKeywords) {
+          if (kClean.includes(fk.toLowerCase())) {
+            const val = row[k];
+            if (val !== undefined && val !== null && String(val).trim() !== '') {
+              return val;
+            }
           }
         }
-
-        throw new Error("Không tìm thấy dữ liệu dòng nào trong sheet.");
-      } catch (err) {
-        console.error("Google Sheets Sync Error:", err);
-        if (statusText) statusText.innerText = "Lỗi kết nối Sheet";
-        if (isUserTriggered) {
-          showToast("Không thể tải Google Sheet. Kiểm tra quyền 'Bất kỳ ai có liên kết'!");
-        }
-        showErrorState("Vui lòng kiểm tra quyền chia sẻ Google Sheet (chọn 'Bất kỳ ai có liên kết đều có thể xem').");
-      } finally {
-        if (syncIcon) syncIcon.classList.remove('fa-spin');
       }
+      return '';
     }
 
-    function fetchGoogleSheetJSONP(sheetId, gid) {
-      return new Promise((resolve, reject) => {
-        const callbackName = 'gvizCallback_' + Math.floor(Math.random() * 1000000);
-        const script = document.createElement('script');
-        
-        const timeout = setTimeout(() => {
-          cleanup();
-          reject(new Error('Quá thời gian phản hồi từ Google Sheets'));
-        }, 9000);
-
-        function cleanup() {
-          clearTimeout(timeout);
-          delete window[callbackName];
-          if (script.parentNode) script.parentNode.removeChild(script);
-        }
-
-        window[callbackName] = function(data) {
-          cleanup();
-          resolve(data);
-        };
-
-        script.src = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=responseHandler:${callbackName}${gid ? '&gid=' + gid : ''}`;
-        script.onerror = function(err) {
-          cleanup();
-          reject(err);
-        };
-        document.body.appendChild(script);
-      });
+    function parseNumeric(val, fallback = 0) {
+      if (val === undefined || val === null || val === '') return fallback;
+      const num = parseFloat(String(val).replace(',', '.'));
+      return isNaN(num) ? fallback : num;
     }
 
-    function parseGvizTableToPlayers(table) {
-      const cols = table.cols || [];
-      const rows = table.rows || [];
-      if (!rows || rows.length === 0) return [];
+    // Đồng bộ từ Google Sheets qua GViz JSON API
+    function syncFromGoogleSheet() {
+      const spinner = document.getElementById('loadingSpinner');
+      spinner.style.display = 'block';
 
-      let headerNames = [];
-      let dataStartIndex = 0;
+      const gvizUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&tq=&timestamp=${Date.now()}`;
 
-      const hasColLabels = cols.some(c => c && c.label && c.label.trim().length > 0);
-      if (hasColLabels) {
-        headerNames = cols.map(c => (c && c.label) ? c.label.trim().toLowerCase() : '');
-        dataStartIndex = 0;
-      } else {
-        headerNames = rows[0].c.map(cell => (cell && cell.v !== null && cell.v !== undefined) ? String(cell.v).trim().toLowerCase() : '');
-        dataStartIndex = 1;
-      }
-
-      function findIdx(keywords) {
-        for (let i = 0; i < headerNames.length; i++) {
-          const h = headerNames[i];
-          for (const kw of keywords) {
-            if (h.includes(kw)) return i;
-          }
-        }
-        return -1;
-      }
-
-      const colIdx = {
-        bxh: findIdx(['hạng bxh', 'bxh', 'stt', 'thứ hạng', 'rank', '#']),
-        name: findIdx(['họ và tên', 'họ tên', 'tên người chơi', 'vận động viên', 'vdv', 'player', 'name']),
-        nick: findIdx(['nickname', 'nick name', 'biệt danh', 'nick']),
-        email: findIdx(['email', 'thư điện tử', 'mail']),
-        gender: findIdx(['giới tính', 'gender', 'nam/nữ']),
-        tier: findIdx(['hạng kỹ năng', 'kỹ năng', 'hạng', 'tier', 'level']),
-        score: findIdx(['điểm', 'score', 'point']),
-        years: findIdx(['đã chơi được bao lâu', 'thâm niên', 'bao lâu', 'years']),
-        freq: findIdx(['tần suất tập', 'tần suất', 'buổi/tuần', 'buổi / tuần']),
-        exp: findIdx(['kinh nghiệm thi đấu', 'kinh nghiệm', 'giải đấu']),
-        role: findIdx(['vai trò khi đánh đôi', 'vai trò đánh đôi', 'vai trò', 'role']),
-        skillPhat: findIdx(['phát cầu', 'giao cầu', 'phát']),
-        skillPhong: findIdx(['phông & khống chế', 'phông', 'khống chế']),
-        skillLuoi: findIdx(['cầu lưới', 'lưới']),
-        skillDap: findIdx(['đập cầu', 'đập', 'smash']),
-        skillDiChuyen: findIdx(['di chuyển & vị trí', 'di chuyển', 'bộ chân']),
-        skillPhongThu: findIdx(['phòng thủ', 'đỡ đập', 'thủ']),
-        skillDanhDoi: findIdx(['phối hợp đánh đôi', 'đánh đôi', 'phối hợp']),
-        skillChienThuat: findIdx(['chiến thuật', 'tư duy']),
-        source: findIdx(['nguồn điểm', 'nguồn', 'trạng thái']),
-        registered: findIdx(['đã đăng ký giải', 'đăng ký giải', 'đăng ký']),
-        events: findIdx(['nội dung đăng ký', 'nội dung', 'hạng mục']),
-        party: findIdx(['tham gia after party', 'after party', 'party', 'tiệc']),
-        fee: findIdx(['trạng thái phí', 'lệ phí', 'phí']),
-        updated: findIdx(['ngày tự đánh giá', 'ngày cập nhật', 'ngày'])
-      };
-
-      function getVal(row, idx) {
-        if (idx === -1 || !row.c || !row.c[idx]) return '';
-        const cell = row.c[idx];
-        if (cell.v !== null && cell.v !== undefined) return cell.v;
-        if (cell.f !== null && cell.f !== undefined) return cell.f;
-        return '';
-      }
-
-      const players = [];
-      for (let i = dataStartIndex; i < rows.length; i++) {
-        const r = rows[i];
-        if (!r || !r.c) continue;
-
-        let name = String(getVal(r, colIdx.name)).trim();
-        if (!name) name = String(getVal(r, 1)).trim();
-        if (!name || name.toLowerCase() === 'họ và tên' || name.toLowerCase() === 'name') continue;
-
-        const bxhVal = parseInt(getVal(r, colIdx.bxh)) || (players.length + 1);
-        const scoreRaw = getVal(r, colIdx.score);
-        const score = isNaN(parseFloat(scoreRaw)) ? 0 : parseFloat(parseFloat(scoreRaw).toFixed(2));
-
-        let tier = String(getVal(r, colIdx.tier)).trim();
-        if (!tier || tier === 'null' || tier === 'undefined') {
-          if (score >= 4.3) tier = 'S';
-          else if (score >= 3.3) tier = 'A+';
-          else if (score >= 3.0) tier = 'A';
-          else if (score >= 2.2) tier = 'B';
-          else if (score >= 1.8) tier = 'C';
-          else if (score > 0) tier = 'D';
-          else tier = 'Chưa xếp';
-        }
-
-        const safeFloat = (val, fallback = 3.0) => {
-          const num = parseFloat(val);
-          return isNaN(num) ? fallback : num;
-        };
-
-        players.push({
-          id: i + 1,
-          bxh: bxhVal,
-          name: name,
-          nick: String(getVal(r, colIdx.nick)).trim(),
-          email: String(getVal(r, colIdx.email)).trim(),
-          gender: String(getVal(r, colIdx.gender)).trim() || 'Nam',
-          tier: tier,
-          score: score,
-          years: String(getVal(r, colIdx.years)).trim() || '1–3 năm',
-          freq: String(getVal(r, colIdx.freq)).trim() || '1–2 buổi / tuần',
-          exp: String(getVal(r, colIdx.exp)).trim() || 'Giao lưu nội bộ',
-          role: String(getVal(r, colIdx.role)).trim() || 'Linh hoạt',
-          skills: {
-            Phat: safeFloat(getVal(r, colIdx.skillPhat)),
-            Phong: safeFloat(getVal(r, colIdx.skillPhong)),
-            Luoi: safeFloat(getVal(r, colIdx.skillLuoi)),
-            Dap: safeFloat(getVal(r, colIdx.skillDap)),
-            DiChuyen: safeFloat(getVal(r, colIdx.skillDiChuyen)),
-            PhongThu: safeFloat(getVal(r, colIdx.skillPhongThu)),
-            DanhDoi: safeFloat(getVal(r, colIdx.skillDanhDoi)),
-            ChienThuat: safeFloat(getVal(r, colIdx.skillChienThuat))
-          },
-          source: String(getVal(r, colIdx.source)).trim() || 'Google Sheets',
-          registered: String(getVal(r, colIdx.registered)).trim() || 'Có',
-          events: String(getVal(r, colIdx.events)).trim() || 'Men Double',
-          party: String(getVal(r, colIdx.party)).trim() || 'Yes',
-          fee: String(getVal(r, colIdx.fee)).trim() || 'Đã đóng',
-          updated: String(getVal(r, colIdx.updated)).trim() || '16/09/2026'
-        });
-      }
-
-      return players;
-    }
-
-    function openSheetConfigModal() {
-      const modal = document.getElementById('sheetConfigModal');
-      const input = document.getElementById('sheetUrlInput');
-      if (input) input.value = activeGoogleSheetUrl;
-      if (modal) modal.classList.remove('hidden');
-    }
-
-    function closeSheetConfigModal() {
-      const modal = document.getElementById('sheetConfigModal');
-      if (modal) modal.classList.add('hidden');
-    }
-
-    function saveAndSyncSheetConfig() {
-      const input = document.getElementById('sheetUrlInput');
-      const newUrl = input ? input.value.trim() : '';
-      if (!newUrl) {
-        showToast("Vui lòng nhập đường dẫn Google Spreadsheet!");
-        return;
-      }
-
-      const parsed = parseGoogleSheetUrl(newUrl);
-      if (!parsed) {
-        showToast("Đường dẫn Google Spreadsheet không hợp lệ!");
-        return;
-      }
-
-      activeGoogleSheetUrl = newUrl;
-      localStorage.setItem('nab_badminton_sheet_url', newUrl);
-
-      const linkBtn = document.getElementById('btnOpenSheetLink');
-      if (linkBtn) linkBtn.href = newUrl;
-
-      closeSheetConfigModal();
-      syncFromGoogleSheet(true);
-    }
-
-    function showToast(message) {
-      const toast = document.getElementById('toastMessage');
-      const text = document.getElementById('toastText');
-      if (text) text.innerText = message;
-      if (toast) {
-        toast.classList.add('show');
-        setTimeout(() => {
-          toast.classList.remove('show');
-        }, 3500);
-      }
-    }
-
-    // Đặt lại bộ lọc và đồng bộ lại từ Google Sheets (không còn reset về mock data)
-    function resetToInitialData() {
-      const searchEl = document.getElementById('searchInput');
-      const rankEl = document.getElementById('rankFilter');
-      const genderEl = document.getElementById('genderFilter');
-      const regEl = document.getElementById('regFilter');
-      const sortEl = document.getElementById('sortFilter');
-      
-      if (searchEl) searchEl.value = '';
-      if (rankEl) rankEl.value = 'all';
-      if (genderEl) genderEl.value = 'all';
-      if (regEl) regEl.value = 'all';
-      if (sortEl) sortEl.value = 'default';
-
-      syncFromGoogleSheet(true);
-    }
-
-    function openPasteModal() {
-      const modal = document.getElementById('pasteModal');
-      if (modal) {
-        modal.classList.remove('hidden');
-        document.getElementById('pasteTextarea').focus();
-      }
-    }
-
-    function closePasteModal() {
-      const modal = document.getElementById('pasteModal');
-      if (modal) modal.classList.add('hidden');
-    }
-
-    function copySampleTemplate() {
-      const sample = JSON.stringify([
-        {
-          "bxh": 1,
-          "name": "Nguyễn Văn A",
-          "nick": "Alex",
-          "email": "a.nguyen@nab.com.au",
-          "gender": "Nam",
-          "tier": "A",
-          "score": 3.8,
-          "years": "3–5 năm",
-          "freq": "2 buổi / tuần",
-          "exp": "Giao lưu nội bộ",
-          "role": "Linh hoạt",
-          "skills": { "Phat": 4, "Phong": 4, "Luoi": 3.5, "Dap": 4, "DiChuyen": 3.5, "PhongThu": 3.5, "DanhDoi": 4, "ChienThuat": 3.5 },
-          "registered": "Có",
-          "events": "Men Double",
-          "party": "Yes"
-        }
-      ], null, 2);
-
-      const tempInput = document.createElement("textarea");
-      tempInput.value = sample;
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      document.execCommand("copy");
-      document.body.removeChild(tempInput);
-      showToast("Đã copy mẫu JSON vào bộ nhớ tạm!");
-    }
-
-    function applyPastedData() {
-      const raw = document.getElementById('pasteTextarea').value.trim();
-      if (!raw) {
-        showToast("Vui lòng dán dữ liệu vào ô trước!");
-        return;
-      }
-
-      try {
-        if (raw.startsWith('[') && raw.endsWith(']')) {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            currentPlayers = parsed.map((item, idx) => ({
-              id: idx + 1,
-              bxh: item.bxh || (idx + 1),
-              name: item.name || 'Người chơi ' + (idx + 1),
-              nick: item.nick || '',
-              email: item.email || '',
-              gender: item.gender || 'Nam',
-              tier: item.tier || 'B',
-              score: parseFloat(item.score) || 0,
-              years: item.years || '1–3 năm',
-              freq: item.freq || '1–2 buổi / tuần',
-              exp: item.exp || 'Giao lưu nội bộ',
-              role: item.role || 'Linh hoạt',
-              skills: item.skills || { Phat: 3, Phong: 3, Luoi: 3, Dap: 3, DiChuyen: 3, PhongThu: 3, DanhDoi: 3, ChienThuat: 3 },
-              source: item.source || 'Admin',
-              registered: item.registered || 'Có',
-              events: item.events || 'Men Double',
-              party: item.party || 'Yes',
-              fee: item.fee || 'Đã đóng',
-              updated: item.updated || '2026'
-            }));
-            closePasteModal();
-            handleFilterChange();
-            updateSummaryKPIs(currentPlayers);
-            showToast(`Đã nạp ${currentPlayers.length} người chơi từ JSON thành công!`);
-            return;
-          }
-        }
-
-        const lines = raw.split(/\r?\n/).filter(line => line.trim().length > 0);
-        if (lines.length > 1) {
-          const headers = lines[0].split('\t').map(h => h.trim().toLowerCase());
+      fetch(gvizUrl)
+        .then(res => res.text())
+        .then(text => {
+          const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/);
+          if (!match) throw new Error("Không thể parse dữ liệu Google Sheets");
           
-          const newPlayers = [];
-          for (let i = 1; i < lines.length; i++) {
-            const cols = lines[i].split('\t').map(c => c.trim());
+          const gvizData = JSON.parse(match[1]);
+          const cols = gvizData.table.cols.map((c, i) => (c && c.label && c.label.trim()) || `Col_${i}`);
+          
+          const rows = gvizData.table.rows.map(r => {
             const rowObj = {};
-            headers.forEach((h, colIndex) => {
-              rowObj[h] = cols[colIndex] || '';
+            r.c.forEach((cell, idx) => {
+              const colName = cols[idx];
+              rowObj[colName] = cell ? (cell.v !== null ? cell.v : cell.f) : '';
             });
+            return rowObj;
+          });
 
-            const name = rowObj['họ và tên'] || rowObj['họ tên'] || rowObj['name'] || cols[1] || cols[0];
-            if (!name) continue;
+          currentPlayers = rows.map((r, idx) => {
+            // Hạng kỹ năng (LOẠI TRỪ Hạng BXH)
+            let tier = getValSmart(r, ['Hạng kỹ năng', 'Tier', 'Hạng', 'Rank'], ['kỹ năng', 'tier'], ['bxh', 'xếp hạng', 'thứ tự']);
+            tier = String(tier).toUpperCase().trim();
+            if (tier.includes('S')) tier = 'S';
+            else if (tier.includes('A+')) tier = 'A+';
+            else if (tier.includes('A')) tier = 'A';
+            else if (tier.includes('B')) tier = 'B';
+            else if (tier.includes('C')) tier = 'C';
+            else if (tier.includes('D')) tier = 'D';
+            else tier = 'Chưa xếp';
 
-            newPlayers.push({
-              id: i,
-              bxh: parseInt(rowObj['hạng bxh'] || rowObj['stt'] || i),
-              name: name,
-              nick: rowObj['nickname'] || rowObj['nick'] || '',
-              email: rowObj['email'] || '',
-              gender: rowObj['giới tính'] || rowObj['gender'] || 'Nam',
-              tier: rowObj['hạng kỹ năng'] || rowObj['hạng'] || rowObj['tier'] || 'B',
-              score: parseFloat(rowObj['điểm'] || rowObj['score'] || 0) || 0,
-              years: rowObj['đã chơi được bao lâu?'] || rowObj['thâm niên'] || '1-3 năm',
-              freq: rowObj['tần suất tập'] || '1–2 buổi / tuần',
-              exp: rowObj['kinh nghiệm thi đấu'] || 'Giao lưu',
-              role: rowObj['vai trò khi đánh đôi'] || rowObj['vai trò'] || 'Linh hoạt',
-              skills: {
-                Phat: parseFloat(rowObj['phát cầu'] || 3.0),
-                Phong: parseFloat(rowObj['phông & khống chế'] || 3.0),
-                Luoi: parseFloat(rowObj['cầu lưới'] || 3.0),
-                Dap: parseFloat(rowObj['đập cầu'] || 3.0),
-                DiChuyen: parseFloat(rowObj['di chuyển & vị trí'] || 3.0),
-                PhongThu: parseFloat(rowObj['phòng thủ'] || 3.0),
-                DanhDoi: parseFloat(rowObj['phối hợp đánh đôi'] || 3.0),
-                ChienThuat: parseFloat(rowObj['chiến thuật'] || 3.0)
-              },
-              source: 'Đã nhập',
-              registered: rowObj['đã đăng ký giải'] || 'Có',
-              events: rowObj['nội dung đăng ký'] || 'Men Double',
-              party: rowObj['tham gia after party'] || 'Yes',
-              fee: rowObj['trạng thái phí'] || 'Đã đóng',
-              updated: '16/09/2026'
-            });
-          }
+            // Điểm số (LOẠI TRỪ Nguồn điểm)
+            const rawScore = getValSmart(r, ['Điểm', 'Score'], ['điểm'], ['nguồn']);
+            const score = parseNumeric(rawScore, 0).toFixed(2);
 
-          if (newPlayers.length > 0) {
-            currentPlayers = newPlayers;
-            closePasteModal();
-            handleFilterChange();
-            updateSummaryKPIs(currentPlayers);
-            showToast(`Đã nhận diện & nạp ${currentPlayers.length} người chơi từ bảng tính!`);
-            return;
-          }
-        }
+            // 8 Kỹ năng: ĐẶC BIỆT ĐÁNH ĐÔI LOẠI TRỪ 'vai trò'
+            const skills = {
+              "Phát": parseNumeric(getValSmart(r, ['Phát cầu', 'Phát', 'Serve'], ['phát'])),
+              "Phông": parseNumeric(getValSmart(r, ['Phông & khống chế', 'Phông', 'Clear'], ['phông'])),
+              "Lưới": parseNumeric(getValSmart(r, ['Cầu lưới', 'Lưới', 'Net'], ['lưới'])),
+              "Đập": parseNumeric(getValSmart(r, ['Đập cầu', 'Đập', 'Smash'], ['đập'])),
+              "Di chuyển": parseNumeric(getValSmart(r, ['Di chuyển & vị trí', 'Di chuyển', 'Footwork'], ['di chuyển'])),
+              "Phòng thủ": parseNumeric(getValSmart(r, ['Phòng thủ', 'Thủ', 'Defense'], ['phòng thủ'])),
+              "Đánh đôi": parseNumeric(getValSmart(r, ['Phối hợp đánh đôi', 'Phối hợp'], ['phối hợp', 'đánh đôi'], ['vai trò'])),
+              "Chiến thuật": parseNumeric(getValSmart(r, ['Chiến thuật', 'Tactics'], ['chiến thuật']))
+            };
 
-        showToast("Không nhận dạng được định dạng bảng hoặc JSON hợp lệ.");
-      } catch (err) {
-        console.error(err);
-        showToast("Lỗi xử lý dữ liệu: " + err.message);
-      }
+            const isReg = getValSmart(r, ['Đã đăng ký giải', 'Đăng ký', 'Registered'], ['đăng ký giải']);
+            const isRegClean = String(isReg).toLowerCase().includes('có') || String(isReg).toLowerCase().includes('đã') || String(isReg).toLowerCase().includes('yes');
+
+            return {
+              id: idx + 1,
+              name: getValSmart(r, ['Họ và tên', 'Họ tên', 'Name', 'Player']) || `VĐV ${idx + 1}`,
+              nickname: getValSmart(r, ['Nickname', 'Nick name', 'Biệt danh']) || '',
+              approved: true,
+              rank: tier,
+              score: score,
+              gender: getValSmart(r, ['Giới tính', 'Gender']) || 'Nam',
+              status: isRegClean ? 'Đã đăng ký' : 'Chưa đăng ký',
+              email: getValSmart(r, ['Email', 'Mail']) || 'Chưa cập nhật',
+              updatedAt: getValSmart(r, ['Ngày đăng ký giải', 'Ngày tự đánh giá', 'Cập nhật']) || '16/09/2026',
+              experience: getValSmart(r, ['Đã chơi được bao lâu?', 'Thâm niên', 'Kinh nghiệm'], ['chơi được bao lâu']) || 'Chưa có',
+              frequency: getValSmart(r, ['Tần suất tập', 'Tần suất']) || 'Chưa có',
+              competition: getValSmart(r, ['Kinh nghiệm thi đấu', 'Giải đấu'], ['kinh nghiệm thi đấu'], ['bao lâu']) || 'Giao lưu nội bộ',
+              doubleRole: getValSmart(r, ['Vai trò đánh đôi', 'Vai trò khi đánh đôi', 'Vai trò'], ['vai trò'], ['phối hợp']) || 'Linh hoạt',
+              events: getValSmart(r, ['Nội dung đăng ký', 'Nội dung']) || 'Chưa đăng ký',
+              fee: getValSmart(r, ['Trạng thái phí', 'Phí']) || 'Chưa đóng',
+              party: getValSmart(r, ['Tham gia after party', 'After party']) || 'No',
+              skills: skills
+            };
+          });
+
+          // Lưu cache vào LocalStorage
+          localStorage.setItem('nab_badminton_players', JSON.stringify(currentPlayers));
+          spinner.style.display = 'none';
+          updateKPIs(currentPlayers);
+          applyFilters();
+        })
+        .catch(err => {
+          console.error("Lỗi đồng bộ Sheet:", err);
+          spinner.innerHTML = `
+            <div style="color: #DC2626; font-weight:600;">
+              <i class="fa-solid fa-triangle-exclamation"></i> Không thể tải trực tiếp từ Google Sheets.
+            </div>
+            <div style="font-size:12px; margin-top:4px;">Đang hiển thị dữ liệu lưu trữ từ phiên trước. Hãy kiểm tra quyền chia sẻ link Google Sheet.</div>
+          `;
+        });
     }
 
-    function setupExcelUpload() {
-      const input = document.getElementById('excelFileInput');
-      if (!input) return;
-
-      input.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          try {
-            const data = new Uint8Array(event.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const firstSheetName = workbook.SheetNames[0];
-            const rows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName]);
-
-            if (rows && rows.length > 0) {
-              currentPlayers = rows.map((row, index) => {
-                const bxh = row['Hạng BXH'] ? parseInt(row['Hạng BXH']) : (index + 1);
-                const scoreVal = row['Điểm'] !== undefined && row['Điểm'] !== null ? parseFloat(row['Điểm']) : 0;
-                return {
-                  id: index + 1,
-                  bxh: bxh,
-                  name: String(row['Họ và tên'] || row['Họ tên'] || row['Name'] || 'Chưa đặt tên').trim(),
-                  nick: String(row['Nickname'] || row['Nick name'] || '').trim(),
-                  email: String(row['Email'] || '').trim(),
-                  gender: String(row['Giới tính'] || row['Gender'] || 'Nam').trim(),
-                  tier: String(row['Hạng kỹ năng'] || row['Hạng'] || row['Tier'] || 'Chưa xếp').trim(),
-                  score: isNaN(scoreVal) ? 0 : parseFloat(scoreVal.toFixed(2)),
-                  years: String(row['Đã chơi được bao lâu?'] || row['Thâm niên'] || '1-3 năm').trim(),
-                  freq: String(row['Tần suất tập'] || '1–2 buổi / tuần').trim(),
-                  exp: String(row['Kinh nghiệm thi đấu'] || 'Giao lưu nội bộ').trim(),
-                  role: String(row['Vai trò đánh đôi'] || row['Vai trò khi đánh đôi'] || 'Linh hoạt').trim(),
-                  skills: {
-                    Phat: parseFloat(row['Phát cầu'] || row['Phát'] || 3.0),
-                    Phong: parseFloat(row['Phông & khống chế'] || row['Phông'] || 3.0),
-                    Luoi: parseFloat(row['Cầu lưới'] || row['Lưới'] || 3.0),
-                    Dap: parseFloat(row['Đập cầu'] || row['Đập'] || 3.0),
-                    DiChuyen: parseFloat(row['Di chuyển & vị trí'] || row['Di chuyển'] || 3.0),
-                    PhongThu: parseFloat(row['Phòng thủ'] || 3.0),
-                    DanhDoi: parseFloat(row['Phối hợp đánh đôi'] || row['Đánh đôi'] || 3.0),
-                    ChienThuat: parseFloat(row['Chiến thuật'] || 3.0)
-                  },
-                  source: String(row['Nguồn điểm'] || 'File Excel').trim(),
-                  registered: String(row['Đã đăng ký giải'] || 'Có').trim(),
-                  events: String(row['Nội dung đăng ký'] || 'Men Double').trim(),
-                  party: String(row['Tham gia after party'] || 'Yes').trim(),
-                  fee: String(row['Trạng thái phí'] || 'Đã đóng').trim(),
-                  updated: row['Ngày tự đánh giá'] || '16/09/2026'
-                };
-              });
-
-              handleFilterChange();
-              updateSummaryKPIs(currentPlayers);
-              showToast(`Tải thành công ${currentPlayers.length} người chơi từ file Excel!`);
-            }
-          } catch (err) {
-            console.error(err);
-            showToast('Lỗi đọc file Excel. Vui lòng kiểm tra lại định dạng file!');
-          }
-        };
-        reader.readAsArrayBuffer(file);
-      });
+    // Cập nhật số liệu thống kê KPIs
+    function updateKPIs(data) {
+      document.getElementById('statTotal').innerText = data.length;
+      document.getElementById('statMale').innerText = data.filter(p => p.gender === 'Nam').length;
+      document.getElementById('statFemale').innerText = data.filter(p => p.gender === 'Nữ').length;
+      document.getElementById('statTierS').innerText = data.filter(p => p.rank === 'S').length;
+      document.getElementById('statTierAplus').innerText = data.filter(p => p.rank === 'A+').length;
+      document.getElementById('statTierA').innerText = data.filter(p => p.rank === 'A').length;
+      document.getElementById('statTierB').innerText = data.filter(p => p.rank === 'B').length;
+      document.getElementById('statTierC').innerText = data.filter(p => p.rank === 'C').length;
+      document.getElementById('statTierD').innerText = data.filter(p => p.rank === 'D').length;
     }
 
-    function updateSummaryKPIs(players) {
-      const setSafeText = (id, text) => {
-        const el = document.getElementById(id);
-        if (el) el.innerText = text;
-      };
-
-      setSafeText('statTotalPlayers', players.length);
-      
-      const regCount = players.filter(p => p.registered === 'Có' || (p.registered && p.registered.toLowerCase().includes('đã'))).length;
-      setSafeText('statRegistered', regCount);
-
-      const maleCount = players.filter(p => p.gender && p.gender.toLowerCase() === 'nam').length;
-      const femaleCount = players.filter(p => p.gender && p.gender.toLowerCase().includes('nữ')).length;
-      setSafeText('statMale', maleCount);
-      setSafeText('statFemale', femaleCount);
-
-      const countS = players.filter(p => p.tier === 'S').length;
-      const countAplus = players.filter(p => p.tier === 'A+').length;
-      const countA = players.filter(p => p.tier === 'A').length;
-      const countB = players.filter(p => p.tier === 'B').length;
-      const countC = players.filter(p => p.tier === 'C').length;
-      const countD = players.filter(p => p.tier === 'D').length;
-
-      setSafeText('statTierS', countS);
-      setSafeText('statTierAplus', countAplus);
-      setSafeText('statTierA', countA);
-      setSafeText('statTierB', countB);
-      setSafeText('statTierC', countC);
-      setSafeText('statTierD', countD);
-
-      const partyCount = players.filter(p => p.party && (p.party.toLowerCase() === 'yes' || p.party.toLowerCase() === 'có')).length;
-      setSafeText('statParty', partyCount);
-    }
-
+    // Quick filter click từ các thẻ KPI
     function quickFilterTier(tier) {
-      const rankSelect = document.getElementById('rankFilter');
-      if (!rankSelect) return;
-      if (rankSelect.value === tier) {
-        rankSelect.value = 'all';
-      } else {
-        rankSelect.value = tier;
-      }
-      handleFilterChange();
+      document.getElementById('rankFilter').value = tier;
+      applyFilters();
     }
 
     function quickFilterGender(gender) {
-      const genderSelect = document.getElementById('genderFilter');
-      if (!genderSelect) return;
-      if (genderSelect.value === gender) {
-        genderSelect.value = 'all';
-      } else {
-        genderSelect.value = gender;
-      }
-      handleFilterChange();
+      document.getElementById('genderFilter').value = gender;
+      applyFilters();
     }
 
-    function handleFilterChange() {
-      const searchInput = document.getElementById('searchInput');
-      const rankFilter = document.getElementById('rankFilter');
-      const genderFilter = document.getElementById('genderFilter');
-      const regFilter = document.getElementById('regFilter');
-      const sortFilter = document.getElementById('sortFilter');
+    // Lọc và hiển thị danh sách
+    function applyFilters() {
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
+      const rank = document.getElementById('rankFilter').value;
+      const gender = document.getElementById('genderFilter').value;
+      const status = document.getElementById('statusFilter').value;
+      const sort = document.getElementById('sortFilter').value;
 
-      const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
-      const rankVal = rankFilter ? rankFilter.value : 'all';
-      const genderVal = genderFilter ? genderFilter.value : 'all';
-      const regVal = regFilter ? regFilter.value : 'all';
-      const sortVal = sortFilter ? sortFilter.value : 'default';
-
-      const tierMap = { 'S': 'btnTierQuick-S', 'A+': 'btnTierQuick-Aplus', 'A': 'btnTierQuick-A', 'B': 'btnTierQuick-B', 'C': 'btnTierQuick-C', 'D': 'btnTierQuick-D' };
-      Object.keys(tierMap).forEach(t => {
-        const el = document.getElementById(tierMap[t]);
-        if (el) {
-          if (rankVal === t) {
-            el.classList.add('ring-2', 'ring-[#C70000]', 'border-transparent', 'bg-red-50/60');
-          } else {
-            el.classList.remove('ring-2', 'ring-[#C70000]', 'border-transparent', 'bg-red-50/60');
-          }
-        }
+      let filtered = currentPlayers.filter(p => {
+        const matchQ = p.name.toLowerCase().includes(q) || 
+                       p.nickname.toLowerCase().includes(q) || 
+                       p.email.toLowerCase().includes(q);
+        const matchRank = (rank === 'all') || (p.rank === rank);
+        const matchGender = (gender === 'all') || (p.gender === gender);
+        const matchStatus = (status === 'all') || (p.status === status);
+        return matchQ && matchRank && matchGender && matchStatus;
       });
 
-      const maleBtn = document.getElementById('btnGenderMale');
-      const femaleBtn = document.getElementById('btnGenderFemale');
-      if (maleBtn) {
-        if (genderVal === 'Nam') maleBtn.classList.add('ring-2', 'ring-blue-600', 'border-transparent', 'bg-blue-50/60');
-        else maleBtn.classList.remove('ring-2', 'ring-blue-600', 'border-transparent', 'bg-blue-50/60');
-      }
-      if (femaleBtn) {
-        if (genderVal === 'Nữ') femaleBtn.classList.add('ring-2', 'ring-pink-600', 'border-transparent', 'bg-pink-50/60');
-        else femaleBtn.classList.remove('ring-2', 'ring-pink-600', 'border-transparent', 'bg-pink-50/60');
-      }
+      if (sort === 'score-desc') filtered.sort((a,b) => parseFloat(b.score) - parseFloat(a.score));
+      else if (sort === 'score-asc') filtered.sort((a,b) => parseFloat(a.score) - parseFloat(b.score));
+      else if (sort === 'name-asc') filtered.sort((a,b) => a.name.localeCompare(b.name));
 
-      let result = currentPlayers.filter(p => {
-        const matchSearch = p.name.toLowerCase().includes(q) ||
-                            p.nick.toLowerCase().includes(q) ||
-                            p.email.toLowerCase().includes(q);
-
-        const matchRank = (rankVal === 'all') || (p.tier === rankVal);
-        const matchGender = (genderVal === 'all') || (p.gender === genderVal);
-        const matchReg = (regVal === 'all') || (p.registered === regVal);
-
-        return matchSearch && matchRank && matchGender && matchReg;
-      });
-
-      if (sortVal === 'score-desc') {
-        result.sort((a, b) => (b.score || 0) - (a.score || 0));
-      } else if (sortVal === 'score-asc') {
-        result.sort((a, b) => (a.score || 0) - (b.score || 0));
-      } else if (sortVal === 'name-asc') {
-        result.sort((a, b) => a.name.localeCompare(b.name, 'vi'));
-      } else {
-        result.sort((a, b) => (a.bxh || 999) - (b.bxh || 999));
-      }
-
-      renderPlayerList(result);
+      renderList(filtered);
     }
 
-    function toggleAllVisuals() {
-      const chkSkills = document.getElementById('chkShowSkills');
-      const chkProfile = document.getElementById('chkShowProfile');
-
-      const showSkills = chkSkills ? chkSkills.checked : true;
-      const showProfile = chkProfile ? chkProfile.checked : true;
-
-      document.querySelectorAll('.skill-box-container').forEach(el => {
-        el.style.display = showSkills ? 'grid' : 'none';
-      });
-      document.querySelectorAll('.profile-box-container').forEach(el => {
-        el.style.display = showProfile ? 'grid' : 'none';
-      });
+    function getRankClass(rank) {
+      if (rank === 'S') return 'rank-S';
+      if (rank === 'A+') return 'rank-A_plus';
+      if (rank === 'A') return 'rank-A';
+      if (rank === 'B') return 'rank-B';
+      if (rank === 'C') return 'rank-C';
+      if (rank === 'D') return 'rank-D';
+      return 'rank-other';
     }
 
-    function renderPlayerList(list) {
+    function renderList(list) {
       const container = document.getElementById('playerListContainer');
-      const counter = document.getElementById('playerCountDisplay');
-      if (counter) counter.innerText = `Hiện ${list.length}/${currentPlayers.length} người`;
+      const counter = document.getElementById('playerCounter');
+      counter.innerText = `Đang hiển thị: ${list.length}/${currentPlayers.length} người`;
 
       if (list.length === 0) {
-        container.innerHTML = `
-          <div class="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-500 space-y-2">
-            <i class="fa-solid fa-magnifying-glass text-3xl text-gray-300"></i>
-            <div class="text-base font-medium">Không tìm thấy người chơi nào phù hợp</div>
-            <p class="text-xs text-gray-400">Hãy thử đổi từ khóa tìm kiếm hoặc làm mới bộ lọc</p>
-          </div>
-        `;
+        container.innerHTML = `<div style="text-align:center; padding: 40px; color:#6B7280;">Không tìm thấy người chơi phù hợp</div>`;
         return;
       }
 
-      container.innerHTML = list.map((p, index) => {
-        const tierClass = p.tier === 'S' ? 'tier-S' :
-                          p.tier === 'A+' ? 'tier-Aplus' :
-                          p.tier === 'A' ? 'tier-A' :
-                          p.tier === 'B' ? 'tier-B' :
-                          p.tier === 'C' ? 'tier-C' :
-                          p.tier === 'D' ? 'tier-D' : 'tier-none';
-
-        const isApproved = p.source && (p.source.toLowerCase().includes('khóa') || p.source.toLowerCase().includes('duyệt'));
-        const isRegistered = p.registered === 'Có' || p.registered.toLowerCase().includes('đã');
-        const tierDescription = getTierDescription(p.tier);
-
-        return `
-          <div class="bg-white rounded-xl border border-gray-200 hover:border-gray-300 shadow-xs transition-all duration-200 overflow-hidden" id="card-${p.id}">
-            
-            <!-- Main Row -->
-            <div class="p-3.5 sm:p-4 grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-              
-              <!-- # Rank Index -->
-              <div class="hidden md:flex col-span-1 justify-center items-center font-bold text-gray-400 text-sm">
-                ${p.bxh || (index + 1)}
-              </div>
-
-              <!-- Name & Identity -->
-              <div class="col-span-1 md:col-span-3 flex items-start sm:items-center space-x-3">
-                <div class="md:hidden font-bold text-gray-400 text-sm mt-0.5">
-                  #${p.bxh || (index + 1)}
-                </div>
-                <div>
-                  <div class="flex items-center space-x-2">
-                    <span class="font-bold text-sm sm:text-base text-gray-900">${p.name}</span>
-                    <span class="md:hidden tier-badge ${tierClass} w-6 h-6 text-xs">${p.tier}</span>
-                  </div>
-                  <div class="flex flex-wrap items-center gap-1.5 mt-0.5">
-                    ${p.nick ? `<span class="text-xs text-gray-500 font-medium">${p.nick}</span>` : ''}
-                    <span class="inline-flex items-center gap-1 text-[11px] text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded">
-                      <i class="fa-solid fa-circle-check text-green-600 text-[10px]"></i>
-                      ${isApproved ? 'Admin đã duyệt' : p.source}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Desktop Tier Badge -->
-              <div class="hidden md:flex col-span-1 justify-center">
-                <span class="tier-badge ${tierClass}">${p.tier}</span>
-              </div>
-
-              <!-- Score -->
-              <div class="hidden md:flex col-span-1 justify-center font-bold text-sm sm:text-base text-gray-900">
-                ${p.score ? p.score.toFixed(2) : '0.00'}
-              </div>
-
-              <!-- Gender -->
-              <div class="hidden md:flex col-span-1 justify-center text-xs sm:text-sm text-gray-700">
-                ${p.gender}
-              </div>
-
-              <!-- Registration Status -->
-              <div class="hidden md:flex col-span-2 justify-center">
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${isRegistered ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}">
-                  <span class="w-1.5 h-1.5 rounded-full ${isRegistered ? 'bg-green-600' : 'bg-gray-400'} mr-1.5"></span>
-                  ${isRegistered ? 'Đã đăng ký' : 'Chưa đăng ký'}
-                </span>
-              </div>
-
-              <!-- Email -->
-              <div class="hidden md:block col-span-2 text-xs text-gray-500 truncate" title="${p.email}">
-                ${p.email}
-              </div>
-
-              <!-- Action Button & Mobile Summary -->
-              <div class="col-span-1 md:col-span-1 flex items-center justify-between md:justify-end gap-2">
-                <div class="md:hidden flex items-center gap-2">
-                  <span class="text-xs font-semibold px-2 py-0.5 bg-gray-100 rounded text-gray-700">Điểm: ${p.score ? p.score.toFixed(2) : '0.00'}</span>
-                  <span class="text-xs text-gray-500">${p.gender}</span>
-                </div>
-                <button 
-                  id="btn-${p.id}"
-                  onclick="togglePlayerDrawer(${p.id})" 
-                  class="text-xs font-semibold px-3 py-1.5 rounded-full border border-gray-300 hover:border-gray-400 hover:bg-gray-50 active:bg-gray-100 transition-colors text-gray-700 whitespace-nowrap shadow-2xs"
-                >
-                  Chi tiết
-                </button>
-              </div>
-
+      container.innerHTML = list.map((p, index) => `
+        <div class="player-card" id="card-${p.id}">
+          <div class="player-main-row">
+            <div class="player-index">${index + 1}</div>
+            <div class="player-identity">
+              <span class="player-name">${p.name}</span>
+              ${p.nickname ? `<span class="player-nick">${p.nickname}</span>` : ''}
+              <span class="admin-approved"><i class="fa-solid fa-circle-check"></i> Admin đã duyệt</span>
             </div>
-
-            <!-- Expandable Detail Drawer -->
-            <div id="drawer-${p.id}" class="player-drawer bg-gray-50/80 border-t border-gray-100">
-              <div class="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-                
-                <!-- Left Column: Radar Chart -->
-                <div class="lg:col-span-5 flex flex-col items-center justify-center">
-                  <div class="radar-wrapper bg-white p-3 rounded-2xl border border-gray-200 shadow-xs">
-                    <canvas id="radar-canvas-${p.id}"></canvas>
-                  </div>
-                  <div class="text-[11px] text-gray-400 mt-2 text-center">Biểu đồ kỹ năng 8 khía cạnh (Thang điểm 1 - 5)</div>
-                </div>
-
-                <!-- Right Column: Player Profile & Detailed Breakdown -->
-                <div class="lg:col-span-7 space-y-4">
-                  
-                  <!-- Drawer Header -->
-                  <div>
-                    <h3 class="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2">
-                      <span>${p.name}</span>
-                      <span class="text-xs font-semibold px-2 py-0.5 rounded bg-red-100 text-[#C70000]">Hạng ${p.tier}</span>
-                      <span class="text-xs text-gray-500 font-normal">(${p.score ? p.score.toFixed(2) : '0.00'} điểm)</span>
-                    </h3>
-                    <p class="text-xs sm:text-sm text-gray-600 italic mt-1 leading-relaxed">
-                      "${tierDescription}"
-                    </p>
-                  </div>
-
-                  <!-- 4 Profile Cards -->
-                  <div class="profile-box-container grid grid-cols-2 gap-2.5">
-                    <div class="bg-white p-2.5 rounded-lg border border-gray-200">
-                      <div class="text-[11px] text-gray-500">Thâm niên</div>
-                      <div class="text-xs sm:text-sm font-bold text-gray-800">${p.years || 'Chưa có'}</div>
-                    </div>
-                    <div class="bg-white p-2.5 rounded-lg border border-gray-200">
-                      <div class="text-[11px] text-gray-500">Tần suất tập</div>
-                      <div class="text-xs sm:text-sm font-bold text-gray-800">${p.freq || '1–2 buổi / tuần'}</div>
-                    </div>
-                    <div class="bg-white p-2.5 rounded-lg border border-gray-200">
-                      <div class="text-[11px] text-gray-500">Kinh nghiệm thi đấu</div>
-                      <div class="text-xs sm:text-sm font-bold text-gray-800 truncate" title="${p.exp}">${p.exp || 'Giao lưu nội bộ'}</div>
-                    </div>
-                    <div class="bg-white p-2.5 rounded-lg border border-gray-200">
-                      <div class="text-[11px] text-gray-500">Vai trò khi đánh đôi</div>
-                      <div class="text-xs sm:text-sm font-bold text-gray-800 truncate" title="${p.role}">${p.role || 'Linh hoạt'}</div>
-                    </div>
-                  </div>
-
-                  <!-- 8 Detailed Skill Ratings -->
-                  <div class="skill-box-container bg-white p-3 rounded-xl border border-gray-200">
-                    <div class="text-xs font-bold text-gray-700 mb-2 flex items-center justify-between">
-                      <span>Bảng điểm 8 kỹ năng thi đấu</span>
-                      <span class="text-[11px] font-normal text-gray-400">Tối đa 5.0</span>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-xs">
-                      <div class="flex justify-between py-1 border-b border-gray-100">
-                        <span class="text-gray-600">Phát cầu:</span>
-                        <strong class="text-gray-900">${p.skills.Phat ? p.skills.Phat.toFixed(1) : 0}/5</strong>
-                      </div>
-                      <div class="flex justify-between py-1 border-b border-gray-100">
-                        <span class="text-gray-600">Phông & khống chế:</span>
-                        <strong class="text-gray-900">${p.skills.Phong ? p.skills.Phong.toFixed(1) : 0}/5</strong>
-                      </div>
-                      <div class="flex justify-between py-1 border-b border-gray-100">
-                        <span class="text-gray-600">Cầu lưới:</span>
-                        <strong class="text-gray-900">${p.skills.Luoi ? p.skills.Luoi.toFixed(1) : 0}/5</strong>
-                      </div>
-                      <div class="flex justify-between py-1 border-b border-gray-100">
-                        <span class="text-gray-600">Đập cầu (Smash):</span>
-                        <strong class="text-gray-900">${p.skills.Dap ? p.skills.Dap.toFixed(1) : 0}/5</strong>
-                      </div>
-                      <div class="flex justify-between py-1 border-b border-gray-100">
-                        <span class="text-gray-600">Di chuyển & vị trí:</span>
-                        <strong class="text-gray-900">${p.skills.DiChuyen ? p.skills.DiChuyen.toFixed(1) : 0}/5</strong>
-                      </div>
-                      <div class="flex justify-between py-1 border-b border-gray-100">
-                        <span class="text-gray-600">Phòng thủ:</span>
-                        <strong class="text-gray-900">${p.skills.PhongThu ? p.skills.PhongThu.toFixed(1) : 0}/5</strong>
-                      </div>
-                      <div class="flex justify-between py-1 border-b border-gray-100">
-                        <span class="text-gray-600">Phối hợp đánh đôi:</span>
-                        <strong class="text-gray-900">${p.skills.DanhDoi ? p.skills.DanhDoi.toFixed(1) : 0}/5</strong>
-                      </div>
-                      <div class="flex justify-between py-1 border-b border-gray-100">
-                        <span class="text-gray-600">Chiến thuật:</span>
-                        <strong class="text-gray-900">${p.skills.ChienThuat ? p.skills.ChienThuat.toFixed(1) : 0}/5</strong>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Tournament Meta -->
-                  <div class="bg-gray-100/70 p-2.5 rounded-lg text-xs text-gray-600 flex flex-wrap items-center justify-between gap-2">
-                    <div>
-                      <span class="font-medium text-gray-700">Nội dung đăng ký:</span> 
-                      <span class="text-gray-900 font-semibold">${p.events || 'Chưa đăng ký'}</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                      <span>Phí: <strong class="text-gray-900">${p.fee || 'Miễn phí'}</strong></span>
-                      <span>After Party: <strong class="${p.party === 'Yes' ? 'text-green-700' : 'text-gray-500'}">${p.party}</strong></span>
-                      <span class="text-gray-400">Cập nhật: ${p.updated}</span>
-                    </div>
-                  </div>
-
-                </div>
-
-              </div>
+            <div>
+              <span class="badge-rank ${getRankClass(p.rank)}">${p.rank}</span>
             </div>
-
+            <div class="badge-score">${p.score}</div>
+            <div>${p.gender}</div>
+            <div><span class="badge-status ${p.status === 'Đã đăng ký' ? 'status-reg' : 'status-not'}">${p.status}</span></div>
+            <div class="player-email">${p.email}</div>
+            <div class="player-date">${p.updatedAt}</div>
+            <div style="text-align: right;">
+              <button class="btn-detail" id="btn-toggle-${p.id}" onclick="toggleDetail(${p.id})">Chi tiết</button>
+            </div>
           </div>
-        `;
-      }).join('');
 
-      toggleAllVisuals();
+          <!-- Drawer Panel -->
+          <div class="player-detail-panel" id="detail-${p.id}">
+            <div class="radar-container">
+              <canvas id="radar-${p.id}"></canvas>
+            </div>
+            <div class="detail-info">
+              <div class="detail-header-title">
+                ${p.name} – <span class="tag-tier">Hạng ${p.rank}</span> (${p.score} điểm)
+              </div>
+              <div class="detail-quote">
+                ${p.rank === 'S' ? 'Nhóm mạnh nhất trong CLB phong trào: đánh chắc, đọc trận tốt, thường được xếp gánh đội hoặc đi đánh giải.' : 'Vận động viên thi đấu giải NAB Hanoi Badminton Championship 2026.'}
+              </div>
+
+              <div class="detail-meta-grid">
+                <div class="meta-box">
+                  <span>Thâm niên</span>
+                  <strong>${p.experience}</strong>
+                </div>
+                <div class="meta-box">
+                  <span>Tần suất tập</span>
+                  <strong>${p.frequency}</strong>
+                </div>
+                <div class="meta-box">
+                  <span>Kinh nghiệm thi đấu</span>
+                  <strong>${p.competition}</strong>
+                </div>
+                <div class="meta-box">
+                  <span>Vai trò khi đánh đôi</span>
+                  <strong>${p.doubleRole}</strong>
+                </div>
+              </div>
+
+              <div class="skills-score-grid">
+                <div class="skill-score-row"><span>Phát cầu:</span><strong>${p.skills['Phát'].toFixed(1)}/5</strong></div>
+                <div class="skill-score-row"><span>Phông & khống chế:</span><strong>${p.skills['Phông'].toFixed(1)}/5</strong></div>
+                <div class="skill-score-row"><span>Cầu lưới:</span><strong>${p.skills['Lưới'].toFixed(1)}/5</strong></div>
+                <div class="skill-score-row"><span>Đập cầu (Smash):</span><strong>${p.skills['Đập'].toFixed(1)}/5</strong></div>
+                <div class="skill-score-row"><span>Di chuyển & vị trí:</span><strong>${p.skills['Di chuyển'].toFixed(1)}/5</strong></div>
+                <div class="skill-score-row"><span>Phòng thủ:</span><strong>${p.skills['Phòng thủ'].toFixed(1)}/5</strong></div>
+                <div class="skill-score-row"><span>Phối hợp đánh đôi:</span><strong>${p.skills['Đánh đôi'].toFixed(1)}/5</strong></div>
+                <div class="skill-score-row"><span>Chiến thuật:</span><strong>${p.skills['Chiến thuật'].toFixed(1)}/5</strong></div>
+              </div>
+
+              <div class="detail-footer-info">
+                <div><strong>Nội dung:</strong> ${p.events}</div>
+                <div><strong>Lệ phí:</strong> ${p.fee}</div>
+                <div><strong>After Party:</strong> ${p.party}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
     }
 
-    function togglePlayerDrawer(id) {
-      const drawer = document.getElementById(`drawer-${id}`);
-      const btn = document.getElementById(`btn-${id}`);
-      const isOpen = drawer.classList.contains('is-open');
+    function toggleDetail(id) {
+      const panel = document.getElementById(`detail-${id}`);
+      const btn = document.getElementById(`btn-toggle-${id}`);
+      const isOpen = panel.classList.contains('open');
 
       if (isOpen) {
-        drawer.classList.remove('is-open');
+        panel.classList.remove('open');
+        btn.classList.remove('active');
         btn.innerText = 'Chi tiết';
-        btn.classList.remove('bg-gray-800', 'text-white', 'border-transparent');
       } else {
-        drawer.classList.add('is-open');
+        panel.classList.add('open');
+        btn.classList.add('active');
         btn.innerText = 'Đóng';
-        btn.classList.add('bg-gray-800', 'text-white', 'border-transparent');
-        createOrUpdateRadarChart(id);
+        renderRadarChart(id);
       }
     }
 
-    function createOrUpdateRadarChart(id) {
+    function renderRadarChart(id) {
       if (chartInstances[id]) return;
 
       const player = currentPlayers.find(p => p.id === id);
       if (!player) return;
 
-      const canvas = document.getElementById(`radar-canvas-${id}`);
-      if (!canvas) return;
-
-      const ctx = canvas.getContext('2d');
+      const ctx = document.getElementById(`radar-${id}`).getContext('2d');
       const labels = ['Phát', 'Phông', 'Lưới', 'Đập', 'Di chuyển', 'Phòng thủ', 'Đánh đôi', 'Chiến thuật'];
-      const dataValues = [
-        player.skills.Phat || 0,
-        player.skills.Phong || 0,
-        player.skills.Luoi || 0,
-        player.skills.Dap || 0,
-        player.skills.DiChuyen || 0,
-        player.skills.PhongThu || 0,
-        player.skills.DanhDoi || 0,
-        player.skills.ChienThuat || 0
-      ];
+      const dataValues = labels.map(l => player.skills[l] || 0);
 
       chartInstances[id] = new Chart(ctx, {
         type: 'radar',
         data: {
           labels: labels,
           datasets: [{
-            label: player.name,
             data: dataValues,
             backgroundColor: 'rgba(199, 0, 0, 0.22)',
             borderColor: '#C70000',
-            borderWidth: 2.2,
+            borderWidth: 2,
             pointBackgroundColor: '#C70000',
-            pointBorderColor: '#FFFFFF',
-            pointBorderWidth: 1.5,
-            pointRadius: 4,
-            pointHoverRadius: 6
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#C70000'
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: true,
           plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: (item) => ` ${item.label}: ${item.raw}/5`
-              }
-            }
+            legend: { display: false }
           },
           scales: {
             r: {
-              min: 0,
-              max: 5,
+              angleLines: { color: '#E5E7EB' },
+              grid: { color: '#E5E7EB' },
+              suggestedMin: 0,
+              suggestedMax: 5,
               ticks: {
                 stepSize: 1,
                 display: true,
                 backdropColor: 'transparent',
-                font: { size: 9, family: "'Inter', sans-serif" },
-                color: '#9CA3AF'
-              },
-              grid: {
-                color: '#E5E7EB',
-                lineWidth: 1
-              },
-              angleLines: {
-                color: '#E5E7EB',
-                lineWidth: 1
+                font: { size: 10 }
               },
               pointLabels: {
                 font: {
@@ -1597,25 +1029,6 @@
           }
         }
       });
-    }
-
-    function getTierDescription(tier) {
-      switch (tier) {
-        case 'S':
-          return 'Nhóm mạnh nhất trong CLB phong trào: đánh chắc chắn, đọc trận tốt, smash uy lực, thường được xếp hạt giống hoặc gánh đội đi đánh giải.';
-        case 'A+':
-          return 'Tay vợt công thủ toàn diện, phản xạ nhanh nhạy, kỹ thuật cơ bản vững vàng, phối hợp đánh đôi ăn ý và có tư duy chiến thuật sắc bén.';
-        case 'A':
-          return 'Kỹ năng vững, kiểm soát cầu tốt, điều cầu chính xác và thể lực dồi dào, là trụ cột trong các trận cầu đôi căng thẳng.';
-        case 'B':
-          return 'Nhóm lực lượng nòng cốt và đông đảo nhất CLB: đánh nhiệt tình, có tinh thần thi đấu cao, kỹ thuật đang ngày càng hoàn thiện.';
-        case 'C':
-          return 'Tay vợt đang trong giai đoạn tích lũy phản xạ và hoàn thiện bộ kỹ thuật đánh lưới, lùi sân phông cầu và di chuyển.';
-        case 'D':
-          return 'Tân binh yêu thích cầu lông NAB, đang làm quen nhịp độ và kỹ thuật di chuyển bộ chân trên sân đấu.';
-        default:
-          return 'Người chơi đã đăng ký tham gia giải đấu NAB Hanoi Badminton Championship 2026.';
-      }
     }
   </script>
 </body>
