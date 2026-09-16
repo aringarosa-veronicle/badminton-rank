@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Danh sách người chơi NAB HANOI BADMINTON CHAMPIONSHIP 2026</title>
+  
+  <!-- Font & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- SheetJS & Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --nab-red: #C70000;
+      --nab-red-hover: #A50000;
+      --nab-red-light: rgba(199, 0, 0, 0.12);
+      --nab-black: #1A1A1A;
+      --nab-gray-bg: #F4F5F7;
+      --nab-card-bg: #FFFFFF;
+      --nab-border: #E5E7EB;
+      --nab-text-muted: #6B7280;
+      --nab-green-badge: #E6F4EA;
+      --nab-green-text: #137333;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--nab-gray-bg);
+      color: var(--nab-black);
+      padding-bottom: 60px;
+    }
+
+    /* Top Brand Bar */
+    header {
+      background: #FFFFFF;
+      border-bottom: 3px solid var(--nab-red);
+      padding: 16px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nab-star {
+      background: var(--nab-red);
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--nab-black);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-upload {
+      background: var(--nab-red);
+      color: #fff;
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: none;
+      transition: background 0.2s;
+    }
+
+    .btn-upload:hover {
+      background: var(--nab-red-hover);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1220px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+
+    /* Filters Bar */
+    .filter-card {
+      background: var(--nab-card-bg);
+      border-radius: 10px;
+      padding: 16px;
+      border: 1px solid var(--nab-border);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      margin-bottom: 18px;
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .filter-input {
+      flex: 2;
+      min-width: 220px;
+      position: relative;
+    }
+
+    .filter-input input {
+      width: 100%;
+      padding: 8px 12px 8px 34px;
+      font-size: 13.5px;
+      border: 1px solid var(--nab-border);
+      border-radius: 6px;
+      outline: none;
+    }
+
+    .filter-input input:focus {
+      border-color: var(--nab-red);
+    }
+
+    .filter-input i {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--nab-text-muted);
+      font-size: 13px;
+    }
+
+    .filter-select {
+      flex: 1;
+      min-width: 140px;
+      padding: 8px 12px;
+      font-size: 13.5px;
+      border: 1px solid var(--nab-border);
+      border-radius: 6px;
+      background-color: white;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .filter-select:focus {
+      border-color: var(--nab-red);
+    }
+
+    .filter-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid #F0F2F5;
+      font-size: 13px;
+      color: var(--nab-text-muted);
+    }
+
+    .filter-meta-left {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .filter-meta-left label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    /* Player Table List */
+    .list-header {
+      display: grid;
+      grid-template-columns: 50px 2.2fr 80px 80px 100px 140px 1.8fr 110px 90px;
+      padding: 10px 16px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--nab-text-muted);
+      align-items: center;
+    }
+
+    .player-card {
+      background: var(--nab-card-bg);
+      border: 1px solid var(--nab-border);
+      border-radius: 8px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+      transition: border-color 0.2s;
+    }
+
+    .player-card:hover {
+      border-color: #D1D5DB;
+    }
+
+    .player-main-row {
+      display: grid;
+      grid-template-columns: 50px 2.2fr 80px 80px 100px 140px 1.8fr 110px 90px;
+      padding: 14px 16px;
+      align-items: center;
+      font-size: 13.5px;
+    }
+
+    .player-index {
+      color: var(--nab-text-muted);
+      font-weight: 500;
+    }
+
+    .player-identity {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .player-name {
+      font-weight: 700;
+      font-size: 14.5px;
+      color: var(--nab-black);
+    }
+
+    .player-nick {
+      font-size: 12px;
+      color: var(--nab-text-muted);
+    }
+
+    .admin-approved {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: #4B5563;
+      background: #F3F4F6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      width: fit-content;
+      margin-top: 3px;
+    }
+
+    /* Rank Badge */
+    .badge-rank {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--nab-red);
+      color: white;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      box-shadow: 0 2px 4px rgba(199, 0, 0, 0.3);
+    }
+
+    .badge-score {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--nab-black);
+    }
+
+    .badge-status {
+      background: var(--nab-green-badge);
+      color: var(--nab-green-text);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 12px;
+      display: inline-block;
+    }
+
+    .player-email {
+      color: var(--nab-text-muted);
+      font-size: 13px;
+      word-break: break-all;
+    }
+
+    .player-date {
+      color: var(--nab-text-muted);
+      font-size: 12.5px;
+    }
+
+    .btn-detail {
+      background: #FFFFFF;
+      border: 1px solid #D1D5DB;
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-detail:hover {
+      background: #F9FAFB;
+      border-color: #9CA3AF;
+    }
+
+    .btn-detail.active {
+      background: #E5E7EB;
+      color: var(--nab-black);
+      border-color: #9CA3AF;
+    }
+
+    /* Detail Drawer Section */
+    .player-detail-panel {
+      display: none;
+      background: #FAFAFA;
+      border-top: 1px solid var(--nab-border);
+      padding: 24px;
+    }
+
+    .player-detail-panel.open {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .radar-container {
+      width: 100%;
+      max-width: 350px;
+      margin: 0 auto;
+    }
+
+    .detail-info {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .detail-header-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--nab-black);
+    }
+
+    .detail-quote {
+      font-size: 13px;
+      color: #4B5563;
+      line-height: 1.5;
+      font-style: italic;
+    }
+
+    .detail-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      background: white;
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid #E5E7EB;
+    }
+
+    .meta-box span {
+      display: block;
+      font-size: 11.5px;
+      color: var(--nab-text-muted);
+      margin-bottom: 3px;
+    }
+
+    .meta-box strong {
+      font-size: 13.5px;
+      color: var(--nab-black);
+    }
+
+    .skills-score-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 24px;
+      padding-top: 4px;
+    }
+
+    .skill-score-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed #E5E7EB;
+    }
+
+    .skill-score-row span {
+      color: #374151;
+    }
+
+    .skill-score-row strong {
+      color: var(--nab-black);
+    }
+
+    @media (max-width: 992px) {
+      .list-header { display: none; }
+      .player-main-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .player-detail-panel.open {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-title">
+      <span class="nab-star">NAB</span>
+      <h1>Danh sách người chơi NAB HANOI BADMINTON CHAMPIONSHIP 2026</h1>
+    </div>
+    <div class="header-actions">
+      <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="display: none;" />
+      <button class="btn-upload" onclick="document.getElementById('excelFileInput').click()">
+        <i class="fa-solid fa-file-excel"></i> Nhập file Excel
+      </button>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Filter Bar -->
+    <div class="filter-card">
+      <div class="filter-row">
+        <div class="filter-input">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="searchInput" placeholder="Tìm tên, nickname, email..." oninput="applyFilters()" />
+        </div>
+        <select class="filter-select" id="rankFilter" onchange="applyFilters()">
+          <option value="all">Tất cả các hạng</option>
+          <option value="S">Hạng S</option>
+          <option value="A">Hạng A</option>
+          <option value="B">Hạng B</option>
+          <option value="C">Hạng C</option>
+        </select>
+        <select class="filter-select" id="genderFilter" onchange="applyFilters()">
+          <option value="all">Nam và nữ</option>
+          <option value="Nam">Nam</option>
+          <option value="Nữ">Nữ</option>
+        </select>
+        <select class="filter-select" id="statusFilter" onchange="applyFilters()">
+          <option value="all">Đăng ký giải: tất cả</option>
+          <option value="Đã đăng ký">Đã đăng ký</option>
+          <option value="Chưa đăng ký">Chưa đăng ký</option>
+        </select>
+        <select class="filter-select" id="sortFilter" onchange="applyFilters()">
+          <option value="default">Hạng & điểm (mặc định)</option>
+          <option value="score-desc">Điểm: Cao đến thấp</option>
+          <option value="score-asc">Điểm: Thấp đến cao</option>
+          <option value="name-asc">Tên: A - Z</option>
+        </select>
+      </div>
+
+      <div class="filter-meta">
+        <div class="filter-meta-left">
+          <label><input type="checkbox" id="checkSkills" checked> Điểm 8 kỹ năng</label>
+          <label><input type="checkbox" id="checkProfile" checked> Hồ sơ người chơi</label>
+        </div>
+        <div id="playerCounter" style="font-weight: 500;">Đang hiển thị: 0 người</div>
+      </div>
+    </div>
+
+    <!-- Table Header -->
+    <div class="list-header">
+      <div>#</div>
+      <div>Người chơi</div>
+      <div>Hạng</div>
+      <div>Điểm</div>
+      <div>Giới tính</div>
+      <div>Đã đăng ký giải</div>
+      <div>Email</div>
+      <div>Cập nhật</div>
+      <div style="text-align: right;">Thao tác</div>
+    </div>
+
+    <!-- Dynamic Player List Container -->
+    <div id="playerListContainer"></div>
+  </div>
+
+  <script>
+    // Dữ liệu ban đầu mô phỏng theo ảnh đính kèm (sẽ tự động ghi đè khi bạn chọn file Excel hoặc tải từ repo)
+    let playersData = [
+      {
+        id: 1,
+        name: "An Văn Thịnh",
+        nickname: "Thinh An",
+        approved: true,
+        rank: "S",
+        score: 5.00,
+        gender: "Nam",
+        status: "Đã đăng ký",
+        email: "vanthinh.an@nab.com.au",
+        updatedAt: "11/09/2026",
+        quote: "Nhóm mạnh nhất trong clb phong trào: đánh chắc, đọc trận tốt, thường được xếp gánh đội hoặc đi đánh giải.",
+        experience: "Trên 5 năm",
+        frequency: "1–2 buổi / tuần",
+        competition: "Giải nội bộ / giao lưu công ty",
+        doubleRole: "Linh hoạt",
+        skills: {
+          "Phát": 5,
+          "Phông": 5,
+          "Lưới": 5,
+          "Đập": 5,
+          "Di chuyển": 5,
+          "Phòng thủ": 5,
+          "Đánh đôi": 5,
+          "Chiến thuật": 5
+        }
+      },
+      {
+        id: 2,
+        name: "Tuyen Bui",
+        nickname: "TuyenB",
+        approved: true,
+        rank: "S",
+        score: 4.53,
+        gender: "Nam",
+        status: "Đã đăng ký",
+        email: "tuyen.bui@nab.com.au",
+        updatedAt: "11/09/2026",
+        quote: "Đánh công thủ toàn diện, xử lý cầu trên lưới tốt và phản xạ nhanh nhẹn.",
+        experience: "3-5 năm",
+        frequency: "2–3 buổi / tuần",
+        competition: "Giải phong trào mở rộng",
+        doubleRole: "Cầu trên / Lưới",
+        skills: {
+          "Phát": 4.5,
+          "Phông": 4.5,
+          "Lưới": 5,
+          "Đập": 4.5,
+          "Di chuyển": 4.5,
+          "Phòng thủ": 4.5,
+          "Đánh đôi": 4.5,
+          "Chiến thuật": 4.5
+        }
+      },
+      {
+        id: 3,
+        name: "Luong Tran",
+        nickname: "Luong Tran",
+        approved: true,
+        rank: "S",
+        score: 4.50,
+        gender: "Nam",
+        status: "Đã đăng ký",
+        email: "luong.tran@nab.com.au",
+        updatedAt: "09/09/2026",
+        quote: "Smash uy lực từ cuối sân, thể lực sung mãn, kinh nghiệm bao quát sân tốt.",
+        experience: "Trên 5 năm",
+        frequency: "2 buổi / tuần",
+        competition: "Giải phong trào mở rộng",
+        doubleRole: "Cầu sau / Tấn công",
+        skills: {
+          "Phát": 4.5,
+          "Phông": 4.5,
+          "Lưới": 4.0,
+          "Đập": 5,
+          "Di chuyển": 4.5,
+          "Phòng thủ": 4.5,
+          "Đánh đôi": 4.5,
+          "Chiến thuật": 4.5
+        }
+      }
+    ];
+
+    const chartInstances = {};
+
+    // Khởi tạo trang web
+    window.addEventListener('DOMContentLoaded', () => {
+      // Tự động load file excel nếu bạn đặt file "data.xlsx" cùng thư mục trên Github
+      fetch('./data.xlsx')
+        .then(res => {
+          if (res.ok) return res.arrayBuffer();
+          throw new Error("Không có file data.xlsx mặc định");
+        })
+        .then(buffer => processExcelBuffer(buffer))
+        .catch(() => renderList(playersData));
+
+      setupFileInput();
+    });
+
+    // Lắng nghe tải file Excel thủ công
+    function setupFileInput() {
+      const input = document.getElementById('excelFileInput');
+      input.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          processExcelBuffer(event.target.result);
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    // Xử lý dữ liệu từ file Excel
+    function processExcelBuffer(buffer) {
+      try {
+        const workbook = XLSX.read(buffer, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const rawJson = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName]);
+        
+        if (rawJson.length > 0) {
+          playersData = rawJson.map((row, idx) => {
+            return {
+              id: idx + 1,
+              name: row['Họ tên'] || row['Họ và tên'] || row['Name'] || 'Chưa đặt tên',
+              nickname: row['Nickname'] || row['Nick name'] || '',
+              approved: true,
+              rank: row['Hạng'] || row['Rank'] || 'B',
+              score: parseFloat(row['Điểm'] || row['Score'] || 0).toFixed(2),
+              gender: row['Giới tính'] || row['Gender'] || 'Nam',
+              status: row['Đã đăng ký giải'] || row['Trạng thái'] || 'Đã đăng ký',
+              email: row['Email'] || 'Chưa cập nhật',
+              updatedAt: row['Cập nhật'] || row['Ngày cập nhật'] || '16/09/2026',
+              quote: row['Nhận xét'] || row['Mô tả'] || 'Tay vợt nhiệt huyết của NAB Hanoi.',
+              experience: row['Thâm niên'] || 'Trên 1 năm',
+              frequency: row['Tần suất tập'] || '1-2 buổi / tuần',
+              competition: row['Kinh nghiệm thi đấu'] || 'Giao lưu nội bộ',
+              doubleRole: row['Vai trò khi đánh đôi'] || 'Linh hoạt',
+              skills: {
+                "Phát": Number(row['Phát cầu'] || row['Phát'] || 4),
+                "Phông": Number(row['Phông & khống chế'] || row['Phông'] || 4),
+                "Lưới": Number(row['Cầu lưới'] || row['Lưới'] || 4),
+                "Đập": Number(row['Đập cầu'] || row['Đập'] || 4),
+                "Di chuyển": Number(row['Di chuyển & vị trí'] || row['Di chuyển'] || 4),
+                "Phòng thủ": Number(row['Phòng thủ'] || 4),
+                "Đánh đôi": Number(row['Phối hợp đánh đôi'] || row['Đánh đôi'] || 4),
+                "Chiến thuật": Number(row['Chiến thuật'] || 4)
+              }
+            };
+          });
+          applyFilters();
+        }
+      } catch (err) {
+        console.error("Lỗi đọc file Excel:", err);
+        renderList(playersData);
+      }
+    }
+
+    // Bộ lọc và sắp xếp danh sách
+    function applyFilters() {
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
+      const rank = document.getElementById('rankFilter').value;
+      const gender = document.getElementById('genderFilter').value;
+      const status = document.getElementById('statusFilter').value;
+      const sort = document.getElementById('sortFilter').value;
+
+      let filtered = playersData.filter(p => {
+        const matchQ = p.name.toLowerCase().includes(q) || 
+                       p.nickname.toLowerCase().includes(q) || 
+                       p.email.toLowerCase().includes(q);
+        const matchRank = (rank === 'all') || (p.rank === rank);
+        const matchGender = (gender === 'all') || (p.gender === gender);
+        const matchStatus = (status === 'all') || (p.status === status);
+        return matchQ && matchRank && matchGender && matchStatus;
+      });
+
+      if (sort === 'score-desc') filtered.sort((a,b) => b.score - a.score);
+      else if (sort === 'score-asc') filtered.sort((a,b) => a.score - b.score);
+      else if (sort === 'name-asc') filtered.sort((a,b) => a.name.localeCompare(b.name));
+
+      renderList(filtered);
+    }
+
+    // Hiển thị danh sách ra HTML
+    function renderList(list) {
+      const container = document.getElementById('playerListContainer');
+      const counter = document.getElementById('playerCounter');
+      counter.innerText = `Hiện ${list.length}/${playersData.length} người`;
+
+      if (list.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding: 40px; color:#6B7280;">Không tìm thấy người chơi phù hợp</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map((p, index) => `
+        <div class="player-card" id="card-${p.id}">
+          <div class="player-main-row">
+            <div class="player-index">${index + 1}</div>
+            <div class="player-identity">
+              <span class="player-name">${p.name}</span>
+              ${p.nickname ? `<span class="player-nick">${p.nickname}</span>` : ''}
+              ${p.approved ? `<span class="admin-approved"><i class="fa-solid fa-circle-check"></i> Admin đã duyệt</span>` : ''}
+            </div>
+            <div>
+              <span class="badge-rank">${p.rank}</span>
+            </div>
+            <div class="badge-score">${parseFloat(p.score).toFixed(2)}</div>
+            <div>${p.gender}</div>
+            <div><span class="badge-status">${p.status}</span></div>
+            <div class="player-email">${p.email}</div>
+            <div class="player-date">${p.updatedAt}</div>
+            <div style="text-align: right;">
+              <button class="btn-detail" id="btn-toggle-${p.id}" onclick="toggleDetail(${p.id})">Chi tiết</button>
+            </div>
+          </div>
+
+          <!-- Chi tiết mở rộng -->
+          <div class="player-detail-panel" id="detail-${p.id}">
+            <div class="radar-container">
+              <canvas id="radar-${p.id}"></canvas>
+            </div>
+            <div class="detail-info">
+              <div class="detail-header-title">${p.name} – hạng ${p.rank}</div>
+              <div class="detail-quote">${p.quote}</div>
+
+              <div class="detail-meta-grid">
+                <div class="meta-box">
+                  <span>Thâm niên</span>
+                  <strong>${p.experience}</strong>
+                </div>
+                <div class="meta-box">
+                  <span>Tần suất tập</span>
+                  <strong>${p.frequency}</strong>
+                </div>
+                <div class="meta-box">
+                  <span>Kinh nghiệm thi đấu</span>
+                  <strong>${p.competition}</strong>
+                </div>
+                <div class="meta-box">
+                  <span>Vai trò khi đánh đôi</span>
+                  <strong>${p.doubleRole}</strong>
+                </div>
+              </div>
+
+              <div class="skills-score-grid">
+                <div class="skill-score-row"><span>Phát cầu</span><strong>${p.skills['Phát']}/5</strong></div>
+                <div class="skill-score-row"><span>Phông & khống chế</span><strong>${p.skills['Phông']}/5</strong></div>
+                <div class="skill-score-row"><span>Cầu lưới</span><strong>${p.skills['Lưới']}/5</strong></div>
+                <div class="skill-score-row"><span>Đập cầu</span><strong>${p.skills['Đập']}/5</strong></div>
+                <div class="skill-score-row"><span>Di chuyển & vị trí</span><strong>${p.skills['Di chuyển']}/5</strong></div>
+                <div class="skill-score-row"><span>Phòng thủ</span><strong>${p.skills['Phòng thủ']}/5</strong></div>
+                <div class="skill-score-row"><span>Phối hợp đánh đôi</span><strong>${p.skills['Đánh đôi']}/5</strong></div>
+                <div class="skill-score-row"><span>Chiến thuật</span><strong>${p.skills['Chiến thuật']}/5</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Toggle đóng / mở chi tiết và vẽ Radar Chart
+    function toggleDetail(id) {
+      const panel = document.getElementById(`detail-${id}`);
+      const btn = document.getElementById(`btn-toggle-${id}`);
+      const isOpen = panel.classList.contains('open');
+
+      if (isOpen) {
+        panel.classList.remove('open');
+        btn.classList.remove('active');
+        btn.innerText = 'Chi tiết';
+      } else {
+        panel.classList.add('open');
+        btn.classList.add('active');
+        btn.innerText = 'Đóng';
+        renderRadarChart(id);
+      }
+    }
+
+    // Khởi tạo biểu đồ radar với tông màu NAB
+    function renderRadarChart(id) {
+      if (chartInstances[id]) return; // Tránh render lại nếu đã tạo
+
+      const player = playersData.find(p => p.id === id);
+      if (!player) return;
+
+      const ctx = document.getElementById(`radar-${id}`).getContext('2d');
+      const labels = ['Phát', 'Phông', 'Lưới', 'Đập', 'Di chuyển', 'Phòng thủ', 'Đánh đôi', 'Chiến thuật'];
+      const dataValues = labels.map(l => player.skills[l] || 4);
+
+      chartInstances[id] = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: dataValues,
+            backgroundColor: 'rgba(199, 0, 0, 0.22)',
+            borderColor: '#C70000',
+            borderWidth: 2,
+            pointBackgroundColor: '#C70000',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#C70000'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            r: {
+              angleLines: { color: '#E5E7EB' },
+              grid: { color: '#E5E7EB' },
+              suggestedMin: 0,
+              suggestedMax: 5,
+              ticks: {
+                stepSize: 1,
+                display: true,
+                backdropColor: 'transparent',
+                font: { size: 10 }
+              },
+              pointLabels: {
+                font: {
+                  size: 11,
+                  weight: '600',
+                  family: "'Inter', sans-serif"
+                },
+                color: '#374151'
+              }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
