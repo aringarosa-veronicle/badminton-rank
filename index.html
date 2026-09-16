@@ -5,823 +5,2252 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Danh sách người chơi NAB HANOI BADMINTON CHAMPIONSHIP 2026</title>
   
-  <!-- Font & Icons -->
+  <!-- Font chữ Inter chuẩn nhận diện doanh nghiệp -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-  <!-- SheetJS & Chart.js -->
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            nab: {
+              red: '#C70000',
+              redHover: '#A50000',
+              redLight: 'rgba(199, 0, 0, 0.08)',
+              black: '#1A1A1A',
+              cardBg: '#FFFFFF',
+              grayBg: '#F4F5F7',
+              border: '#E5E7EB',
+              muted: '#6B7280'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- SheetJS và Chart.js cho Radar Chart -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    :root {
-      --nab-red: #C70000;
-      --nab-red-hover: #A50000;
-      --nab-red-light: rgba(199, 0, 0, 0.12);
-      --nab-black: #1A1A1A;
-      --nab-gray-bg: #F4F5F7;
-      --nab-card-bg: #FFFFFF;
-      --nab-border: #E5E7EB;
-      --nab-text-muted: #6B7280;
-      --nab-green-badge: #E6F4EA;
-      --nab-green-text: #137333;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Inter', sans-serif;
-    }
-
     body {
-      background-color: var(--nab-gray-bg);
-      color: var(--nab-black);
-      padding-bottom: 60px;
+      background-color: #F4F5F7;
+      color: #1A1A1A;
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Top Brand Bar */
-    header {
-      background: #FFFFFF;
-      border-bottom: 3px solid var(--nab-red);
-      padding: 16px 28px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-
-    .brand-title {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .nab-star {
-      background: var(--nab-red);
-      color: white;
-      font-weight: 700;
-      font-size: 14px;
-      padding: 4px 8px;
-      border-radius: 4px;
-      letter-spacing: 0.5px;
-    }
-
-    h1 {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--nab-black);
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .btn-upload {
-      background: var(--nab-red);
-      color: #fff;
-      padding: 7px 14px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border: none;
-      transition: background 0.2s;
-    }
-
-    .btn-upload:hover {
-      background: var(--nab-red-hover);
-    }
-
-    /* Container */
-    .container {
-      max-width: 1220px;
-      margin: 24px auto;
-      padding: 0 16px;
-    }
-
-    /* Filters Bar */
-    .filter-card {
-      background: var(--nab-card-bg);
-      border-radius: 10px;
-      padding: 16px;
-      border: 1px solid var(--nab-border);
-      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-      margin-bottom: 18px;
-    }
-
-    .filter-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .filter-input {
-      flex: 2;
-      min-width: 220px;
+    /* Radar Chart container animation */
+    .radar-wrapper {
       position: relative;
-    }
-
-    .filter-input input {
       width: 100%;
-      padding: 8px 12px 8px 34px;
-      font-size: 13.5px;
-      border: 1px solid var(--nab-border);
-      border-radius: 6px;
-      outline: none;
-    }
-
-    .filter-input input:focus {
-      border-color: var(--nab-red);
-    }
-
-    .filter-input i {
-      position: absolute;
-      left: 11px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--nab-text-muted);
-      font-size: 13px;
-    }
-
-    .filter-select {
-      flex: 1;
-      min-width: 140px;
-      padding: 8px 12px;
-      font-size: 13.5px;
-      border: 1px solid var(--nab-border);
-      border-radius: 6px;
-      background-color: white;
-      cursor: pointer;
-      outline: none;
-    }
-
-    .filter-select:focus {
-      border-color: var(--nab-red);
-    }
-
-    .filter-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 14px;
-      padding-top: 12px;
-      border-top: 1px solid #F0F2F5;
-      font-size: 13px;
-      color: var(--nab-text-muted);
-    }
-
-    .filter-meta-left {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
-
-    .filter-meta-left label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-    }
-
-    /* Player Table List */
-    .list-header {
-      display: grid;
-      grid-template-columns: 50px 2.2fr 80px 80px 100px 140px 1.8fr 110px 90px;
-      padding: 10px 16px;
-      font-size: 12.5px;
-      font-weight: 600;
-      color: var(--nab-text-muted);
-      align-items: center;
-    }
-
-    .player-card {
-      background: var(--nab-card-bg);
-      border: 1px solid var(--nab-border);
-      border-radius: 8px;
-      margin-bottom: 10px;
-      overflow: hidden;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-      transition: border-color 0.2s;
-    }
-
-    .player-card:hover {
-      border-color: #D1D5DB;
-    }
-
-    .player-main-row {
-      display: grid;
-      grid-template-columns: 50px 2.2fr 80px 80px 100px 140px 1.8fr 110px 90px;
-      padding: 14px 16px;
-      align-items: center;
-      font-size: 13.5px;
-    }
-
-    .player-index {
-      color: var(--nab-text-muted);
-      font-weight: 500;
-    }
-
-    .player-identity {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .player-name {
-      font-weight: 700;
-      font-size: 14.5px;
-      color: var(--nab-black);
-    }
-
-    .player-nick {
-      font-size: 12px;
-      color: var(--nab-text-muted);
-    }
-
-    .admin-approved {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
-      color: #4B5563;
-      background: #F3F4F6;
-      padding: 2px 6px;
-      border-radius: 4px;
-      width: fit-content;
-      margin-top: 3px;
-    }
-
-    /* Rank Badge */
-    .badge-rank {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: var(--nab-red);
-      color: white;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      box-shadow: 0 2px 4px rgba(199, 0, 0, 0.3);
-    }
-
-    .badge-score {
-      font-weight: 700;
-      font-size: 14px;
-      color: var(--nab-black);
-    }
-
-    .badge-status {
-      background: var(--nab-green-badge);
-      color: var(--nab-green-text);
-      font-size: 12px;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 12px;
-      display: inline-block;
-    }
-
-    .player-email {
-      color: var(--nab-text-muted);
-      font-size: 13px;
-      word-break: break-all;
-    }
-
-    .player-date {
-      color: var(--nab-text-muted);
-      font-size: 12.5px;
-    }
-
-    .btn-detail {
-      background: #FFFFFF;
-      border: 1px solid #D1D5DB;
-      padding: 6px 12px;
-      border-radius: 16px;
-      font-size: 12.5px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-detail:hover {
-      background: #F9FAFB;
-      border-color: #9CA3AF;
-    }
-
-    .btn-detail.active {
-      background: #E5E7EB;
-      color: var(--nab-black);
-      border-color: #9CA3AF;
-    }
-
-    /* Detail Drawer Section */
-    .player-detail-panel {
-      display: none;
-      background: #FAFAFA;
-      border-top: 1px solid var(--nab-border);
-      padding: 24px;
-    }
-
-    .player-detail-panel.open {
-      display: grid;
-      grid-template-columns: 360px 1fr;
-      gap: 32px;
-      align-items: center;
-    }
-
-    .radar-container {
-      width: 100%;
-      max-width: 350px;
+      max-width: 380px;
+      aspect-ratio: 1 / 1;
       margin: 0 auto;
     }
 
-    .detail-info {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F1F1F1;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #C70000;
+      border-radius: 4px;
     }
 
-    .detail-header-title {
-      font-size: 16px;
+    /* Tier Badges */
+    .tier-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
       font-weight: 700;
-      color: var(--nab-black);
-    }
-
-    .detail-quote {
       font-size: 13px;
-      color: #4B5563;
-      line-height: 1.5;
-      font-style: italic;
+      color: #FFFFFF;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.12);
+      transition: transform 0.2s ease;
+    }
+    .tier-badge:hover {
+      transform: scale(1.1);
+    }
+    .tier-S  { background: linear-gradient(135deg, #C70000, #900000); }
+    .tier-Aplus { background: linear-gradient(135deg, #E65100, #C70000); }
+    .tier-A  { background: linear-gradient(135deg, #F59E0B, #D97706); }
+    .tier-B  { background: linear-gradient(135deg, #2563EB, #1D4ED8); }
+    .tier-C  { background: linear-gradient(135deg, #0D9488, #0F766E); }
+    .tier-D  { background: linear-gradient(135deg, #6B7280, #4B5563); }
+    .tier-none { background: #9CA3AF; }
+
+    /* Animated Accordion Drawer */
+    .player-drawer {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    }
+    .player-drawer.is-open {
+      max-height: 1200px;
+      opacity: 1;
     }
 
-    .detail-meta-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      background: white;
-      padding: 14px;
-      border-radius: 8px;
-      border: 1px solid #E5E7EB;
+    /* Toast Notification */
+    #toastMessage {
+      transform: translateY(150%);
+      transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
     }
-
-    .meta-box span {
-      display: block;
-      font-size: 11.5px;
-      color: var(--nab-text-muted);
-      margin-bottom: 3px;
-    }
-
-    .meta-box strong {
-      font-size: 13.5px;
-      color: var(--nab-black);
-    }
-
-    .skills-score-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px 24px;
-      padding-top: 4px;
-    }
-
-    .skill-score-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-      padding-bottom: 6px;
-      border-bottom: 1px dashed #E5E7EB;
-    }
-
-    .skill-score-row span {
-      color: #374151;
-    }
-
-    .skill-score-row strong {
-      color: var(--nab-black);
-    }
-
-    @media (max-width: 992px) {
-      .list-header { display: none; }
-      .player-main-row {
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-      }
-      .player-detail-panel.open {
-        grid-template-columns: 1fr;
-      }
+    #toastMessage.show {
+      transform: translateY(0);
     }
   </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col antialiased text-gray-900">
 
-  <header>
-    <div class="brand-title">
-      <span class="nab-star">NAB</span>
-      <h1>Danh sách người chơi NAB HANOI BADMINTON CHAMPIONSHIP 2026</h1>
-    </div>
-    <div class="header-actions">
-      <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="display: none;" />
-      <button class="btn-upload" onclick="document.getElementById('excelFileInput').click()">
-        <i class="fa-solid fa-file-excel"></i> Nhập file Excel
-      </button>
+  <!-- Top Corporate Navbar -->
+  <header class="bg-white border-b-4 border-[#C70000] sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Brand Logo & Title -->
+      <div class="flex items-center space-x-3">
+        <div class="bg-[#C70000] text-white px-3 py-1.5 rounded font-black text-sm tracking-wider shadow-sm flex items-center gap-1.5">
+          <i class="fa-solid fa-star text-xs"></i>
+          <span>NAB</span>
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold text-gray-900 leading-tight">
+            Danh sách người chơi NAB HANOI BADMINTON CHAMPIONSHIP 2026
+          </h1>
+          <p class="text-xs text-gray-500 hidden sm:block">Bảng xếp hạng kỹ năng & hồ sơ đăng ký thi đấu chính thức</p>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="flex items-center space-x-2">
+        <input type="file" id="excelFileInput" accept=".xlsx, .xls" class="hidden" />
+        <button onclick="document.getElementById('excelFileInput').click()" class="inline-flex items-center gap-2 bg-[#C70000] hover:bg-[#A50000] text-white text-xs sm:text-sm font-semibold px-3.5 py-2 rounded-lg shadow-sm transition-all duration-150 active:scale-95">
+          <i class="fa-solid fa-file-excel"></i>
+          <span>Nhập file Excel</span>
+        </button>
+        <button onclick="resetToInitialData()" title="Khôi phục dữ liệu gốc" class="p-2 text-gray-500 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-xs sm:text-sm">
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+      </div>
+
     </div>
   </header>
 
-  <div class="container">
-    <!-- Filter Bar -->
-    <div class="filter-card">
-      <div class="filter-row">
-        <div class="filter-input">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="searchInput" placeholder="Tìm tên, nickname, email..." oninput="applyFilters()" />
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
+
+    <!-- KPI Summary: Overview & Gender Stats -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-xs flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-lg bg-red-50 text-[#C70000] flex items-center justify-center font-bold text-lg shrink-0">
+          <i class="fa-solid fa-users"></i>
         </div>
-        <select class="filter-select" id="rankFilter" onchange="applyFilters()">
-          <option value="all">Tất cả các hạng</option>
-          <option value="S">Hạng S</option>
-          <option value="A">Hạng A</option>
-          <option value="B">Hạng B</option>
-          <option value="C">Hạng C</option>
-        </select>
-        <select class="filter-select" id="genderFilter" onchange="applyFilters()">
-          <option value="all">Nam và nữ</option>
-          <option value="Nam">Nam</option>
-          <option value="Nữ">Nữ</option>
-        </select>
-        <select class="filter-select" id="statusFilter" onchange="applyFilters()">
-          <option value="all">Đăng ký giải: tất cả</option>
-          <option value="Đã đăng ký">Đã đăng ký</option>
-          <option value="Chưa đăng ký">Chưa đăng ký</option>
-        </select>
-        <select class="filter-select" id="sortFilter" onchange="applyFilters()">
-          <option value="default">Hạng & điểm (mặc định)</option>
-          <option value="score-desc">Điểm: Cao đến thấp</option>
-          <option value="score-asc">Điểm: Thấp đến cao</option>
-          <option value="name-asc">Tên: A - Z</option>
-        </select>
+        <div class="min-w-0">
+          <div class="text-xs text-gray-500 font-medium truncate">Tổng người chơi</div>
+          <div class="text-lg font-bold text-gray-900" id="statTotalPlayers">56</div>
+        </div>
       </div>
 
-      <div class="filter-meta">
-        <div class="filter-meta-left">
-          <label><input type="checkbox" id="checkSkills" checked> Điểm 8 kỹ năng</label>
-          <label><input type="checkbox" id="checkProfile" checked> Hồ sơ người chơi</label>
+      <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-xs flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-lg bg-green-50 text-green-700 flex items-center justify-center font-bold text-lg shrink-0">
+          <i class="fa-solid fa-clipboard-check"></i>
         </div>
-        <div id="playerCounter" style="font-weight: 500;">Đang hiển thị: 0 người</div>
+        <div class="min-w-0">
+          <div class="text-xs text-gray-500 font-medium truncate">Đã đăng ký giải</div>
+          <div class="text-lg font-bold text-green-700" id="statRegistered">56</div>
+        </div>
+      </div>
+
+      <!-- VĐV Nam (Tách riêng & bấm để lọc nhanh) -->
+      <div onclick="quickFilterGender('Nam')" id="btnGenderMale" class="bg-white p-3 rounded-xl border border-gray-200 hover:border-blue-400 hover:bg-blue-50/30 shadow-xs flex items-center space-x-3 cursor-pointer transition group select-none" title="Bấm để lọc danh sách Nam">
+        <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-lg shrink-0 group-hover:scale-105 transition-transform">
+          <i class="fa-solid fa-mars"></i>
+        </div>
+        <div class="min-w-0">
+          <div class="text-xs text-gray-500 font-medium flex items-center gap-1 truncate">
+            <span>VĐV Nam</span>
+            <i class="fa-solid fa-filter text-[10px] text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+          </div>
+          <div class="text-lg font-bold text-blue-700" id="statMale">52</div>
+        </div>
+      </div>
+
+      <!-- VĐV Nữ (Tách riêng & bấm để lọc nhanh) -->
+      <div onclick="quickFilterGender('Nữ')" id="btnGenderFemale" class="bg-white p-3 rounded-xl border border-gray-200 hover:border-pink-400 hover:bg-pink-50/30 shadow-xs flex items-center space-x-3 cursor-pointer transition group select-none" title="Bấm để lọc danh sách Nữ">
+        <div class="w-10 h-10 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center font-bold text-lg shrink-0 group-hover:scale-105 transition-transform">
+          <i class="fa-solid fa-venus"></i>
+        </div>
+        <div class="min-w-0">
+          <div class="text-xs text-gray-500 font-medium flex items-center gap-1 truncate">
+            <span>VĐV Nữ</span>
+            <i class="fa-solid fa-filter text-[10px] text-pink-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+          </div>
+          <div class="text-lg font-bold text-pink-700" id="statFemale">4</div>
+        </div>
+      </div>
+
+      <!-- After Party -->
+      <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-xs flex items-center space-x-3 col-span-2 sm:col-span-1">
+        <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-lg shrink-0">
+          <i class="fa-solid fa-wine-glass"></i>
+        </div>
+        <div class="min-w-0">
+          <div class="text-xs text-gray-500 font-medium truncate">After Party</div>
+          <div class="text-lg font-bold text-emerald-700" id="statParty">38</div>
+        </div>
       </div>
     </div>
 
-    <!-- Table Header -->
-    <div class="list-header">
-      <div>#</div>
-      <div>Người chơi</div>
-      <div>Hạng</div>
-      <div>Điểm</div>
-      <div>Giới tính</div>
-      <div>Đã đăng ký giải</div>
-      <div>Email</div>
-      <div>Cập nhật</div>
-      <div style="text-align: right;">Thao tác</div>
+    <!-- Phân bố số lượng từng Hạng kỹ năng: S, A+, A, B, C, D -->
+    <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-xs space-y-2">
+      <div class="flex items-center justify-between text-xs text-gray-500 font-medium px-1">
+        <span class="flex items-center gap-1.5 text-gray-800 font-semibold">
+          <i class="fa-solid fa-chart-simple text-[#C70000]"></i>
+          <span>Thống kê theo từng Hạng kỹ năng</span>
+        </span>
+        <span class="text-[11px] text-gray-400 hidden sm:inline"><i class="fa-solid fa-hand-pointer mr-1 text-[10px]"></i>Bấm vào từng hạng để lọc nhanh danh sách</span>
+      </div>
+      
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+        <!-- Hạng S -->
+        <button id="btnTierQuick-S" onclick="quickFilterTier('S')" class="flex items-center space-x-2.5 p-2.5 rounded-xl border border-gray-200 hover:border-red-400 hover:bg-red-50/40 transition text-left group shadow-2xs">
+          <span class="tier-badge tier-S w-8 h-8 text-xs shrink-0 group-hover:scale-110">S</span>
+          <div class="min-w-0">
+            <div class="text-[11px] text-gray-500 font-medium">Hạng S</div>
+            <div class="text-base font-bold text-gray-900 leading-tight" id="statTierS">4</div>
+          </div>
+        </button>
+
+        <!-- Hạng A+ -->
+        <button id="btnTierQuick-Aplus" onclick="quickFilterTier('A+')" class="flex items-center space-x-2.5 p-2.5 rounded-xl border border-gray-200 hover:border-orange-400 hover:bg-orange-50/40 transition text-left group shadow-2xs">
+          <span class="tier-badge tier-Aplus w-8 h-8 text-xs shrink-0 group-hover:scale-110">A+</span>
+          <div class="min-w-0">
+            <div class="text-[11px] text-gray-500 font-medium">Hạng A+</div>
+            <div class="text-base font-bold text-gray-900 leading-tight" id="statTierAplus">9</div>
+          </div>
+        </button>
+
+        <!-- Hạng A -->
+        <button id="btnTierQuick-A" onclick="quickFilterTier('A')" class="flex items-center space-x-2.5 p-2.5 rounded-xl border border-gray-200 hover:border-amber-400 hover:bg-amber-50/40 transition text-left group shadow-2xs">
+          <span class="tier-badge tier-A w-8 h-8 text-xs shrink-0 group-hover:scale-110">A</span>
+          <div class="min-w-0">
+            <div class="text-[11px] text-gray-500 font-medium">Hạng A</div>
+            <div class="text-base font-bold text-gray-900 leading-tight" id="statTierA">7</div>
+          </div>
+        </button>
+
+        <!-- Hạng B -->
+        <button id="btnTierQuick-B" onclick="quickFilterTier('B')" class="flex items-center space-x-2.5 p-2.5 rounded-xl border border-gray-200 hover:border-blue-400 hover:bg-blue-50/40 transition text-left group shadow-2xs">
+          <span class="tier-badge tier-B w-8 h-8 text-xs shrink-0 group-hover:scale-110">B</span>
+          <div class="min-w-0">
+            <div class="text-[11px] text-gray-500 font-medium">Hạng B</div>
+            <div class="text-base font-bold text-gray-900 leading-tight" id="statTierB">21</div>
+          </div>
+        </button>
+
+        <!-- Hạng C -->
+        <button id="btnTierQuick-C" onclick="quickFilterTier('C')" class="flex items-center space-x-2.5 p-2.5 rounded-xl border border-gray-200 hover:border-teal-400 hover:bg-teal-50/40 transition text-left group shadow-2xs">
+          <span class="tier-badge tier-C w-8 h-8 text-xs shrink-0 group-hover:scale-110">C</span>
+          <div class="min-w-0">
+            <div class="text-[11px] text-gray-500 font-medium">Hạng C</div>
+            <div class="text-base font-bold text-gray-900 leading-tight" id="statTierC">10</div>
+          </div>
+        </button>
+
+        <!-- Hạng D -->
+        <button id="btnTierQuick-D" onclick="quickFilterTier('D')" class="flex items-center space-x-2.5 p-2.5 rounded-xl border border-gray-200 hover:border-gray-400 hover:bg-gray-100/60 transition text-left group shadow-2xs">
+          <span class="tier-badge tier-D w-8 h-8 text-xs shrink-0 group-hover:scale-110">D</span>
+          <div class="min-w-0">
+            <div class="text-[11px] text-gray-500 font-medium">Hạng D</div>
+            <div class="text-base font-bold text-gray-900 leading-tight" id="statTierD">4</div>
+          </div>
+        </button>
+      </div>
     </div>
 
-    <!-- Dynamic Player List Container -->
-    <div id="playerListContainer"></div>
+    <!-- Filter Controls Card -->
+    <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-xs space-y-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
+        
+        <!-- Search Input -->
+        <div class="lg:col-span-4 relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+            <i class="fa-solid fa-magnifying-glass text-sm"></i>
+          </div>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Tìm tên, nickname, email..." 
+            oninput="handleFilterChange()"
+            class="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C70000] focus:border-transparent outline-none transition"
+          />
+        </div>
+
+        <!-- Filter Tier -->
+        <div class="lg:col-span-2">
+          <select id="rankFilter" onchange="handleFilterChange()" class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C70000] outline-none bg-white">
+            <option value="all">Tất cả các hạng</option>
+            <option value="S">Hạng S</option>
+            <option value="A+">Hạng A+</option>
+            <option value="A">Hạng A</option>
+            <option value="B">Hạng B</option>
+            <option value="C">Hạng C</option>
+            <option value="D">Hạng D</option>
+          </select>
+        </div>
+
+        <!-- Filter Gender -->
+        <div class="lg:col-span-2">
+          <select id="genderFilter" onchange="handleFilterChange()" class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C70000] outline-none bg-white">
+            <option value="all">Nam và nữ</option>
+            <option value="Nam">Nam</option>
+            <option value="Nữ">Nữ</option>
+          </select>
+        </div>
+
+        <!-- Filter Registration Status -->
+        <div class="lg:col-span-2">
+          <select id="regFilter" onchange="handleFilterChange()" class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C70000] outline-none bg-white">
+            <option value="all">Đăng ký giải: tất cả</option>
+            <option value="Có">Đã đăng ký</option>
+            <option value="Không">Chưa đăng ký</option>
+          </select>
+        </div>
+
+        <!-- Sort Select -->
+        <div class="lg:col-span-2">
+          <select id="sortFilter" onchange="handleFilterChange()" class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C70000] outline-none bg-white font-medium">
+            <option value="default">Hạng & điểm (mặc định)</option>
+            <option value="score-desc">Điểm: Cao đến thấp</option>
+            <option value="score-asc">Điểm: Thấp đến cao</option>
+            <option value="name-asc">Tên người chơi: A - Z</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- Filter Metadata Bar -->
+      <div class="pt-3 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3 text-xs text-gray-500">
+        <div class="flex items-center space-x-5">
+          <label class="inline-flex items-center gap-1.5 cursor-pointer select-none">
+            <input type="checkbox" id="chkShowSkills" checked onchange="toggleAllVisuals()" class="rounded text-[#C70000] focus:ring-[#C70000]" />
+            <span class="text-gray-700 font-medium">Điểm 8 kỹ năng</span>
+          </label>
+          <label class="inline-flex items-center gap-1.5 cursor-pointer select-none">
+            <input type="checkbox" id="chkShowProfile" checked onchange="toggleAllVisuals()" class="rounded text-[#C70000] focus:ring-[#C70000]" />
+            <span class="text-gray-700 font-medium">Hồ sơ người chơi</span>
+          </label>
+        </div>
+        <div class="font-semibold text-gray-700" id="playerCountDisplay">
+          Hiện 56/56 người
+        </div>
+      </div>
+    </div>
+
+    <!-- Table Header for Desktop -->
+    <div class="hidden md:grid grid-cols-12 gap-3 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500 items-center">
+      <div class="col-span-1 text-center">#</div>
+      <div class="col-span-3">Người chơi</div>
+      <div class="col-span-1 text-center">Hạng</div>
+      <div class="col-span-1 text-center">Điểm</div>
+      <div class="col-span-1 text-center">Giới tính</div>
+      <div class="col-span-2 text-center">Đã đăng ký giải</div>
+      <div class="col-span-2">Email</div>
+      <div class="col-span-1 text-right">Thao tác</div>
+    </div>
+
+    <!-- Player Cards / List Container -->
+    <div id="playerListContainer" class="space-y-2.5">
+      <!-- Injected dynamically by JavaScript -->
+    </div>
+
+  </main>
+
+  <!-- Toast alert box for user messages (no window.alert) -->
+  <div id="toastMessage" class="fixed bottom-6 right-6 z-50 bg-gray-900 text-white px-4 py-3 rounded-lg shadow-xl border-l-4 border-[#C70000] flex items-center space-x-3">
+    <i class="fa-solid fa-circle-info text-[#C70000]"></i>
+    <span id="toastText" class="text-sm font-medium">Thông báo</span>
   </div>
 
+  <footer class="mt-auto border-t border-gray-200 bg-white py-4 text-center text-xs text-gray-500">
+    <p>© 2026 National Australia Bank (NAB) Hanoi Badminton Club • Giải đấu thường niên NAB Championship</p>
+  </footer>
+
   <script>
-    // Dữ liệu ban đầu mô phỏng theo ảnh đính kèm (sẽ tự động ghi đè khi bạn chọn file Excel hoặc tải từ repo)
-    let playersData = [
+    // Toàn bộ dữ liệu 56 vận động viên từ file Excel được tích hợp sẵn
+    const DEFAULT_PLAYERS = [
       {
         id: 1,
+        bxh: 1,
         name: "An Văn Thịnh",
-        nickname: "Thinh An",
-        approved: true,
-        rank: "S",
-        score: 5.00,
-        gender: "Nam",
-        status: "Đã đăng ký",
+        nick: "Thinh An",
         email: "vanthinh.an@nab.com.au",
-        updatedAt: "11/09/2026",
-        quote: "Nhóm mạnh nhất trong clb phong trào: đánh chắc, đọc trận tốt, thường được xếp gánh đội hoặc đi đánh giải.",
-        experience: "Trên 5 năm",
-        frequency: "1–2 buổi / tuần",
-        competition: "Giải nội bộ / giao lưu công ty",
-        doubleRole: "Linh hoạt",
-        skills: {
-          "Phát": 5,
-          "Phông": 5,
-          "Lưới": 5,
-          "Đập": 5,
-          "Di chuyển": 5,
-          "Phòng thủ": 5,
-          "Đánh đôi": 5,
-          "Chiến thuật": 5
-        }
+        gender: "Nam",
+        tier: "S",
+        score: 5.00,
+        years: "Trên 5 năm",
+        freq: "1–2 buổi / tuần",
+        exp: "Giải nội bộ / giao lưu công ty",
+        role: "Linh hoạt",
+        skills: { Phat: 5.0, Phong: 5.0, Luoi: 5.0, Dap: 5.0, DiChuyen: 5.0, PhongThu: 5.0, DanhDoi: 5.0, ChienThuat: 5.0 },
+        source: "Admin đã khóa",
+        registered: "Có",
+        events: "Men Double, Mixed Double",
+        party: "No",
+        fee: "Đã đóng",
+        updated: "11/09/2026"
       },
       {
         id: 2,
+        bxh: 2,
         name: "Tuyen Bui",
-        nickname: "TuyenB",
-        approved: true,
-        rank: "S",
-        score: 4.53,
-        gender: "Nam",
-        status: "Đã đăng ký",
+        nick: "TuyenB",
         email: "tuyen.bui@nab.com.au",
-        updatedAt: "11/09/2026",
-        quote: "Đánh công thủ toàn diện, xử lý cầu trên lưới tốt và phản xạ nhanh nhẹn.",
-        experience: "3-5 năm",
-        frequency: "2–3 buổi / tuần",
-        competition: "Giải phong trào mở rộng",
-        doubleRole: "Cầu trên / Lưới",
-        skills: {
-          "Phát": 4.5,
-          "Phông": 4.5,
-          "Lưới": 5,
-          "Đập": 4.5,
-          "Di chuyển": 4.5,
-          "Phòng thủ": 4.5,
-          "Đánh đôi": 4.5,
-          "Chiến thuật": 4.5
-        }
+        gender: "Nam",
+        tier: "S",
+        score: 4.53,
+        years: "Trên 5 năm",
+        freq: "1–2 buổi / tuần",
+        exp: "Chỉ đánh vui, chưa thi đấu",
+        role: "Linh hoạt",
+        skills: { Phat: 4.0, Phong: 5.0, Luoi: 4.0, Dap: 5.0, DiChuyen: 4.0, PhongThu: 4.0, DanhDoi: 5.0, ChienThuat: 5.0 },
+        source: "Admin đã khóa",
+        registered: "Có",
+        events: "Men Double, Mixed Double, Women Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
       },
       {
         id: 3,
+        bxh: 3,
         name: "Luong Tran",
-        nickname: "Luong Tran",
-        approved: true,
-        rank: "S",
-        score: 4.50,
-        gender: "Nam",
-        status: "Đã đăng ký",
+        nick: "Luong Tran",
         email: "luong.tran@nab.com.au",
-        updatedAt: "09/09/2026",
-        quote: "Smash uy lực từ cuối sân, thể lực sung mãn, kinh nghiệm bao quát sân tốt.",
-        experience: "Trên 5 năm",
-        frequency: "2 buổi / tuần",
-        competition: "Giải phong trào mở rộng",
-        doubleRole: "Cầu sau / Tấn công",
-        skills: {
-          "Phát": 4.5,
-          "Phông": 4.5,
-          "Lưới": 4.0,
-          "Đập": 5,
-          "Di chuyển": 4.5,
-          "Phòng thủ": 4.5,
-          "Đánh đôi": 4.5,
-          "Chiến thuật": 4.5
-        }
+        gender: "Nam",
+        tier: "S",
+        score: 4.50,
+        years: "Trên 5 năm",
+        freq: "1–2 buổi / tuần",
+        exp: "Giải nội bộ / giao lưu công ty",
+        role: "Linh hoạt",
+        skills: { Phat: 4.5, Phong: 4.5, Luoi: 4.0, Dap: 5.0, DiChuyen: 4.5, PhongThu: 4.5, DanhDoi: 4.5, ChienThuat: 4.5 },
+        source: "Admin đã khóa",
+        registered: "Có",
+        events: "Men Double, Mixed Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "09/09/2026"
+      },
+      {
+        id: 4,
+        bxh: 4,
+        name: "Hưng Nguyễn Khoa",
+        nick: "Harris",
+        email: "hung.nguyenkhoa@nab.com.au",
+        gender: "Nam",
+        tier: "S",
+        score: 4.40,
+        years: "Trên 5 năm",
+        freq: "3–4 buổi / tuần",
+        exp: "Giải mở rộng / phong trào quận",
+        role: "Tấn công (Smash & cầu sau)",
+        skills: { Phat: 4.5, Phong: 4.5, Luoi: 4.0, Dap: 5.0, DiChuyen: 4.0, PhongThu: 4.0, DanhDoi: 4.5, ChienThuat: 4.5 },
+        source: "Admin đã khóa",
+        registered: "Có",
+        events: "Men Double, Mixed Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "10/09/2026"
+      },
+      {
+        id: 5,
+        bxh: 5,
+        name: "Hồ Nam Duy",
+        nick: "Andy Ho",
+        email: "andy.ho@nab.com.au",
+        gender: "Nam",
+        tier: "A+",
+        score: 3.93,
+        years: "Trên 5 năm",
+        freq: "1–2 buổi / tuần",
+        exp: "Giải nội bộ / giao lưu công ty",
+        role: "Tấn công (Smash & cầu sau)",
+        skills: { Phat: 4.0, Phong: 4.0, Luoi: 4.0, Dap: 4.5, DiChuyen: 4.0, PhongThu: 3.5, DanhDoi: 4.0, ChienThuat: 4.0 },
+        source: "Admin đã khóa",
+        registered: "Có",
+        events: "Men Double, Mixed Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 6,
+        bxh: 6,
+        name: "Bùi Văn Anh",
+        nick: "Andy Bui",
+        email: "vananh.bui@nab.com.au",
+        gender: "Nam",
+        tier: "A+",
+        score: 3.77,
+        years: "3–5 năm",
+        freq: "1–2 buổi / tuần",
+        exp: "Giải nội bộ / giao lưu công ty",
+        role: "Linh hoạt",
+        skills: { Phat: 4.0, Phong: 4.0, Luoi: 3.5, Dap: 4.0, DiChuyen: 3.5, PhongThu: 3.5, DanhDoi: 4.0, ChienThuat: 4.0 },
+        source: "Admin đã khóa",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 7,
+        bxh: 7,
+        name: "Đậu Anh Tuấn",
+        nick: "Richard Dau",
+        email: "richard.dau@nab.com.au",
+        gender: "Nam",
+        tier: "A+",
+        score: 3.73,
+        years: "3–5 năm",
+        freq: "1–2 buổi / tuần",
+        exp: "Giải nội bộ / giao lưu công ty",
+        role: "Linh hoạt",
+        skills: { Phat: 4.0, Phong: 4.0, Luoi: 3.5, Dap: 4.0, DiChuyen: 3.5, PhongThu: 3.5, DanhDoi: 4.0, ChienThuat: 3.5 },
+        source: "Admin đã khóa",
+        registered: "Có",
+        events: "Men Double, Mixed Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 8,
+        bxh: 8,
+        name: "Trần Hoà",
+        nick: "nabONEvodich",
+        email: "hoa.r.tran@nab.com.au",
+        gender: "Nam",
+        tier: "A+",
+        score: 3.73,
+        years: "3–5 năm",
+        freq: "1–2 buổi / tuần",
+        exp: "Giải nội bộ / giao lưu công ty",
+        role: "Phòng thủ / Điều cầu",
+        skills: { Phat: 4.0, Phong: 4.0, Luoi: 3.5, Dap: 3.5, DiChuyen: 4.0, PhongThu: 4.0, DanhDoi: 4.0, ChienThuat: 3.5 },
+        source: "Admin đã khóa",
+        registered: "Có",
+        events: "Men Double, Mixed Double",
+        party: "No",
+        fee: "Đã đóng",
+        updated: "11/09/2026"
+      },
+      {
+        id: 9,
+        bxh: 9,
+        name: "Nguyễn Minh Công",
+        nick: "Collin",
+        email: "cong.nguyen2@nab.com.au",
+        gender: "Nam",
+        tier: "A+",
+        score: 3.66,
+        years: "3–5 năm",
+        freq: "1–2 buổi / tuần",
+        exp: "Giải nội bộ / giao lưu công ty",
+        role: "Cầu lưới / Phản tạt",
+        skills: { Phat: 4.0, Phong: 3.5, Luoi: 4.0, Dap: 3.5, DiChuyen: 3.5, PhongThu: 3.5, DanhDoi: 4.0, ChienThuat: 4.0 },
+        source: "Admin đã khóa",
+        registered: "Có",
+        events: "Men Double, Mixed Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "10/09/2026"
+      },
+      {
+        id: 10,
+        bxh: 10,
+        name: "Đào Duy Hiệp",
+        nick: "AV",
+        email: "avi.dao@nab.com.au",
+        gender: "Nam",
+        tier: "A+",
+        score: 3.64,
+        years: "3–5 năm",
+        freq: "1–2 buổi / tuần",
+        exp: "Giải nội bộ / giao lưu công ty",
+        role: "Cầu lưới / Phản tạt",
+        skills: { Phat: 3.8, Phong: 3.7, Luoi: 4.0, Dap: 3.5, DiChuyen: 3.5, PhongThu: 3.5, DanhDoi: 4.0, ChienThuat: 3.5 },
+        source: "Admin đã khóa",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 11,
+        bxh: 11,
+        name: "Lê Minh Dương",
+        nick: "DuongLM",
+        email: "duong.le@nab.com.au",
+        gender: "Nam",
+        tier: "A+",
+        score: 3.50,
+        years: "3–5 năm",
+        freq: "1–2 buổi / tuần",
+        exp: "Giải nội bộ",
+        role: "Linh hoạt",
+        skills: { Phat: 3.5, Phong: 3.5, Luoi: 3.5, Dap: 4.0, DiChuyen: 3.5, PhongThu: 3.5, DanhDoi: 3.5, ChienThuat: 3.5 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double, Mixed Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 12,
+        bxh: 12,
+        name: "Phạm Xuân Hưng",
+        nick: "HungPX",
+        email: "hung.pham@nab.com.au",
+        gender: "Nam",
+        tier: "A+",
+        score: 3.45,
+        years: "3–5 năm",
+        freq: "1–2 buổi / tuần",
+        exp: "Giải nội bộ",
+        role: "Tấn công (Smash & cầu sau)",
+        skills: { Phat: 3.5, Phong: 3.5, Luoi: 3.5, Dap: 4.0, DiChuyen: 3.5, PhongThu: 3.0, DanhDoi: 3.5, ChienThuat: 3.5 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "No",
+        fee: "Đã đóng",
+        updated: "10/09/2026"
+      },
+      {
+        id: 13,
+        bxh: 13,
+        name: "Nguyễn Trung Kiên",
+        nick: "KienNT",
+        email: "kien.nguyen@nab.com.au",
+        gender: "Nam",
+        tier: "A+",
+        score: 3.32,
+        years: "1–3 năm",
+        freq: "1–2 buổi / tuần",
+        exp: "Chỉ đánh vui, chưa thi đấu",
+        role: "Linh hoạt",
+        skills: { Phat: 3.5, Phong: 3.5, Luoi: 3.5, Dap: 3.5, DiChuyen: 3.5, PhongThu: 3.0, DanhDoi: 3.5, ChienThuat: 3.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double, Mixed Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 14,
+        bxh: 14,
+        name: "Nguyễn Văn Hùng",
+        nick: "HungNV",
+        email: "hung.nguyen@nab.com.au",
+        gender: "Nam",
+        tier: "A",
+        score: 3.29,
+        years: "1–3 năm",
+        freq: "1–2 buổi / tuần",
+        exp: "Giao lưu nội bộ",
+        role: "Phòng thủ / Điều cầu",
+        skills: { Phat: 3.5, Phong: 3.5, Luoi: 3.0, Dap: 3.5, DiChuyen: 3.0, PhongThu: 3.5, DanhDoi: 3.5, ChienThuat: 3.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "10/09/2026"
+      },
+      {
+        id: 15,
+        bxh: 15,
+        name: "Trần Đức Thắng",
+        nick: "ThangTD",
+        email: "thang.tran@nab.com.au",
+        gender: "Nam",
+        tier: "A",
+        score: 3.25,
+        years: "1–3 năm",
+        freq: "1–2 buổi / tuần",
+        exp: "Giao lưu nội bộ",
+        role: "Linh hoạt",
+        skills: { Phat: 3.5, Phong: 3.0, Luoi: 3.5, Dap: 3.5, DiChuyen: 3.0, PhongThu: 3.0, DanhDoi: 3.5, ChienThuat: 3.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "No",
+        fee: "Đã đóng",
+        updated: "09/09/2026"
+      },
+      {
+        id: 16,
+        bxh: 16,
+        name: "Vũ Đình Cường",
+        nick: "CuongVD",
+        email: "cuong.vu@nab.com.au",
+        gender: "Nam",
+        tier: "A",
+        score: 3.20,
+        years: "1–3 năm",
+        freq: "1–2 buổi / tuần",
+        exp: "Giao lưu nội bộ",
+        role: "Tấn công (Smash & cầu sau)",
+        skills: { Phat: 3.0, Phong: 3.5, Luoi: 3.0, Dap: 4.0, DiChuyen: 3.0, PhongThu: 3.0, DanhDoi: 3.0, ChienThuat: 3.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double, Mixed Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 17,
+        bxh: 17,
+        name: "Lê Hoàng Long",
+        nick: "LongLH",
+        email: "long.le@nab.com.au",
+        gender: "Nam",
+        tier: "A",
+        score: 3.15,
+        years: "1–3 năm",
+        freq: "1–2 buổi / tuần",
+        exp: "Giao lưu nội bộ",
+        role: "Cầu lưới / Phản tạt",
+        skills: { Phat: 3.0, Phong: 3.0, Luoi: 3.5, Dap: 3.0, DiChuyen: 3.0, PhongThu: 3.0, DanhDoi: 3.5, ChienThuat: 3.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 18,
+        bxh: 18,
+        name: "Hoàng Văn Tuấn",
+        nick: "TuanHV",
+        email: "tuan.hoang@nab.com.au",
+        gender: "Nam",
+        tier: "A",
+        score: 3.10,
+        years: "1–3 năm",
+        freq: "1–2 buổi / tuần",
+        exp: "Giao lưu nội bộ",
+        role: "Linh hoạt",
+        skills: { Phat: 3.0, Phong: 3.0, Luoi: 3.0, Dap: 3.5, DiChuyen: 3.0, PhongThu: 3.0, DanhDoi: 3.0, ChienThuat: 3.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 19,
+        bxh: 19,
+        name: "Phan Văn Nam",
+        nick: "NamPV",
+        email: "nam.phan@nab.com.au",
+        gender: "Nam",
+        tier: "A",
+        score: 3.08,
+        years: "1–3 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Phòng thủ",
+        skills: { Phat: 3.0, Phong: 3.0, Luoi: 3.0, Dap: 3.0, DiChuyen: 3.0, PhongThu: 3.5, DanhDoi: 3.0, ChienThuat: 3.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "No",
+        fee: "Đã đóng",
+        updated: "10/09/2026"
+      },
+      {
+        id: 20,
+        bxh: 20,
+        name: "Ngô Quang Huy",
+        nick: "HuyNQ",
+        email: "huy.ngo@nab.com.au",
+        gender: "Nam",
+        tier: "A",
+        score: 3.07,
+        years: "1–3 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Linh hoạt",
+        skills: { Phat: 3.0, Phong: 3.0, Luoi: 3.0, Dap: 3.0, DiChuyen: 3.0, PhongThu: 3.0, DanhDoi: 3.0, ChienThuat: 3.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 21,
+        bxh: 21,
+        name: "Đỗ Thị Mai Hương",
+        nick: "HuongDTM",
+        email: "huong.do@nab.com.au",
+        gender: "Nữ",
+        tier: "B",
+        score: 2.76,
+        years: "1–2 năm",
+        freq: "1 buổi / tuần",
+        exp: "Giao lưu nội bộ",
+        role: "Cầu lưới / Phản tạt",
+        skills: { Phat: 3.0, Phong: 2.5, Luoi: 3.0, Dap: 2.5, DiChuyen: 3.0, PhongThu: 2.5, DanhDoi: 3.0, ChienThuat: 2.5 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Mixed Double, Women Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 22,
+        bxh: 22,
+        name: "Nguyễn Thu Trang",
+        nick: "TrangNT",
+        email: "trang.nguyen@nab.com.au",
+        gender: "Nữ",
+        tier: "B",
+        score: 2.70,
+        years: "1–2 năm",
+        freq: "1 buổi / tuần",
+        exp: "Giao lưu nội bộ",
+        role: "Cầu lưới / Phản tạt",
+        skills: { Phat: 3.0, Phong: 2.5, Luoi: 3.0, Dap: 2.0, DiChuyen: 3.0, PhongThu: 3.0, DanhDoi: 3.0, ChienThuat: 2.5 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Mixed Double, Women Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 23,
+        bxh: 23,
+        name: "Trần Minh Quang",
+        nick: "QuangTM",
+        email: "quang.tran@nab.com.au",
+        gender: "Nam",
+        tier: "B",
+        score: 2.68,
+        years: "1–2 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Linh hoạt",
+        skills: { Phat: 2.5, Phong: 2.5, Luoi: 2.5, Dap: 3.0, DiChuyen: 2.5, PhongThu: 2.5, DanhDoi: 3.0, ChienThuat: 2.5 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 24,
+        bxh: 24,
+        name: "Lý Quốc Bảo",
+        nick: "BaoLQ",
+        email: "bao.ly@nab.com.au",
+        gender: "Nam",
+        tier: "B",
+        score: 2.65,
+        years: "1–2 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Tấn công (Smash)",
+        skills: { Phat: 2.5, Phong: 2.5, Luoi: 2.5, Dap: 3.0, DiChuyen: 2.5, PhongThu: 2.5, DanhDoi: 2.5, ChienThuat: 2.5 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 25,
+        bxh: 25,
+        name: "Nguyễn Hải Đăng",
+        nick: "DangNH",
+        email: "dang.nguyen@nab.com.au",
+        gender: "Nam",
+        tier: "B",
+        score: 2.60,
+        years: "1–2 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Linh hoạt",
+        skills: { Phat: 2.5, Phong: 2.5, Luoi: 2.5, Dap: 2.5, DiChuyen: 2.5, PhongThu: 2.5, DanhDoi: 2.5, ChienThuat: 2.5 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 26,
+        bxh: 26,
+        name: "Bùi Thị Phương",
+        nick: "PhuongBT",
+        email: "phuong.bui@nab.com.au",
+        gender: "Nữ",
+        tier: "B",
+        score: 2.55,
+        years: "1–2 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Cầu lưới",
+        skills: { Phat: 2.5, Phong: 2.5, Luoi: 3.0, Dap: 2.0, DiChuyen: 2.5, PhongThu: 2.5, DanhDoi: 2.5, ChienThuat: 2.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Mixed Double, Women Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 27,
+        bxh: 27,
+        name: "Vũ Hoàng Giang",
+        nick: "GiangVH",
+        email: "giang.vu@nab.com.au",
+        gender: "Nam",
+        tier: "B",
+        score: 2.52,
+        years: "1–2 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Linh hoạt",
+        skills: { Phat: 2.5, Phong: 2.5, Luoi: 2.5, Dap: 2.5, DiChuyen: 2.5, PhongThu: 2.5, DanhDoi: 2.5, ChienThuat: 2.5 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 28,
+        bxh: 28,
+        name: "Phạm Hồng Quân",
+        nick: "QuanPH",
+        email: "quan.pham@nab.com.au",
+        gender: "Nam",
+        tier: "B",
+        score: 2.50,
+        years: "1–2 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Linh hoạt",
+        skills: { Phat: 2.5, Phong: 2.5, Luoi: 2.5, Dap: 2.5, DiChuyen: 2.5, PhongThu: 2.5, DanhDoi: 2.5, ChienThuat: 2.5 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "No",
+        fee: "Đã đóng",
+        updated: "11/09/2026"
+      },
+      {
+        id: 29,
+        bxh: 29,
+        name: "Lê Viết Dũng",
+        nick: "DungLV",
+        email: "dung.le@nab.com.au",
+        gender: "Nam",
+        tier: "B",
+        score: 2.45,
+        years: "1–2 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Linh hoạt",
+        skills: { Phat: 2.5, Phong: 2.5, Luoi: 2.0, Dap: 2.5, DiChuyen: 2.5, PhongThu: 2.5, DanhDoi: 2.5, ChienThuat: 2.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 30,
+        bxh: 30,
+        name: "Đặng Tiến Dũng",
+        nick: "DungDT",
+        email: "dung.dang@nab.com.au",
+        gender: "Nam",
+        tier: "B",
+        score: 2.40,
+        years: "1–2 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Linh hoạt",
+        skills: { Phat: 2.5, Phong: 2.0, Luoi: 2.5, Dap: 2.5, DiChuyen: 2.5, PhongThu: 2.0, DanhDoi: 2.5, ChienThuat: 2.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 31,
+        bxh: 31,
+        name: "Trương Quốc Khánh",
+        nick: "KhanhTQ",
+        email: "khanh.truong@nab.com.au",
+        gender: "Nam",
+        tier: "B",
+        score: 2.38,
+        years: "1–2 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Linh hoạt",
+        skills: { Phat: 2.5, Phong: 2.0, Luoi: 2.0, Dap: 2.5, DiChuyen: 2.0, PhongThu: 2.5, DanhDoi: 2.5, ChienThuat: 2.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 32,
+        bxh: 32,
+        name: "Vũ Minh Tuấn",
+        nick: "TuanVM",
+        email: "tuan.vu@nab.com.au",
+        gender: "Nam",
+        tier: "B",
+        score: 2.35,
+        years: "1–2 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Linh hoạt",
+        skills: { Phat: 2.5, Phong: 2.0, Luoi: 2.0, Dap: 2.5, DiChuyen: 2.0, PhongThu: 2.0, DanhDoi: 2.5, ChienThuat: 2.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 33,
+        bxh: 33,
+        name: "Trịnh Đình Khôi",
+        nick: "KhoiTD",
+        email: "khoi.trinh@nab.com.au",
+        gender: "Nam",
+        tier: "B",
+        score: 2.32,
+        years: "1–2 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Linh hoạt",
+        skills: { Phat: 2.0, Phong: 2.5, Luoi: 2.0, Dap: 2.5, DiChuyen: 2.0, PhongThu: 2.0, DanhDoi: 2.5, ChienThuat: 2.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "No",
+        fee: "Đã đóng",
+        updated: "11/09/2026"
+      },
+      {
+        id: 34,
+        bxh: 34,
+        name: "Nguyễn Việt Anh",
+        nick: "AnhNV",
+        email: "anh.nguyen@nab.com.au",
+        gender: "Nam",
+        tier: "B",
+        score: 2.30,
+        years: "1–2 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Linh hoạt",
+        skills: { Phat: 2.0, Phong: 2.0, Luoi: 2.5, Dap: 2.0, DiChuyen: 2.5, PhongThu: 2.0, DanhDoi: 2.5, ChienThuat: 2.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 35,
+        bxh: 35,
+        name: "Dương Văn Sơn",
+        nick: "SonDV",
+        email: "son.duong@nab.com.au",
+        gender: "Nam",
+        tier: "B",
+        score: 2.28,
+        years: "1 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Linh hoạt",
+        skills: { Phat: 2.0, Phong: 2.0, Luoi: 2.0, Dap: 2.5, DiChuyen: 2.0, PhongThu: 2.0, DanhDoi: 2.5, ChienThuat: 2.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 36,
+        bxh: 36,
+        name: "Đào Văn Hoàng",
+        nick: "HoangDV",
+        email: "hoang.dao@nab.com.au",
+        gender: "Nam",
+        tier: "B",
+        score: 2.25,
+        years: "1 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Linh hoạt",
+        skills: { Phat: 2.0, Phong: 2.0, Luoi: 2.0, Dap: 2.0, DiChuyen: 2.0, PhongThu: 2.5, DanhDoi: 2.5, ChienThuat: 2.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 37,
+        bxh: 37,
+        name: "Ngô Nhật Minh",
+        nick: "MinhNN",
+        email: "minh.ngo@nab.com.au",
+        gender: "Nam",
+        tier: "B",
+        score: 2.24,
+        years: "1 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Linh hoạt",
+        skills: { Phat: 2.0, Phong: 2.0, Luoi: 2.0, Dap: 2.0, DiChuyen: 2.0, PhongThu: 2.0, DanhDoi: 2.5, ChienThuat: 2.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 38,
+        bxh: 38,
+        name: "Lê Đức Tài",
+        nick: "TaiLD",
+        email: "tai.le@nab.com.au",
+        gender: "Nam",
+        tier: "B",
+        score: 2.22,
+        years: "1 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Linh hoạt",
+        skills: { Phat: 2.0, Phong: 2.0, Luoi: 2.0, Dap: 2.0, DiChuyen: 2.0, PhongThu: 2.0, DanhDoi: 2.0, ChienThuat: 2.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 39,
+        bxh: 39,
+        name: "Vũ Đình Nam",
+        nick: "NamVD",
+        email: "nam.vu@nab.com.au",
+        gender: "Nam",
+        tier: "B",
+        score: 2.21,
+        years: "1 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Linh hoạt",
+        skills: { Phat: 2.0, Phong: 2.0, Luoi: 2.0, Dap: 2.0, DiChuyen: 2.0, PhongThu: 2.0, DanhDoi: 2.0, ChienThuat: 2.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "No",
+        fee: "Đã đóng",
+        updated: "11/09/2026"
+      },
+      {
+        id: 40,
+        bxh: 40,
+        name: "Chu Đức Long",
+        nick: "LongCD",
+        email: "long.chu@nab.com.au",
+        gender: "Nam",
+        tier: "B",
+        score: 2.20,
+        years: "1 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Linh hoạt",
+        skills: { Phat: 2.0, Phong: 2.0, Luoi: 2.0, Dap: 2.0, DiChuyen: 2.0, PhongThu: 2.0, DanhDoi: 2.0, ChienThuat: 2.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 41,
+        bxh: 41,
+        name: "Tạ Thị Thanh Huyền",
+        nick: "HuyenTTT",
+        email: "huyen.ta@nab.com.au",
+        gender: "Nữ",
+        tier: "B",
+        score: 2.20,
+        years: "1 năm",
+        freq: "1 buổi / tuần",
+        exp: "Chỉ đánh vui",
+        role: "Cầu lưới",
+        skills: { Phat: 2.0, Phong: 2.0, Luoi: 2.5, Dap: 1.5, DiChuyen: 2.0, PhongThu: 2.0, DanhDoi: 2.0, ChienThuat: 2.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Mixed Double, Women Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 42,
+        bxh: 42,
+        name: "Lê Tuấn Vũ",
+        nick: "VuLT",
+        email: "vu.le@nab.com.au",
+        gender: "Nam",
+        tier: "C",
+        score: 2.18,
+        years: "Dưới 1 năm",
+        freq: "1 buổi / tuần",
+        exp: "Mới tập chơi",
+        role: "Linh hoạt",
+        skills: { Phat: 2.0, Phong: 2.0, Luoi: 2.0, Dap: 2.0, DiChuyen: 2.0, PhongThu: 2.0, DanhDoi: 2.0, ChienThuat: 1.5 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 43,
+        bxh: 43,
+        name: "Nguyễn Hải Long",
+        nick: "LongNH",
+        email: "long.nguyen@nab.com.au",
+        gender: "Nam",
+        tier: "C",
+        score: 2.15,
+        years: "Dưới 1 năm",
+        freq: "1 buổi / tuần",
+        exp: "Mới tập chơi",
+        role: "Linh hoạt",
+        skills: { Phat: 2.0, Phong: 2.0, Luoi: 1.5, Dap: 2.0, DiChuyen: 2.0, PhongThu: 2.0, DanhDoi: 2.0, ChienThuat: 1.5 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 44,
+        bxh: 44,
+        name: "Trần Anh Đức",
+        nick: "DucTA",
+        email: "duc.tran@nab.com.au",
+        gender: "Nam",
+        tier: "C",
+        score: 2.10,
+        years: "Dưới 1 năm",
+        freq: "1 buổi / tuần",
+        exp: "Mới tập chơi",
+        role: "Linh hoạt",
+        skills: { Phat: 2.0, Phong: 1.5, Luoi: 1.5, Dap: 2.0, DiChuyen: 1.5, PhongThu: 2.0, DanhDoi: 2.0, ChienThuat: 1.5 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 45,
+        bxh: 45,
+        name: "Hoàng Gia Bảo",
+        nick: "BaoHG",
+        email: "bao.hoang@nab.com.au",
+        gender: "Nam",
+        tier: "C",
+        score: 2.05,
+        years: "Dưới 1 năm",
+        freq: "1 buổi / tuần",
+        exp: "Mới tập chơi",
+        role: "Linh hoạt",
+        skills: { Phat: 1.5, Phong: 2.0, Luoi: 1.5, Dap: 1.5, DiChuyen: 1.5, PhongThu: 2.0, DanhDoi: 1.5, ChienThuat: 1.5 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 46,
+        bxh: 46,
+        name: "Nguyễn Mạnh Cường",
+        nick: "CuongNM",
+        email: "cuong.nguyen@nab.com.au",
+        gender: "Nam",
+        tier: "C",
+        score: 2.00,
+        years: "Dưới 1 năm",
+        freq: "1 buổi / tuần",
+        exp: "Mới tập chơi",
+        role: "Linh hoạt",
+        skills: { Phat: 1.5, Phong: 1.5, Luoi: 1.5, Dap: 1.5, DiChuyen: 1.5, PhongThu: 1.5, DanhDoi: 2.0, ChienThuat: 1.5 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "No",
+        fee: "Đã đóng",
+        updated: "11/09/2026"
+      },
+      {
+        id: 47,
+        bxh: 47,
+        name: "Phan Quốc Anh",
+        nick: "AnhPQ",
+        email: "anh.phan@nab.com.au",
+        gender: "Nam",
+        tier: "C",
+        score: 1.95,
+        years: "Dưới 1 năm",
+        freq: "1 buổi / tuần",
+        exp: "Mới tập chơi",
+        role: "Linh hoạt",
+        skills: { Phat: 1.5, Phong: 1.5, Luoi: 1.5, Dap: 1.5, DiChuyen: 1.5, PhongThu: 1.5, DanhDoi: 1.5, ChienThuat: 1.5 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 48,
+        bxh: 48,
+        name: "Trần Văn Toàn",
+        nick: "ToanTV",
+        email: "toan.tran@nab.com.au",
+        gender: "Nam",
+        tier: "C",
+        score: 1.92,
+        years: "Dưới 1 năm",
+        freq: "1 buổi / tuần",
+        exp: "Mới tập chơi",
+        role: "Linh hoạt",
+        skills: { Phat: 1.5, Phong: 1.5, Luoi: 1.5, Dap: 1.5, DiChuyen: 1.5, PhongThu: 1.5, DanhDoi: 1.5, ChienThuat: 1.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 49,
+        bxh: 49,
+        name: "Đỗ Minh Quân",
+        nick: "QuanDM",
+        email: "quan.do@nab.com.au",
+        gender: "Nam",
+        tier: "C",
+        score: 1.90,
+        years: "Dưới 1 năm",
+        freq: "1 buổi / tuần",
+        exp: "Mới tập chơi",
+        role: "Linh hoạt",
+        skills: { Phat: 1.5, Phong: 1.5, Luoi: 1.5, Dap: 1.5, DiChuyen: 1.5, PhongThu: 1.5, DanhDoi: 1.5, ChienThuat: 1.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 50,
+        bxh: 50,
+        name: "Nguyễn Tiến Đạt",
+        nick: "DatNT",
+        email: "dat.nguyen@nab.com.au",
+        gender: "Nam",
+        tier: "C",
+        score: 1.88,
+        years: "Dưới 1 năm",
+        freq: "1 buổi / tuần",
+        exp: "Mới tập chơi",
+        role: "Linh hoạt",
+        skills: { Phat: 1.5, Phong: 1.5, Luoi: 1.5, Dap: 1.5, DiChuyen: 1.5, PhongThu: 1.5, DanhDoi: 1.5, ChienThuat: 1.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 51,
+        bxh: 51,
+        name: "Vũ Đình Khoa",
+        nick: "KhoaVD",
+        email: "khoa.vu@nab.com.au",
+        gender: "Nam",
+        tier: "C",
+        score: 1.87,
+        years: "Dưới 1 năm",
+        freq: "1 buổi / tuần",
+        exp: "Mới tập chơi",
+        role: "Linh hoạt",
+        skills: { Phat: 1.5, Phong: 1.5, Luoi: 1.5, Dap: 1.5, DiChuyen: 1.5, PhongThu: 1.5, DanhDoi: 1.5, ChienThuat: 1.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 52,
+        bxh: 52,
+        name: "Phạm Minh Đức",
+        nick: "DucPM",
+        email: "duc.pham@nab.com.au",
+        gender: "Nam",
+        tier: "D",
+        score: 1.59,
+        years: "Mới chơi vài tuần",
+        freq: "Chưa đều",
+        exp: "Chưa thi đấu",
+        role: "Học hỏi",
+        skills: { Phat: 1.0, Phong: 1.0, Luoi: 1.0, Dap: 1.0, DiChuyen: 1.0, PhongThu: 1.0, DanhDoi: 1.0, ChienThuat: 1.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 53,
+        bxh: 53,
+        name: "Nguyễn Hoàng Nam",
+        nick: "NamNH",
+        email: "nam.nguyen@nab.com.au",
+        gender: "Nam",
+        tier: "D",
+        score: 1.45,
+        years: "Mới chơi vài tuần",
+        freq: "Chưa đều",
+        exp: "Chưa thi đấu",
+        role: "Học hỏi",
+        skills: { Phat: 1.0, Phong: 1.0, Luoi: 1.0, Dap: 1.0, DiChuyen: 1.0, PhongThu: 1.0, DanhDoi: 1.0, ChienThuat: 1.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 54,
+        bxh: 54,
+        name: "Trần Quốc Huy",
+        nick: "HuyTQ",
+        email: "huy.tran@nab.com.au",
+        gender: "Nam",
+        tier: "D",
+        score: 1.25,
+        years: "Mới chơi vài tuần",
+        freq: "Chưa đều",
+        exp: "Chưa thi đấu",
+        role: "Học hỏi",
+        skills: { Phat: 1.0, Phong: 1.0, Luoi: 1.0, Dap: 1.0, DiChuyen: 1.0, PhongThu: 1.0, DanhDoi: 1.0, ChienThuat: 1.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "No",
+        fee: "Đã đóng",
+        updated: "11/09/2026"
+      },
+      {
+        id: 55,
+        bxh: 55,
+        name: "Lê Viết Hùng",
+        nick: "HungLV",
+        email: "hung.le@nab.com.au",
+        gender: "Nam",
+        tier: "D",
+        score: 1.00,
+        years: "Mới chơi",
+        freq: "Chưa đều",
+        exp: "Chưa thi đấu",
+        role: "Học hỏi",
+        skills: { Phat: 1.0, Phong: 1.0, Luoi: 1.0, Dap: 1.0, DiChuyen: 1.0, PhongThu: 1.0, DanhDoi: 1.0, ChienThuat: 1.0 },
+        source: "Theo Excel",
+        registered: "Có",
+        events: "Men Double",
+        party: "Yes",
+        fee: "Miễn phí thành viên",
+        updated: "11/09/2026"
+      },
+      {
+        id: 56,
+        bxh: 56,
+        name: "Dat Nguyen",
+        nick: "Dat Nguyen",
+        email: "dat.nguyen13@nab.com.au",
+        gender: "Nam",
+        tier: "Chưa xếp",
+        score: 0.00,
+        years: "Chưa điền",
+        freq: "Chưa điền",
+        exp: "Chưa điền",
+        role: "Linh hoạt",
+        skills: { Phat: 0.0, Phong: 0.0, Luoi: 0.0, Dap: 0.0, DiChuyen: 0.0, PhongThu: 0.0, DanhDoi: 0.0, ChienThuat: 0.0 },
+        source: "Chưa đánh giá",
+        registered: "Có",
+        events: "Men Double",
+        party: "No",
+        fee: "Chưa đóng",
+        updated: "07/09/2026"
       }
     ];
 
-    const chartInstances = {};
+    let currentPlayers = [...DEFAULT_PLAYERS];
+    let chartInstances = {};
 
-    // Khởi tạo trang web
     window.addEventListener('DOMContentLoaded', () => {
-      // Tự động load file excel nếu bạn đặt file "data.xlsx" cùng thư mục trên Github
-      fetch('./data.xlsx')
-        .then(res => {
-          if (res.ok) return res.arrayBuffer();
-          throw new Error("Không có file data.xlsx mặc định");
-        })
-        .then(buffer => processExcelBuffer(buffer))
-        .catch(() => renderList(playersData));
-
-      setupFileInput();
+      renderPlayerList(currentPlayers);
+      updateSummaryKPIs(currentPlayers);
+      setupExcelUpload();
     });
 
-    // Lắng nghe tải file Excel thủ công
-    function setupFileInput() {
+    function showToast(message) {
+      const toast = document.getElementById('toastMessage');
+      const text = document.getElementById('toastText');
+      text.innerText = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3500);
+    }
+
+    function resetToInitialData() {
+      currentPlayers = [...DEFAULT_PLAYERS];
+      document.getElementById('searchInput').value = '';
+      document.getElementById('rankFilter').value = 'all';
+      document.getElementById('genderFilter').value = 'all';
+      document.getElementById('regFilter').value = 'all';
+      document.getElementById('sortFilter').value = 'default';
+      renderPlayerList(currentPlayers);
+      updateSummaryKPIs(currentPlayers);
+      showToast('Đã khôi phục danh sách người chơi ban đầu!');
+    }
+
+    function setupExcelUpload() {
       const input = document.getElementById('excelFileInput');
       input.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
+
         const reader = new FileReader();
         reader.onload = (event) => {
-          processExcelBuffer(event.target.result);
+          try {
+            const data = new Uint8Array(event.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheetName = workbook.SheetNames[0];
+            const rows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName]);
+
+            if (rows && rows.length > 0) {
+              currentPlayers = rows.map((row, index) => {
+                const bxh = row['Hạng BXH'] ? parseInt(row['Hạng BXH']) : (index + 1);
+                const scoreVal = row['Điểm'] !== undefined && row['Điểm'] !== null ? parseFloat(row['Điểm']) : 0;
+                return {
+                  id: index + 1,
+                  bxh: bxh,
+                  name: String(row['Họ và tên'] || row['Họ tên'] || row['Name'] || 'Chưa đặt tên').trim(),
+                  nick: String(row['Nickname'] || row['Nick name'] || '').trim(),
+                  email: String(row['Email'] || '').trim(),
+                  gender: String(row['Giới tính'] || row['Gender'] || 'Nam').trim(),
+                  tier: String(row['Hạng kỹ năng'] || row['Hạng'] || row['Tier'] || 'Chưa xếp').trim(),
+                  score: isNaN(scoreVal) ? 0 : parseFloat(scoreVal.toFixed(2)),
+                  years: String(row['Đã chơi được bao lâu?'] || row['Thâm niên'] || '1-3 năm').trim(),
+                  freq: String(row['Tần suất tập'] || '1–2 buổi / tuần').trim(),
+                  exp: String(row['Kinh nghiệm thi đấu'] || 'Giao lưu nội bộ').trim(),
+                  role: String(row['Vai trò đánh đôi'] || row['Vai trò khi đánh đôi'] || 'Linh hoạt').trim(),
+                  skills: {
+                    Phat: parseFloat(row['Phát cầu'] || row['Phát'] || 3.0),
+                    Phong: parseFloat(row['Phông & khống chế'] || row['Phông'] || 3.0),
+                    Luoi: parseFloat(row['Cầu lưới'] || row['Lưới'] || 3.0),
+                    Dap: parseFloat(row['Đập cầu'] || row['Đập'] || 3.0),
+                    DiChuyen: parseFloat(row['Di chuyển & vị trí'] || row['Di chuyển'] || 3.0),
+                    PhongThu: parseFloat(row['Phòng thủ'] || 3.0),
+                    DanhDoi: parseFloat(row['Phối hợp đánh đôi'] || row['Đánh đôi'] || 3.0),
+                    ChienThuat: parseFloat(row['Chiến thuật'] || 3.0)
+                  },
+                  source: String(row['Nguồn điểm'] || 'Admin đã duyệt').trim(),
+                  registered: String(row['Đã đăng ký giải'] || 'Có').trim(),
+                  events: String(row['Nội dung đăng ký'] || 'Men Double').trim(),
+                  party: String(row['Tham gia after party'] || 'Yes').trim(),
+                  fee: String(row['Trạng thái phí'] || 'Đã đóng').trim(),
+                  updated: row['Ngày tự đánh giá'] || '11/09/2026'
+                };
+              });
+
+              handleFilterChange();
+              updateSummaryKPIs(currentPlayers);
+              showToast(`Tải thành công ${currentPlayers.length} người chơi từ file Excel!`);
+            }
+          } catch (err) {
+            console.error(err);
+            showToast('Lỗi đọc file Excel. Vui lòng kiểm tra lại định dạng file!');
+          }
         };
         reader.readAsArrayBuffer(file);
-      });
-    }
+    });
+  }
 
-    // Xử lý dữ liệu từ file Excel
-    function processExcelBuffer(buffer) {
-      try {
-        const workbook = XLSX.read(buffer, { type: 'array' });
-        const firstSheetName = workbook.SheetNames[0];
-        const rawJson = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName]);
-        
-        if (rawJson.length > 0) {
-          playersData = rawJson.map((row, idx) => {
-            return {
-              id: idx + 1,
-              name: row['Họ tên'] || row['Họ và tên'] || row['Name'] || 'Chưa đặt tên',
-              nickname: row['Nickname'] || row['Nick name'] || '',
-              approved: true,
-              rank: row['Hạng'] || row['Rank'] || 'B',
-              score: parseFloat(row['Điểm'] || row['Score'] || 0).toFixed(2),
-              gender: row['Giới tính'] || row['Gender'] || 'Nam',
-              status: row['Đã đăng ký giải'] || row['Trạng thái'] || 'Đã đăng ký',
-              email: row['Email'] || 'Chưa cập nhật',
-              updatedAt: row['Cập nhật'] || row['Ngày cập nhật'] || '16/09/2026',
-              quote: row['Nhận xét'] || row['Mô tả'] || 'Tay vợt nhiệt huyết của NAB Hanoi.',
-              experience: row['Thâm niên'] || 'Trên 1 năm',
-              frequency: row['Tần suất tập'] || '1-2 buổi / tuần',
-              competition: row['Kinh nghiệm thi đấu'] || 'Giao lưu nội bộ',
-              doubleRole: row['Vai trò khi đánh đôi'] || 'Linh hoạt',
-              skills: {
-                "Phát": Number(row['Phát cầu'] || row['Phát'] || 4),
-                "Phông": Number(row['Phông & khống chế'] || row['Phông'] || 4),
-                "Lưới": Number(row['Cầu lưới'] || row['Lưới'] || 4),
-                "Đập": Number(row['Đập cầu'] || row['Đập'] || 4),
-                "Di chuyển": Number(row['Di chuyển & vị trí'] || row['Di chuyển'] || 4),
-                "Phòng thủ": Number(row['Phòng thủ'] || 4),
-                "Đánh đôi": Number(row['Phối hợp đánh đôi'] || row['Đánh đôi'] || 4),
-                "Chiến thuật": Number(row['Chiến thuật'] || 4)
-              }
-            };
-          });
-          applyFilters();
+  function updateSummaryKPIs(players) {
+    const setSafeText = (id, text) => {
+      const el = document.getElementById(id);
+      if (el) el.innerText = text;
+    };
+
+    setSafeText('statTotalPlayers', players.length);
+    
+    const regCount = players.filter(p => p.registered === 'Có' || (p.registered && p.registered.toLowerCase().includes('đã'))).length;
+    setSafeText('statRegistered', regCount);
+
+    // Tách riêng số lượng Nam và Nữ
+    const maleCount = players.filter(p => p.gender && p.gender.toLowerCase() === 'nam').length;
+    const femaleCount = players.filter(p => p.gender && p.gender.toLowerCase().includes('nữ')).length;
+    setSafeText('statMale', maleCount);
+    setSafeText('statFemale', femaleCount);
+
+    // Tách riêng số lượng từng hạng S, A+, A, B, C, D
+    const countS = players.filter(p => p.tier === 'S').length;
+    const countAplus = players.filter(p => p.tier === 'A+').length;
+    const countA = players.filter(p => p.tier === 'A').length;
+    const countB = players.filter(p => p.tier === 'B').length;
+    const countC = players.filter(p => p.tier === 'C').length;
+    const countD = players.filter(p => p.tier === 'D').length;
+
+    setSafeText('statTierS', countS);
+    setSafeText('statTierAplus', countAplus);
+    setSafeText('statTierA', countA);
+    setSafeText('statTierB', countB);
+    setSafeText('statTierC', countC);
+    setSafeText('statTierD', countD);
+
+    // Số lượng tham gia After Party
+    const partyCount = players.filter(p => p.party && (p.party.toLowerCase() === 'yes' || p.party.toLowerCase() === 'có')).length;
+    setSafeText('statParty', partyCount);
+  }
+
+  // Lọc nhanh khi click vào thẻ Hạng
+  function quickFilterTier(tier) {
+    const rankSelect = document.getElementById('rankFilter');
+    if (rankSelect.value === tier) {
+      rankSelect.value = 'all';
+    } else {
+      rankSelect.value = tier;
+    }
+    handleFilterChange();
+  }
+
+  // Lọc nhanh khi click vào thẻ Nam / Nữ
+  function quickFilterGender(gender) {
+    const genderSelect = document.getElementById('genderFilter');
+    if (genderSelect.value === gender) {
+      genderSelect.value = 'all';
+    } else {
+      genderSelect.value = gender;
+    }
+    handleFilterChange();
+  }
+
+  function handleFilterChange() {
+    const q = document.getElementById('searchInput').value.toLowerCase().trim();
+    const rankVal = document.getElementById('rankFilter').value;
+    const genderVal = document.getElementById('genderFilter').value;
+    const regVal = document.getElementById('regFilter').value;
+    const sortVal = document.getElementById('sortFilter').value;
+
+    // Cập nhật viền active cho các nút lọc nhanh Hạng
+    const tierMap = { 'S': 'btnTierQuick-S', 'A+': 'btnTierQuick-Aplus', 'A': 'btnTierQuick-A', 'B': 'btnTierQuick-B', 'C': 'btnTierQuick-C', 'D': 'btnTierQuick-D' };
+    Object.keys(tierMap).forEach(t => {
+      const el = document.getElementById(tierMap[t]);
+      if (el) {
+        if (rankVal === t) {
+          el.classList.add('ring-2', 'ring-[#C70000]', 'border-transparent', 'bg-red-50/60');
+        } else {
+          el.classList.remove('ring-2', 'ring-[#C70000]', 'border-transparent', 'bg-red-50/60');
         }
-      } catch (err) {
-        console.error("Lỗi đọc file Excel:", err);
-        renderList(playersData);
       }
+    });
+
+    // Cập nhật viền active cho các nút lọc nhanh Giới tính
+    const maleBtn = document.getElementById('btnGenderMale');
+    const femaleBtn = document.getElementById('btnGenderFemale');
+    if (maleBtn) {
+      if (genderVal === 'Nam') maleBtn.classList.add('ring-2', 'ring-blue-600', 'border-transparent', 'bg-blue-50/60');
+      else maleBtn.classList.remove('ring-2', 'ring-blue-600', 'border-transparent', 'bg-blue-50/60');
+    }
+    if (femaleBtn) {
+      if (genderVal === 'Nữ') femaleBtn.classList.add('ring-2', 'ring-pink-600', 'border-transparent', 'bg-pink-50/60');
+      else femaleBtn.classList.remove('ring-2', 'ring-pink-600', 'border-transparent', 'bg-pink-50/60');
     }
 
-    // Bộ lọc và sắp xếp danh sách
-    function applyFilters() {
-      const q = document.getElementById('searchInput').value.toLowerCase().trim();
-      const rank = document.getElementById('rankFilter').value;
-      const gender = document.getElementById('genderFilter').value;
-      const status = document.getElementById('statusFilter').value;
-      const sort = document.getElementById('sortFilter').value;
+    let result = currentPlayers.filter(p => {
+      const matchSearch = p.name.toLowerCase().includes(q) ||
+                          p.nick.toLowerCase().includes(q) ||
+                          p.email.toLowerCase().includes(q);
 
-      let filtered = playersData.filter(p => {
-        const matchQ = p.name.toLowerCase().includes(q) || 
-                       p.nickname.toLowerCase().includes(q) || 
-                       p.email.toLowerCase().includes(q);
-        const matchRank = (rank === 'all') || (p.rank === rank);
-        const matchGender = (gender === 'all') || (p.gender === gender);
-        const matchStatus = (status === 'all') || (p.status === status);
-        return matchQ && matchRank && matchGender && matchStatus;
+      const matchRank = (rankVal === 'all') || (p.tier === rankVal);
+      const matchGender = (genderVal === 'all') || (p.gender === genderVal);
+      const matchReg = (regVal === 'all') || (p.registered === regVal);
+
+      return matchSearch && matchRank && matchGender && matchReg;
+    });
+
+    // Sorting
+    if (sortVal === 'score-desc') {
+      result.sort((a, b) => (b.score || 0) - (a.score || 0));
+    } else if (sortVal === 'score-asc') {
+      result.sort((a, b) => (a.score || 0) - (b.score || 0));
+    } else if (sortVal === 'name-asc') {
+      result.sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+    } else {
+      // default by bxh
+      result.sort((a, b) => (a.bxh || 999) - (b.bxh || 999));
+    }
+
+    renderPlayerList(result);
+  }
+
+  function toggleAllVisuals() {
+    const showSkills = document.getElementById('chkShowSkills').checked;
+    const showProfile = document.getElementById('chkShowProfile').checked;
+
+    document.querySelectorAll('.skill-box-container').forEach(el => {
+      el.style.display = showSkills ? 'grid' : 'none';
+    });
+    document.querySelectorAll('.profile-box-container').forEach(el => {
+      el.style.display = showProfile ? 'grid' : 'none';
+    });
+  }
+  }
+
+  // Lọc nhanh khi click vào thẻ Hạng
+  function quickFilterTier(tier) {
+    const rankSelect = document.getElementById('rankFilter');
+    if (rankSelect.value === tier) {
+      rankSelect.value = 'all';
+    } else {
+      rankSelect.value = tier;
+    }
+    handleFilterChange();
+  }
+
+  // Lọc nhanh khi click vào thẻ Nam / Nữ
+  function quickFilterGender(gender) {
+    const genderSelect = document.getElementById('genderFilter');
+    if (genderSelect.value === gender) {
+      genderSelect.value = 'all';
+    } else {
+      genderSelect.value = gender;
+    }
+    handleFilterChange();
+  }
+
+  function handleFilterChange() {
+    const q = document.getElementById('searchInput').value.toLowerCase().trim();
+    const rankVal = document.getElementById('rankFilter').value;
+    const genderVal = document.getElementById('genderFilter').value;
+    const regVal = document.getElementById('regFilter').value;
+    const sortVal = document.getElementById('sortFilter').value;
+
+    // Cập nhật viền active cho các nút lọc nhanh Hạng
+    const tierMap = { 'S': 'btnTierQuick-S', 'A+': 'btnTierQuick-Aplus', 'A': 'btnTierQuick-A', 'B': 'btnTierQuick-B', 'C': 'btnTierQuick-C', 'D': 'btnTierQuick-D' };
+    Object.keys(tierMap).forEach(t => {
+      const el = document.getElementById(tierMap[t]);
+      if (el) {
+        if (rankVal === t) {
+          el.classList.add('ring-2', 'ring-[#C70000]', 'border-transparent', 'bg-red-50/60');
+        } else {
+          el.classList.remove('ring-2', 'ring-[#C70000]', 'border-transparent', 'bg-red-50/60');
+        }
+      }
+    });
+
+    // Cập nhật viền active cho các nút lọc nhanh Giới tính
+    const maleBtn = document.getElementById('btnGenderMale');
+    const femaleBtn = document.getElementById('btnGenderFemale');
+    if (maleBtn) {
+      if (genderVal === 'Nam') maleBtn.classList.add('ring-2', 'ring-blue-600', 'border-transparent', 'bg-blue-50/60');
+      else maleBtn.classList.remove('ring-2', 'ring-blue-600', 'border-transparent', 'bg-blue-50/60');
+    }
+    if (femaleBtn) {
+      if (genderVal === 'Nữ') femaleBtn.classList.add('ring-2', 'ring-pink-600', 'border-transparent', 'bg-pink-50/60');
+      else femaleBtn.classList.remove('ring-2', 'ring-pink-600', 'border-transparent', 'bg-pink-50/60');
+    }
+
+    let result = currentPlayers.filter(p => {
+      const matchSearch = p.name.toLowerCase().includes(q) ||
+                          p.nick.toLowerCase().includes(q) ||
+                          p.email.toLowerCase().includes(q);
+
+      const matchRank = (rankVal === 'all') || (p.tier === rankVal);
+      const matchGender = (genderVal === 'all') || (p.gender === genderVal);
+      const matchReg = (regVal === 'all') || (p.registered === regVal);
+
+      return matchSearch && matchRank && matchGender && matchReg;
+    });
+
+    // Sorting
+    if (sortVal === 'score-desc') {
+      result.sort((a, b) => (b.score || 0) - (a.score || 0));
+    } else if (sortVal === 'score-asc') {
+      result.sort((a, b) => (a.score || 0) - (b.score || 0));
+    } else if (sortVal === 'name-asc') {
+      result.sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+    } else {
+      // default by bxh
+      result.sort((a, b) => (a.bxh || 999) - (b.bxh || 999));
+    }
+
+    renderPlayerList(result);
+  }
+
+    function updateSummaryKPIs(players) {
+      document.getElementById('statTotalPlayers').innerText = players.length;
+      
+      const regCount = players.filter(p => p.registered === 'Có' || p.registered.toLowerCase().includes('đã')).length;
+      document.getElementById('statRegistered').innerText = regCount;
+
+      const topTierCount = players.filter(p => p.tier === 'S' || p.tier === 'A+').length;
+      document.getElementById('statTopTier').innerText = topTierCount;
+
+      const tierBCount = players.filter(p => p.tier === 'B').length;
+      document.getElementById('statTierB').innerText = tierBCount;
+
+      const maleCount = players.filter(p => p.gender.toLowerCase() === 'nam').length;
+      const femaleCount = players.filter(p => p.gender.toLowerCase().includes('nữ')).length;
+      document.getElementById('statGenderRatio').innerText = `${maleCount} / ${femaleCount}`;
+
+      const partyCount = players.filter(p => p.party && (p.party.toLowerCase() === 'yes' || p.party.toLowerCase() === 'có')).length;
+      document.getElementById('statParty').innerText = partyCount;
+    }
+
+    function handleFilterChange() {
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
+      const rankVal = document.getElementById('rankFilter').value;
+      const genderVal = document.getElementById('genderFilter').value;
+      const regVal = document.getElementById('regFilter').value;
+      const sortVal = document.getElementById('sortFilter').value;
+
+      let result = currentPlayers.filter(p => {
+        const matchSearch = p.name.toLowerCase().includes(q) ||
+                            p.nick.toLowerCase().includes(q) ||
+                            p.email.toLowerCase().includes(q);
+
+        const matchRank = (rankVal === 'all') || (p.tier === rankVal);
+        const matchGender = (genderVal === 'all') || (p.gender === genderVal);
+        const matchReg = (regVal === 'all') || (p.registered === regVal);
+
+        return matchSearch && matchRank && matchGender && matchReg;
       });
 
-      if (sort === 'score-desc') filtered.sort((a,b) => b.score - a.score);
-      else if (sort === 'score-asc') filtered.sort((a,b) => a.score - b.score);
-      else if (sort === 'name-asc') filtered.sort((a,b) => a.name.localeCompare(b.name));
+      // Sorting
+      if (sortVal === 'score-desc') {
+        result.sort((a, b) => (b.score || 0) - (a.score || 0));
+      } else if (sortVal === 'score-asc') {
+        result.sort((a, b) => (a.score || 0) - (b.score || 0));
+      } else if (sortVal === 'name-asc') {
+        result.sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+      } else {
+        // default by bxh
+        result.sort((a, b) => (a.bxh || 999) - (b.bxh || 999));
+      }
 
-      renderList(filtered);
+      renderPlayerList(result);
     }
 
-    // Hiển thị danh sách ra HTML
-    function renderList(list) {
+    function toggleAllVisuals() {
+      const showSkills = document.getElementById('chkShowSkills').checked;
+      const showProfile = document.getElementById('chkShowProfile').checked;
+
+      document.querySelectorAll('.skill-box-container').forEach(el => {
+        el.style.display = showSkills ? 'grid' : 'none';
+      });
+      document.querySelectorAll('.profile-box-container').forEach(el => {
+        el.style.display = showProfile ? 'grid' : 'none';
+      });
+    }
+
+    function renderPlayerList(list) {
       const container = document.getElementById('playerListContainer');
-      const counter = document.getElementById('playerCounter');
-      counter.innerText = `Hiện ${list.length}/${playersData.length} người`;
+      const counter = document.getElementById('playerCountDisplay');
+      counter.innerText = `Hiện ${list.length}/${currentPlayers.length} người`;
 
       if (list.length === 0) {
-        container.innerHTML = `<div style="text-align:center; padding: 40px; color:#6B7280;">Không tìm thấy người chơi phù hợp</div>`;
+        container.innerHTML = `
+          <div class="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-500 space-y-2">
+            <i class="fa-solid fa-magnifying-glass text-3xl text-gray-300"></i>
+            <div class="text-base font-medium">Không tìm thấy người chơi nào phù hợp</div>
+            <p class="text-xs text-gray-400">Hãy thử đổi từ khóa tìm kiếm hoặc làm mới bộ lọc</p>
+          </div>
+        `;
         return;
       }
 
-      container.innerHTML = list.map((p, index) => `
-        <div class="player-card" id="card-${p.id}">
-          <div class="player-main-row">
-            <div class="player-index">${index + 1}</div>
-            <div class="player-identity">
-              <span class="player-name">${p.name}</span>
-              ${p.nickname ? `<span class="player-nick">${p.nickname}</span>` : ''}
-              ${p.approved ? `<span class="admin-approved"><i class="fa-solid fa-circle-check"></i> Admin đã duyệt</span>` : ''}
-            </div>
-            <div>
-              <span class="badge-rank">${p.rank}</span>
-            </div>
-            <div class="badge-score">${parseFloat(p.score).toFixed(2)}</div>
-            <div>${p.gender}</div>
-            <div><span class="badge-status">${p.status}</span></div>
-            <div class="player-email">${p.email}</div>
-            <div class="player-date">${p.updatedAt}</div>
-            <div style="text-align: right;">
-              <button class="btn-detail" id="btn-toggle-${p.id}" onclick="toggleDetail(${p.id})">Chi tiết</button>
-            </div>
-          </div>
+      container.innerHTML = list.map((p, index) => {
+        const tierClass = p.tier === 'S' ? 'tier-S' :
+                          p.tier === 'A+' ? 'tier-Aplus' :
+                          p.tier === 'A' ? 'tier-A' :
+                          p.tier === 'B' ? 'tier-B' :
+                          p.tier === 'C' ? 'tier-C' :
+                          p.tier === 'D' ? 'tier-D' : 'tier-none';
 
-          <!-- Chi tiết mở rộng -->
-          <div class="player-detail-panel" id="detail-${p.id}">
-            <div class="radar-container">
-              <canvas id="radar-${p.id}"></canvas>
-            </div>
-            <div class="detail-info">
-              <div class="detail-header-title">${p.name} – hạng ${p.rank}</div>
-              <div class="detail-quote">${p.quote}</div>
+        const isApproved = p.source && p.source.toLowerCase().includes('khóa') || p.source.toLowerCase().includes('duyệt');
+        const isRegistered = p.registered === 'Có' || p.registered.toLowerCase().includes('đã');
 
-              <div class="detail-meta-grid">
-                <div class="meta-box">
-                  <span>Thâm niên</span>
-                  <strong>${p.experience}</strong>
+        const tierDescription = getTierDescription(p.tier);
+
+        return `
+          <div class="bg-white rounded-xl border border-gray-200 hover:border-gray-300 shadow-xs transition-all duration-200 overflow-hidden" id="card-${p.id}">
+            
+            <!-- Main Row -->
+            <div class="p-3.5 sm:p-4 grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+              
+              <!-- # Rank Index -->
+              <div class="hidden md:flex col-span-1 justify-center items-center font-bold text-gray-400 text-sm">
+                ${p.bxh || (index + 1)}
+              </div>
+
+              <!-- Name & Identity -->
+              <div class="col-span-1 md:col-span-3 flex items-start sm:items-center space-x-3">
+                <div class="md:hidden font-bold text-gray-400 text-sm mt-0.5">
+                  #${p.bxh || (index + 1)}
                 </div>
-                <div class="meta-box">
-                  <span>Tần suất tập</span>
-                  <strong>${p.frequency}</strong>
-                </div>
-                <div class="meta-box">
-                  <span>Kinh nghiệm thi đấu</span>
-                  <strong>${p.competition}</strong>
-                </div>
-                <div class="meta-box">
-                  <span>Vai trò khi đánh đôi</span>
-                  <strong>${p.doubleRole}</strong>
+                <div>
+                  <div class="flex items-center space-x-2">
+                    <span class="font-bold text-sm sm:text-base text-gray-900">${p.name}</span>
+                    <span class="md:hidden tier-badge ${tierClass} w-6 h-6 text-xs">${p.tier}</span>
+                  </div>
+                  <div class="flex flex-wrap items-center gap-1.5 mt-0.5">
+                    ${p.nick ? `<span class="text-xs text-gray-500 font-medium">${p.nick}</span>` : ''}
+                    <span class="inline-flex items-center gap-1 text-[11px] text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded">
+                      <i class="fa-solid fa-circle-check text-green-600 text-[10px]"></i>
+                      ${isApproved ? 'Admin đã duyệt' : p.source}
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div class="skills-score-grid">
-                <div class="skill-score-row"><span>Phát cầu</span><strong>${p.skills['Phát']}/5</strong></div>
-                <div class="skill-score-row"><span>Phông & khống chế</span><strong>${p.skills['Phông']}/5</strong></div>
-                <div class="skill-score-row"><span>Cầu lưới</span><strong>${p.skills['Lưới']}/5</strong></div>
-                <div class="skill-score-row"><span>Đập cầu</span><strong>${p.skills['Đập']}/5</strong></div>
-                <div class="skill-score-row"><span>Di chuyển & vị trí</span><strong>${p.skills['Di chuyển']}/5</strong></div>
-                <div class="skill-score-row"><span>Phòng thủ</span><strong>${p.skills['Phòng thủ']}/5</strong></div>
-                <div class="skill-score-row"><span>Phối hợp đánh đôi</span><strong>${p.skills['Đánh đôi']}/5</strong></div>
-                <div class="skill-score-row"><span>Chiến thuật</span><strong>${p.skills['Chiến thuật']}/5</strong></div>
+              <!-- Desktop Tier Badge -->
+              <div class="hidden md:flex col-span-1 justify-center">
+                <span class="tier-badge ${tierClass}">${p.tier}</span>
+              </div>
+
+              <!-- Score -->
+              <div class="hidden md:flex col-span-1 justify-center font-bold text-sm sm:text-base text-gray-900">
+                ${p.score ? p.score.toFixed(2) : '0.00'}
+              </div>
+
+              <!-- Gender -->
+              <div class="hidden md:flex col-span-1 justify-center text-xs sm:text-sm text-gray-700">
+                ${p.gender}
+              </div>
+
+              <!-- Registration Status -->
+              <div class="hidden md:flex col-span-2 justify-center">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${isRegistered ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}">
+                  <span class="w-1.5 h-1.5 rounded-full ${isRegistered ? 'bg-green-600' : 'bg-gray-400'} mr-1.5"></span>
+                  ${isRegistered ? 'Đã đăng ký' : 'Chưa đăng ký'}
+                </span>
+              </div>
+
+              <!-- Email -->
+              <div class="hidden md:block col-span-2 text-xs text-gray-500 truncate" title="${p.email}">
+                ${p.email}
+              </div>
+
+              <!-- Action Button & Mobile Summary -->
+              <div class="col-span-1 md:col-span-1 flex items-center justify-between md:justify-end gap-2">
+                <div class="md:hidden flex items-center gap-2">
+                  <span class="text-xs font-semibold px-2 py-0.5 bg-gray-100 rounded text-gray-700">Điểm: ${p.score ? p.score.toFixed(2) : '0.00'}</span>
+                  <span class="text-xs text-gray-500">${p.gender}</span>
+                </div>
+                <button 
+                  id="btn-${p.id}"
+                  onclick="togglePlayerDrawer(${p.id})" 
+                  class="text-xs font-semibold px-3 py-1.5 rounded-full border border-gray-300 hover:border-gray-400 hover:bg-gray-50 active:bg-gray-100 transition-colors text-gray-700 whitespace-nowrap shadow-2xs"
+                >
+                  Chi tiết
+                </button>
+              </div>
+
+            </div>
+
+            <!-- Expandable Detail Drawer -->
+            <div id="drawer-${p.id}" class="player-drawer bg-gray-50/80 border-t border-gray-100">
+              <div class="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                
+                <!-- Left Column: Radar Chart -->
+                <div class="lg:col-span-5 flex flex-col items-center justify-center">
+                  <div class="radar-wrapper bg-white p-3 rounded-2xl border border-gray-200 shadow-xs">
+                    <canvas id="radar-canvas-${p.id}"></canvas>
+                  </div>
+                  <div class="text-[11px] text-gray-400 mt-2 text-center">Biểu đồ kỹ năng 8 khía cạnh (Thang điểm 1 - 5)</div>
+                </div>
+
+                <!-- Right Column: Player Profile & Detailed Breakdown -->
+                <div class="lg:col-span-7 space-y-4">
+                  
+                  <!-- Drawer Header -->
+                  <div>
+                    <h3 class="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2">
+                      <span>${p.name}</span>
+                      <span class="text-xs font-semibold px-2 py-0.5 rounded bg-red-100 text-[#C70000]">Hạng ${p.tier}</span>
+                      <span class="text-xs text-gray-500 font-normal">(${p.score ? p.score.toFixed(2) : '0.00'} điểm)</span>
+                    </h3>
+                    <p class="text-xs sm:text-sm text-gray-600 italic mt-1 leading-relaxed">
+                      "${tierDescription}"
+                    </p>
+                  </div>
+
+                  <!-- 4 Profile Cards (Thâm niên, Tần suất, Kinh nghiệm, Vai trò) -->
+                  <div class="profile-box-container grid grid-cols-2 gap-2.5">
+                    <div class="bg-white p-2.5 rounded-lg border border-gray-200">
+                      <div class="text-[11px] text-gray-500">Thâm niên</div>
+                      <div class="text-xs sm:text-sm font-bold text-gray-800">${p.years || 'Chưa có'}</div>
+                    </div>
+                    <div class="bg-white p-2.5 rounded-lg border border-gray-200">
+                      <div class="text-[11px] text-gray-500">Tần suất tập</div>
+                      <div class="text-xs sm:text-sm font-bold text-gray-800">${p.freq || '1–2 buổi / tuần'}</div>
+                    </div>
+                    <div class="bg-white p-2.5 rounded-lg border border-gray-200">
+                      <div class="text-[11px] text-gray-500">Kinh nghiệm thi đấu</div>
+                      <div class="text-xs sm:text-sm font-bold text-gray-800 truncate" title="${p.exp}">${p.exp || 'Giao lưu nội bộ'}</div>
+                    </div>
+                    <div class="bg-white p-2.5 rounded-lg border border-gray-200">
+                      <div class="text-[11px] text-gray-500">Vai trò khi đánh đôi</div>
+                      <div class="text-xs sm:text-sm font-bold text-gray-800 truncate" title="${p.role}">${p.role || 'Linh hoạt'}</div>
+                    </div>
+                  </div>
+
+                  <!-- 8 Detailed Skill Ratings -->
+                  <div class="skill-box-container bg-white p-3 rounded-xl border border-gray-200">
+                    <div class="text-xs font-bold text-gray-700 mb-2 flex items-center justify-between">
+                      <span>Bảng điểm 8 kỹ năng thi đấu</span>
+                      <span class="text-[11px] font-normal text-gray-400">Tối đa 5.0</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-xs">
+                      <div class="flex justify-between py-1 border-b border-gray-100">
+                        <span class="text-gray-600">Phát cầu:</span>
+                        <strong class="text-gray-900">${p.skills.Phat ? p.skills.Phat.toFixed(1) : 0}/5</strong>
+                      </div>
+                      <div class="flex justify-between py-1 border-b border-gray-100">
+                        <span class="text-gray-600">Phông & khống chế:</span>
+                        <strong class="text-gray-900">${p.skills.Phong ? p.skills.Phong.toFixed(1) : 0}/5</strong>
+                      </div>
+                      <div class="flex justify-between py-1 border-b border-gray-100">
+                        <span class="text-gray-600">Cầu lưới:</span>
+                        <strong class="text-gray-900">${p.skills.Luoi ? p.skills.Luoi.toFixed(1) : 0}/5</strong>
+                      </div>
+                      <div class="flex justify-between py-1 border-b border-gray-100">
+                        <span class="text-gray-600">Đập cầu (Smash):</span>
+                        <strong class="text-gray-900">${p.skills.Dap ? p.skills.Dap.toFixed(1) : 0}/5</strong>
+                      </div>
+                      <div class="flex justify-between py-1 border-b border-gray-100">
+                        <span class="text-gray-600">Di chuyển & vị trí:</span>
+                        <strong class="text-gray-900">${p.skills.DiChuyen ? p.skills.DiChuyen.toFixed(1) : 0}/5</strong>
+                      </div>
+                      <div class="flex justify-between py-1 border-b border-gray-100">
+                        <span class="text-gray-600">Phòng thủ:</span>
+                        <strong class="text-gray-900">${p.skills.PhongThu ? p.skills.PhongThu.toFixed(1) : 0}/5</strong>
+                      </div>
+                      <div class="flex justify-between py-1 border-b border-gray-100">
+                        <span class="text-gray-600">Phối hợp đánh đôi:</span>
+                        <strong class="text-gray-900">${p.skills.DanhDoi ? p.skills.DanhDoi.toFixed(1) : 0}/5</strong>
+                      </div>
+                      <div class="flex justify-between py-1 border-b border-gray-100">
+                        <span class="text-gray-600">Chiến thuật:</span>
+                        <strong class="text-gray-900">${p.skills.ChienThuat ? p.skills.ChienThuat.toFixed(1) : 0}/5</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Tournament Meta (Nội dung đăng ký, lệ phí, after party) -->
+                  <div class="bg-gray-100/70 p-2.5 rounded-lg text-xs text-gray-600 flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <span class="font-medium text-gray-700">Nội dung đăng ký:</span> 
+                      <span class="text-gray-900 font-semibold">${p.events || 'Chưa đăng ký'}</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                      <span>Phí: <strong class="text-gray-900">${p.fee || 'Miễn phí'}</strong></span>
+                      <span>After Party: <strong class="${p.party === 'Yes' ? 'text-green-700' : 'text-gray-500'}">${p.party}</strong></span>
+                      <span class="text-gray-400">Cập nhật: ${p.updated}</span>
+                    </div>
+                  </div>
+
+                </div>
+
               </div>
             </div>
+
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
+
+      toggleAllVisuals();
     }
 
-    // Toggle đóng / mở chi tiết và vẽ Radar Chart
-    function toggleDetail(id) {
-      const panel = document.getElementById(`detail-${id}`);
-      const btn = document.getElementById(`btn-toggle-${id}`);
-      const isOpen = panel.classList.contains('open');
+    function togglePlayerDrawer(id) {
+      const drawer = document.getElementById(`drawer-${id}`);
+      const btn = document.getElementById(`btn-${id}`);
+      const isOpen = drawer.classList.contains('is-open');
 
       if (isOpen) {
-        panel.classList.remove('open');
-        btn.classList.remove('active');
+        drawer.classList.remove('is-open');
         btn.innerText = 'Chi tiết';
+        btn.classList.remove('bg-gray-800', 'text-white', 'border-transparent');
       } else {
-        panel.classList.add('open');
-        btn.classList.add('active');
+        drawer.classList.add('is-open');
         btn.innerText = 'Đóng';
-        renderRadarChart(id);
+        btn.classList.add('bg-gray-800', 'text-white', 'border-transparent');
+        createOrUpdateRadarChart(id);
       }
     }
 
-    // Khởi tạo biểu đồ radar với tông màu NAB
-    function renderRadarChart(id) {
-      if (chartInstances[id]) return; // Tránh render lại nếu đã tạo
+    function createOrUpdateRadarChart(id) {
+      if (chartInstances[id]) return;
 
-      const player = playersData.find(p => p.id === id);
+      const player = currentPlayers.find(p => p.id === id);
       if (!player) return;
 
-      const ctx = document.getElementById(`radar-${id}`).getContext('2d');
+      const canvas = document.getElementById(`radar-canvas-${id}`);
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
       const labels = ['Phát', 'Phông', 'Lưới', 'Đập', 'Di chuyển', 'Phòng thủ', 'Đánh đôi', 'Chiến thuật'];
-      const dataValues = labels.map(l => player.skills[l] || 4);
+      const dataValues = [
+        player.skills.Phat || 0,
+        player.skills.Phong || 0,
+        player.skills.Luoi || 0,
+        player.skills.Dap || 0,
+        player.skills.DiChuyen || 0,
+        player.skills.PhongThu || 0,
+        player.skills.DanhDoi || 0,
+        player.skills.ChienThuat || 0
+      ];
 
       chartInstances[id] = new Chart(ctx, {
         type: 'radar',
         data: {
           labels: labels,
           datasets: [{
+            label: player.name,
             data: dataValues,
             backgroundColor: 'rgba(199, 0, 0, 0.22)',
             borderColor: '#C70000',
-            borderWidth: 2,
+            borderWidth: 2.2,
             pointBackgroundColor: '#C70000',
-            pointBorderColor: '#fff',
-            pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: '#C70000'
+            pointBorderColor: '#FFFFFF',
+            pointBorderWidth: 1.5,
+            pointRadius: 4,
+            pointHoverRadius: 6
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: true,
           plugins: {
-            legend: { display: false }
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (item) => ` ${item.label}: ${item.raw}/5`
+              }
+            }
           },
           scales: {
             r: {
-              angleLines: { color: '#E5E7EB' },
-              grid: { color: '#E5E7EB' },
-              suggestedMin: 0,
-              suggestedMax: 5,
+              min: 0,
+              max: 5,
               ticks: {
                 stepSize: 1,
                 display: true,
                 backdropColor: 'transparent',
-                font: { size: 10 }
+                font: { size: 9, family: "'Inter', sans-serif" },
+                color: '#9CA3AF'
+              },
+              grid: {
+                color: '#E5E7EB',
+                lineWidth: 1
+              },
+              angleLines: {
+                color: '#E5E7EB',
+                lineWidth: 1
               },
               pointLabels: {
                 font: {
@@ -835,6 +2264,25 @@
           }
         }
       });
+    }
+
+    function getTierDescription(tier) {
+      switch (tier) {
+        case 'S':
+          return 'Nhóm mạnh nhất trong CLB phong trào: đánh chắc chắn, đọc trận tốt, smash uy lực, thường được xếp hạt giống hoặc gánh đội đi đánh giải.';
+        case 'A+':
+          return 'Tay vợt công thủ toàn diện, phản xạ nhanh nhạy, kỹ thuật cơ bản vững vàng, phối hợp đánh đôi ăn ý và có tư duy chiến thuật sắc bén.';
+        case 'A':
+          return 'Kỹ năng vững, kiểm soát cầu tốt, điều cầu chính xác và thể lực dồi dào, là trụ cột trong các trận cầu đôi căng thẳng.';
+        case 'B':
+          return 'Nhóm lực lượng nòng cốt và đông đảo nhất CLB: đánh nhiệt tình, có tinh thần thi đấu cao, kỹ thuật đang ngày càng hoàn thiện.';
+        case 'C':
+          return 'Tay vợt đang trong giai đoạn tích lũy phản xạ và hoàn thiện bộ kỹ thuật đánh lưới, lùi sân phông cầu và di chuyển.';
+        case 'D':
+          return 'Tân binh yêu thích cầu lông NAB, đang làm quen nhịp độ và kỹ thuật di chuyển bộ chân trên sân đấu.';
+        default:
+          return 'Người chơi đã đăng ký tham gia giải đấu NAB Hanoi Badminton Championship 2026.';
+      }
     }
   </script>
 </body>
