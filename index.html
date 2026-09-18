@@ -11,7 +11,7 @@
   <!-- Font & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
   <!-- SheetJS & Chart.js -->
@@ -30,6 +30,18 @@
       --nab-text-muted: #6B7280;
       --nab-green-badge: #E6F4EA;
       --nab-green-text: #137333;
+      --gold-color: #D97706;
+      --silver-color: #64748B;
+      --bronze-color: #B45309;
+
+      /* Dark Theme Tokens cho Tab Chia Đội */
+      --dark-bg: #0F1117;
+      --dark-surface: #181A22;
+      --dark-card: #202330;
+      --dark-border: #2D3142;
+      --dark-text: #F3F4F6;
+      --dark-text-muted: #9CA3AF;
+      --dark-red-accent: #E50914;
     }
 
     * {
@@ -43,6 +55,12 @@
       background-color: var(--nab-gray-bg);
       color: var(--nab-black);
       padding-bottom: 60px;
+      transition: background-color 0.25s ease;
+    }
+
+    body.dark-mode-active {
+      background-color: var(--dark-bg);
+      color: var(--dark-text);
     }
 
     header {
@@ -58,6 +76,12 @@
       z-index: 100;
       flex-wrap: wrap;
       gap: 12px;
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    body.dark-mode-active header {
+      background: #14161F;
+      border-bottom: 3px solid var(--dark-red-accent);
     }
 
     .brand-title {
@@ -82,16 +106,26 @@
       color: var(--nab-black);
     }
 
+    body.dark-mode-active h1 {
+      color: #FFFFFF;
+    }
+
     .nav-tabs {
       display: flex;
       background: #F3F4F6;
-      padding: 3px;
+      padding: 4px;
       border-radius: 8px;
       border: 1px solid #E5E7EB;
+      gap: 4px;
+    }
+
+    body.dark-mode-active .nav-tabs {
+      background: #202330;
+      border-color: #2D3142;
     }
 
     .nav-tab-btn {
-      padding: 7px 16px;
+      padding: 7px 15px;
       border-radius: 6px;
       border: none;
       background: transparent;
@@ -105,8 +139,16 @@
       transition: all 0.2s;
     }
 
+    body.dark-mode-active .nav-tab-btn {
+      color: #9CA3AF;
+    }
+
     .nav-tab-btn:hover {
       color: var(--nab-black);
+    }
+
+    body.dark-mode-active .nav-tab-btn:hover {
+      color: #FFFFFF;
     }
 
     .nav-tab-btn.active {
@@ -114,6 +156,11 @@
       color: var(--nab-red);
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       font-weight: 700;
+    }
+
+    body.dark-mode-active .nav-tab-btn.active {
+      background: var(--dark-red-accent);
+      color: #FFFFFF;
     }
 
     .header-actions {
@@ -156,7 +203,7 @@
     }
 
     .container {
-      max-width: 1240px;
+      max-width: 1380px;
       margin: 20px auto;
       padding: 0 16px;
     }
@@ -170,7 +217,6 @@
       animation: fadeIn 0.25s ease;
     }
 
-    /* KPI Cards */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
@@ -628,7 +674,6 @@
       border-top: 1px solid #E5E7EB;
     }
 
-    /* RULES TAB STYLES */
     .rules-hero {
       background: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%);
       color: white;
@@ -675,6 +720,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
+      align-items: center;
     }
 
     .btn-doc-primary {
@@ -775,6 +821,7 @@
       border: 1px solid #E5E7EB;
       border-radius: 10px;
       padding: 16px;
+      position: relative;
       transition: all 0.2s;
     }
 
@@ -937,33 +984,617 @@
       margin-top: 4px;
     }
 
-    #loadingSpinner {
+    .teams-dark-wrapper {
+      background: var(--dark-surface);
+      border-radius: 14px;
+      padding: 24px;
+      color: var(--dark-text);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+      border: 1px solid var(--dark-border);
+    }
+
+    .teams-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .teams-main-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #FFFFFF;
+    }
+
+    .teams-main-title .red-bar {
+      width: 4px;
+      height: 22px;
+      background: var(--dark-red-accent);
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    .teams-action-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-dark-tool {
+      background: #252836;
+      color: #D1D5DB;
+      border: 1px solid #374151;
+      padding: 8px 14px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.2s;
+    }
+
+    .btn-dark-tool:hover:not(:disabled) {
+      background: #32364A;
+      color: #FFFFFF;
+      border-color: #4B5563;
+    }
+
+    .btn-dark-tool:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-download-excel {
+      background: var(--dark-red-accent);
+      color: #FFFFFF;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      box-shadow: 0 2px 8px rgba(229, 9, 20, 0.4);
+      transition: all 0.2s;
+    }
+
+    .btn-download-excel:hover {
+      background: #FF1F2E;
+      transform: translateY(-1px);
+    }
+
+    .teams-sub-desc {
+      font-size: 13px;
+      color: #9CA3AF;
+      line-height: 1.55;
+      margin-bottom: 22px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--dark-border);
+    }
+
+    /* Sub Tabs inside Team view */
+    .teams-sub-nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--dark-border);
+      padding-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .sub-nav-btn {
+      background: transparent;
+      border: none;
+      color: #9CA3AF;
+      font-size: 13.5px;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .sub-nav-btn:hover {
+      color: #FFFFFF;
+      background: #252836;
+    }
+
+    .sub-nav-btn.active {
+      color: #FFFFFF;
+      background: var(--dark-red-accent);
+      box-shadow: 0 2px 6px rgba(229, 9, 20, 0.35);
+    }
+
+    .balance-table-wrapper {
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--dark-border);
+      margin-bottom: 28px;
+      background: #141620;
+    }
+
+    .balance-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
       text-align: center;
-      padding: 60px 20px;
-      color: #6B7280;
     }
 
-    .spinner {
-      border: 3px solid #E5E7EB;
-      border-top: 3px solid var(--nab-red);
+    .balance-table th {
+      background: var(--dark-red-accent);
+      color: #FFFFFF;
+      padding: 12px 14px;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.3px;
+      border: none;
+    }
+
+    .balance-table th:first-child {
+      text-align: left;
+      padding-left: 18px;
+    }
+
+    .balance-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #232738;
+      color: #E5E7EB;
+      font-weight: 500;
+    }
+
+    .balance-table td:first-child {
+      text-align: left;
+      font-weight: 600;
+      padding-left: 18px;
+      color: #D1D5DB;
+    }
+
+    .balance-table tr:nth-child(even) td {
+      background: #181A26;
+    }
+
+    .balance-table tr.row-total-score td {
+      background: #2E151A;
+      color: #FCA5A5;
+      font-weight: 700;
+    }
+
+    .balance-table tr.row-avg-score td {
+      background: #231216;
+      color: #FECACA;
+      font-weight: 700;
+    }
+
+    .badge-balanced {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11.5px;
+      font-weight: 700;
+      background: rgba(34, 197, 94, 0.2);
+      color: #4ADE80;
+    }
+
+    .badge-diff {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11.5px;
+      font-weight: 700;
+      background: rgba(239, 68, 68, 0.2);
+      color: #F87171;
+    }
+
+    /* Horizontal score bars section */
+    .bars-section {
+      background: #151722;
+      border-radius: 10px;
+      padding: 20px;
+      border: 1px solid var(--dark-border);
+      margin-bottom: 28px;
+    }
+
+    .bars-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .bars-title {
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bars-sub {
+      font-size: 12px;
+      color: #9CA3AF;
+    }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 14px;
+      font-size: 13px;
+    }
+
+    .bar-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .bar-team-label {
+      width: 55px;
+      font-weight: 700;
+      color: #E5E7EB;
+      flex-shrink: 0;
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 12px;
+      background: #252838;
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #B91C1C, #EF4444);
+      border-radius: 6px;
+      transition: width 0.4s ease;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+    }
+
+    .bar-stat-text {
+      width: 140px;
+      text-align: right;
+      font-weight: 700;
+      font-size: 13px;
+      color: #F3F4F6;
+      flex-shrink: 0;
+    }
+
+    .bar-stat-text span {
+      color: #9CA3AF;
+      font-weight: 500;
+      margin-left: 6px;
+    }
+
+    .teams-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .team-column {
+      background: #141622;
+      border-radius: 12px;
+      border: 1px solid var(--dark-border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.2s;
+    }
+
+    .team-column.drag-over {
+      border-color: var(--dark-red-accent);
+      box-shadow: 0 0 15px rgba(229, 9, 20, 0.35);
+    }
+
+    .team-card-header {
+      padding: 16px 14px;
+      background: #181B27;
+      border-bottom: 1px solid var(--dark-border);
+    }
+
+    .team-title-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .team-num-badge {
+      background: var(--dark-red-accent);
+      color: white;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 12px auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
     }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    .team-name-text {
+      font-size: 15px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: 0.3px;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
+    .team-member-meta {
+      font-size: 12px;
+      color: #9CA3AF;
+      margin-bottom: 10px;
     }
 
-    @media (max-width: 992px) {
+    .team-kpi-badge-box {
+      background: linear-gradient(135deg, #2E1217 0%, #1F1318 100%);
+      border: 1px solid #5A1B24;
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #FFFFFF;
+    }
+
+    .team-kpi-primary {
+      font-size: 14px;
+      font-weight: 800;
+      color: #FFFFFF;
+    }
+
+    .team-kpi-sub {
+      font-size: 12px;
+      color: #FCA5A5;
+      font-weight: 600;
+    }
+
+    .team-players-dropzone {
+      padding: 10px;
+      flex: 1;
+      min-height: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .team-player-item {
+      background: #1A1D2B;
+      border: 1px solid #282C3D;
+      border-radius: 7px;
+      padding: 9px 12px;
+      cursor: grab;
+      user-select: none;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .team-player-item:hover {
+      background: #222638;
+      border-color: #3F4660;
+      transform: translateY(-1px);
+    }
+
+    .team-player-item.dragging {
+      opacity: 0.4;
+      border-color: var(--dark-red-accent);
+    }
+
+    .tp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tp-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tp-badge-duphong {
+      background: #B91C1C;
+      color: white;
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 3px;
+      letter-spacing: 0.3px;
+    }
+
+    .tp-sub {
+      font-size: 11.5px;
+      color: #9CA3AF;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tp-sub strong {
+      color: #D1D5DB;
+    }
+
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 18px;
+    }
+
+    .event-card {
+      background: #141622;
+      border: 1px solid var(--dark-border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+    }
+
+    .event-header {
+      padding: 14px 16px;
+      background: #1A1D2B;
+      border-bottom: 1px solid var(--dark-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .event-num-title {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .event-tier-badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      color: white;
+    }
+
+    .event-desc-bar {
+      padding: 8px 16px;
+      font-size: 12px;
+      color: #9CA3AF;
+      background: #12141F;
+      border-bottom: 1px solid #232738;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .event-pairs-list {
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .event-pair-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1A1D2C;
+      padding: 10px 12px;
+      border-radius: 7px;
+      border: 1px solid #2A2E42;
+    }
+
+    .pair-team-tag {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: #2A2E44;
+      color: #E5E7EB;
+      margin-right: 8px;
+    }
+
+    .pair-players-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: #FFFFFF;
+    }
+
+    .pair-stat-text {
+      font-size: 12px;
+      font-weight: 700;
+      color: #F87171;
+    }
+
+    /* Player Matrix Table */
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+
+    .matrix-table th {
+      background: #1A1D2B;
+      padding: 10px 12px;
+      color: #D1D5DB;
+      font-weight: 700;
+      border: 1px solid #2A2E42;
+      white-space: nowrap;
+    }
+
+    .matrix-table td {
+      padding: 9px 12px;
+      border: 1px solid #2A2E42;
+      color: #E5E7EB;
+    }
+
+    .matrix-table tr:nth-child(even) td {
+      background: #141622;
+    }
+
+    .badge-event-count {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .event-count-1 { background: #1E3A8A; color: #93C5FD; }
+    .event-count-2 { background: #065F46; color: #6EE7B7; }
+    .event-count-overflow { background: #991B1B; color: #FCA5A5; }
+
+    /* Toast Notification */
+    #toastNotification {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1F2937;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+      border-left: 4px solid var(--nab-red);
+      font-size: 13.5px;
+      font-weight: 600;
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    /* Responsive */
+    @media (max-width: 1180px) {
+      .teams-grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .teams-grid-4 {
+        grid-template-columns: 1fr;
+      }
       .list-header { display: none; }
       .player-main-row {
         grid-template-columns: 1fr 1fr;
@@ -988,7 +1619,10 @@
 
     <!-- Navigation Tabs -->
     <div class="nav-tabs">
-      <button class="nav-tab-btn active" id="tabBtnPlayers" onclick="switchView('players')">
+      <button class="nav-tab-btn active" id="tabBtnTeams" onclick="switchView('teams')">
+        <i class="fa-solid fa-people-group"></i> Danh sách Đội thi đấu
+      </button>
+      <button class="nav-tab-btn" id="tabBtnPlayers" onclick="switchView('players')">
         <i class="fa-solid fa-users"></i> Danh sách người chơi
       </button>
       <button class="nav-tab-btn" id="tabBtnRules" onclick="switchView('rules')">
@@ -997,10 +1631,13 @@
     </div>
 
     <div class="header-actions">
+      <button class="btn-header btn-doc" onclick="exportTeamsExcel()" title="Tải file Excel kết quả phân chia các bảng">
+        <i class="fa-solid fa-file-excel"></i> Tải Excel
+      </button>
       <a href="https://docs.google.com/document/d/1osHqi2JD3OT8Iu6sRYQrWjFB6zdirlAJ/edit?usp=sharing&ouid=102416618896836630248&rtpof=true&sd=true" target="_blank" class="btn-header btn-doc" title="Mở văn bản Quy chế chính thức trên Google Docs">
-        <i class="fa-solid fa-file-word"></i> Xem Doc Quy chế
+        <i class="fa-solid fa-file-word"></i> Xem Quy chế
       </a>
-      <button class="btn-header btn-sync" onclick="syncFromGoogleSheet()">
+      <button class="btn-header btn-sync" onclick="syncFromGoogleSheet()" title="Đồng bộ lại từ Google Sheet gốc">
         <i class="fa-solid fa-rotate"></i> Đồng bộ Sheet
       </button>
     </div>
@@ -1008,8 +1645,147 @@
 
   <div class="container">
     
-    <!-- TAB 1: DANH SÁCH NGƯỜI CHƠI -->
-    <div id="viewPlayers" class="tab-view active">
+    <!-- ================================================= -->
+    <!-- TAB 1: DANH SÁCH ĐỘI THI ĐẤU (CHỦ ĐỀ NỘI DUNG MỚI)-->
+    <!-- ================================================= -->
+    <div id="viewTeams" class="tab-view active">
+      <div class="teams-dark-wrapper">
+        
+        <!-- Header Actions Row -->
+        <div class="teams-header-row">
+          <div class="teams-main-title">
+            <span class="red-bar"></span> 3. KẾT QUẢ PHÂN CHIA ĐỘI & BẢNG ĐẤU
+          </div>
+          <div class="teams-action-bar">
+            <button class="btn-dark-tool" id="btnUndo" onclick="undoTeamChange()" disabled title="Hoàn tác thao tác đổi người (⌘Z)">
+              <i class="fa-solid fa-arrow-rotate-left"></i> Hoàn tác
+            </button>
+            <button class="btn-dark-tool" id="btnRedo" onclick="redoTeamChange()" disabled title="Làm lại thao tác đổi người (⇧⌘Z)">
+              <i class="fa-solid fa-arrow-rotate-right"></i> Làm lại
+            </button>
+            <button class="btn-dark-tool" onclick="window.print()" title="In bảng phân chia 4 đội">
+              <i class="fa-solid fa-print"></i> In
+            </button>
+            <label class="btn-dark-tool" style="cursor: pointer;" title="Nhập file Excel chia đội mới (.xlsx)">
+              <i class="fa-solid fa-file-arrow-up"></i> Nhập Excel
+              <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="display: none;" onchange="handleExcelUpload(event)">
+            </label>
+            <button class="btn-download-excel" onclick="exportTeamsExcel()" title="Tải về file Excel chứa đầy đủ các bảng và nội dung">
+              <i class="fa-solid fa-file-excel"></i> Tải Excel các bảng đấu
+            </button>
+          </div>
+        </div>
+
+        <div class="teams-sub-desc">
+          Dữ liệu đồng bộ trực tiếp từ file phân đội của giải. Kéo tên người chơi sang bảng khác để điều chỉnh; điểm, nam/nữ và bảng cân bằng sẽ tự động cập nhật ngay lập tức. Hoàn tác / Làm lại hỗ trợ phím tắt (⌘Z / ⇧⌘Z).
+        </div>
+
+        <!-- Sub Navigation Tabs -->
+        <div class="teams-sub-nav">
+          <button class="sub-nav-btn active" id="subTabOverview" onclick="switchTeamSubTab('overview')">
+            <i class="fa-solid fa-table-columns"></i> Bảng chia 4 Đội & Cân bằng
+          </button>
+          <button class="sub-nav-btn" id="subTabEvents" onclick="switchTeamSubTab('events')">
+            <i class="fa-solid fa-volleyball"></i> 9 Nội dung thi đấu (Đôi)
+          </button>
+          <button class="sub-nav-btn" id="subTabMatrix" onclick="switchTeamSubTab('matrix')">
+            <i class="fa-solid fa-list-check"></i> Ma trận phân bổ VĐV (1–2 nội dung)
+          </button>
+        </div>
+
+        <!-- SUB-VIEW A: OVERVIEW & 4 TEAM DRAG-DROP -->
+        <div id="subViewOverview">
+          <!-- BẢNG CÂN BẰNG TỔNG QUAN -->
+          <div class="balance-table-wrapper">
+            <table class="balance-table" id="balanceMatrixTable">
+              <thead>
+                <tr>
+                  <th>Tiêu chí</th>
+                  <th>Đội 1</th>
+                  <th>Đội 2</th>
+                  <th>Đội 3</th>
+                  <th>Đội 4</th>
+                  <th>Cân bằng</th>
+                </tr>
+              </thead>
+              <tbody id="balanceMatrixBody">
+                <!-- Sẽ được tạo tự động bởi JS dựa trên dữ liệu 4 đội -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- THANH ĐIỂM TỰ ĐÁNH GIÁ MỖI BẢNG -->
+          <div class="bars-section">
+            <div class="bars-header">
+              <div class="bars-title">
+                <i class="fa-solid fa-chart-simple" style="color:var(--dark-red-accent);"></i> Điểm tự đánh giá mỗi bảng
+              </div>
+              <div class="bars-sub">
+                Tổng và trung bình theo điểm 0–5 (chỉ người đã có điểm). Thanh càng dài thì tổng điểm bảng càng cao.
+              </div>
+            </div>
+            <div id="barsContainer">
+              <!-- Sẽ render tự động qua JS -->
+            </div>
+          </div>
+
+          <!-- 4 CỘT BẢNG ĐẤU KÉO THẢ TRỰC TIẾP -->
+          <div class="teams-grid-4" id="teamColumnsContainer">
+            <!-- Render qua hàm renderTeamColumns() -->
+          </div>
+        </div>
+
+        <!-- SUB-VIEW B: 9 NỘI DUNG THI ĐẤU -->
+        <div id="subViewEvents" style="display: none;">
+          <div style="margin-bottom: 16px; font-size: 13.5px; color: #D1D5DB; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <i class="fa-solid fa-circle-info" style="color:var(--dark-red-accent);"></i> 
+              Mỗi nội dung gồm 4 đôi đại diện cho 4 Đội thi đấu vòng tròn 1 lượt (set 15đ) và chung kết xếp hạng (set 17đ).
+            </div>
+            <div style="font-size: 12px; color: #9CA3AF;">
+              Quy ước: VĐV được phép đánh lên trần cao hơn, tuyệt đối không được đánh xuống trần thấp hơn.
+            </div>
+          </div>
+          <div class="events-grid" id="eventsContainer">
+            <!-- Render qua hàm renderEvents() -->
+          </div>
+        </div>
+
+        <!-- SUB-VIEW C: MA TRẬN PHÂN BỔ VĐV -->
+        <div id="subViewMatrix" style="display: none;">
+          <div style="margin-bottom: 14px; font-size: 13px; color: #9CA3AF;">
+            Theo <strong>Điều 9 Quy chế</strong>: Mỗi vận động viên tham gia tối thiểu 1 nội dung và tối đa 2 nội dung. Bảng kiểm tra bên dưới giúp Ban tổ chức và Đội trưởng giám sát sự tuân thủ.
+          </div>
+          <div class="table-responsive" style="border-radius: 8px; border: 1px solid var(--dark-border);">
+            <table class="matrix-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Họ và tên</th>
+                  <th>Đội</th>
+                  <th>Giới tính</th>
+                  <th>Hạng</th>
+                  <th>Điểm</th>
+                  <th>Số nội dung</th>
+                  <th>Các nội dung thi đấu</th>
+                  <th>Kiểm tra quy định</th>
+                </tr>
+              </thead>
+              <tbody id="matrixTableBody">
+                <!-- Render qua JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================================================= -->
+    <!-- TAB 2: DANH SÁCH NGƯỜI CHƠI (DANH BẠ CỦA TOÀN CLB)-->
+    <!-- ================================================= -->
+    <div id="viewPlayers" class="tab-view">
+      <!-- Top Stats Cards -->
       <div class="stats-grid">
         <div class="stat-card active" id="cardTotal" onclick="resetAllFilters()">
           <div class="stat-title"><i class="fa-solid fa-users"></i> Tổng số</div>
@@ -1049,6 +1825,7 @@
         </div>
       </div>
 
+      <!-- Filter Bar -->
       <div class="filter-card">
         <div class="filter-row">
           <div class="filter-input">
@@ -1075,7 +1852,7 @@
             <option value="Chưa đăng ký">Chưa đăng ký</option>
           </select>
           <select class="filter-select" id="orgFilter" onchange="applyFilters()">
-            <option value="all">Nhân viên của NAB: Tất cả</option>
+            <option value="all">Nhân viên NAB: Tất cả</option>
             <option value="nab">NAB</option>
             <option value="non-nab">Non-NAB</option>
           </select>
@@ -1093,6 +1870,7 @@
         </div>
       </div>
 
+      <!-- Table Header -->
       <div class="list-header">
         <div>#</div>
         <div>Người chơi</div>
@@ -1105,16 +1883,21 @@
         <div style="text-align: right;">Thao tác</div>
       </div>
 
+      <!-- Loading State -->
       <div id="loadingSpinner">
-        <div class="spinner"></div>
+        <div class="spinner" style="border: 3px solid #E5E7EB; border-top: 3px solid var(--nab-red); border-radius: 50%; width: 36px; height: 36px; animation: spin 0.8s linear infinite; margin: 0 auto 12px auto;"></div>
         <div>Đang đồng bộ dữ liệu từ Google Sheets...</div>
       </div>
 
+      <!-- List Container -->
       <div id="playerListContainer"></div>
     </div>
 
-    <!-- TAB 2: QUY CHẾ & THỂ THỨC TỔ CHỨC GIẢI -->
+    <!-- ================================================= -->
+    <!-- TAB 3: QUY CHẾ & THỂ THỨC TỔ CHỨC GIẢI           -->
+    <!-- ================================================= -->
     <div id="viewRules" class="tab-view">
+      <!-- Hero Banner -->
       <div class="rules-hero">
         <div class="rules-badge"><i class="fa-solid fa-certificate"></i> Quy chế chính thức ban hành 17/09/2026</div>
         <h2>QUY CHẾ GIẢI NAB HANOI BADMINTON CHAMPIONSHIP 2026</h2>
@@ -1129,6 +1912,7 @@
         </div>
       </div>
 
+      <!-- 4 Trụ cột số liệu giải -->
       <div class="rules-stats-bar">
         <div class="rule-kpi-card">
           <div class="rule-kpi-icon" style="background:#FEE2E2; color:var(--nab-red);">
@@ -1168,11 +1952,15 @@
         </div>
       </div>
 
-      <!-- Lộ trình thể thức -->
+      <!-- Lộ trình thể thức thi đấu -->
       <div class="rules-section">
         <div class="section-title">
           <i class="fa-solid fa-diagram-project"></i> Lộ trình & Thể thức thi đấu từng nội dung
         </div>
+        <p style="font-size:13.5px; color:#4B5563; margin-bottom:16px;">
+          Mỗi nội dung gồm 4 đôi đại diện cho 4 đội thi đấu theo thể thức 2 giai đoạn: Vòng tròn một lượt tính điểm phân hạng, sau đó bước vào vòng chung kết tranh huy chương trực tiếp.
+        </p>
+
         <div class="roadmap-grid">
           <div class="roadmap-step">
             <div class="step-num">1</div>
@@ -1205,13 +1993,13 @@
             <div class="step-title">Quy đổi Điểm đội</div>
             <div class="step-desc">
               Sau vòng tranh huy chương, điểm số được phân bổ trực tiếp cho bảng tổng sắp đội: 
-              <strong>Vàng = 6đ | Bạc = 4đ | Đồng = 2đ | Hạng 4 = 1đ</strong>.
+              <strong>Vàng = 6 điểm | Bạc = 4 điểm | Đồng = 2 điểm | Hạng 4 = 1 điểm</strong>.
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 9 Nội dung & Trần hạng -->
+      <!-- Bảng 9 Nội dung & Trần hạng -->
       <div class="rules-section">
         <div class="section-title">
           <i class="fa-solid fa-layer-group"></i> 9 Nội dung thi đấu & Quy định Trần hạng (Điều 9)
@@ -1352,157 +2140,654 @@
             <div style="background:white; padding:8px 14px; border-radius:6px; border:1px solid #CBD5E1;">
               🏅 <strong>Hạng Tư:</strong> <span style="color:#4B5563; font-weight:800; font-size:16px;">1 điểm</span>
             </div>
-            <div style="background:white; padding:8px 14px; border-radius:6px; border:1px solid #FECACA; color:#B91C1C;">
-              ❌ <strong>Bỏ cuộc (Walk-over):</strong> <span style="font-weight:800; font-size:16px;">0 điểm</span>
-            </div>
-          </div>
-          <div style="font-size:12.5px; color:#64748B; margin-top:10px; line-height:1.5;">
-            * Mỗi nội dung phân phối cố định 13 điểm cho 4 đội. Tổng điểm tối đa một đội có thể đạt được là <strong>54 điểm</strong> (9 nội dung × 6đ).<br>
-            * Nếu bằng điểm, xét lần lượt: <strong>Số HCV > Số HCB > Số HCĐ > Tổng trận thắng > Hiệu số set > Hiệu số điểm > Play-off 1 set 21 điểm</strong>.
           </div>
         </div>
       </div>
 
-      <!-- Kỷ luật & Fair-play -->
-      <div class="rules-section">
-        <div class="section-title">
-          <i class="fa-solid fa-shield-halved"></i> Quy định Kỷ luật, Walk-over & Fair-Play (Điều 4, 8, 16, 21)
-        </div>
-        <div class="policy-grid">
-          <div class="policy-card">
-            <div class="policy-card-title">
-              <i class="fa-solid fa-clock-rotate-left" style="color:#EA580C;"></i> Đến trễ thi đấu
-            </div>
-            <div class="policy-card-text">
-              Đôi không có đủ 2 người trên sân sau <strong>5 phút</strong> kể từ giờ thi đấu (sau khi BTC đã gọi tên 3 lần) sẽ bị xử thua <strong>Walk-over (0–2)</strong>.
-            </div>
-            <div class="badge-punish">Thua 0-15 (vòng tròn) / 0-17 (chung kết)</div>
-          </div>
-
-          <div class="policy-card">
-            <div class="policy-card-title">
-              <i class="fa-solid fa-user-slash" style="color:#DC2626;"></i> Nghiêm cấm đánh thay
-            </div>
-            <div class="policy-card-text">
-              Chỉ VĐV có tên trong danh sách 4 đội mới được ra sân. Nghiêm cấm mượn người ngoài hoặc đội khác đánh thay.
-            </div>
-            <div class="badge-punish">Xử thua 0–2 & Trừ 3 điểm đội</div>
-          </div>
-
-          <div class="policy-card">
-            <div class="policy-card-title">
-              <i class="fa-solid fa-handshake-simple" style="color:#0284C7;"></i> Fair-play & Dàn xếp
-            </div>
-            <div class="policy-card-text">
-              Nghiêm cấm thi đấu dưới sức, nhường điểm hoặc dàn xếp thứ hạng vòng tròn. Tuyệt đối không sử dụng rượu bia trước khi ra sân.
-            </div>
-            <div class="badge-punish">Hủy kết quả nội dung & Trừ 6 điểm đội</div>
-          </div>
-
-          <div class="policy-card">
-            <div class="policy-card-title">
-              <i class="fa-solid fa-user-injured" style="color:#16A34A;"></i> Thay người đột xuất
-            </div>
-            <div class="policy-card-text">
-              Chỉ được thay khi có chấn thương/ốm/việc bất khả kháng có báo BTC. Người thay phải cùng đội, không vượt trần hạng và sau khi thay vẫn <strong>không quá 2 nội dung</strong>.
-            </div>
-          </div>
-
-          <div class="policy-card">
-            <div class="policy-card-title">
-              <i class="fa-solid fa-scale-balanced" style="color:#7C3AED;"></i> Trọng tài & Khiếu nại
-            </div>
-            <div class="policy-card-text">
-              Các đôi tự tính điểm theo tinh thần fair-play (hoặc theo trọng tài do BTC cử). Mọi khiếu nại phải do Đội trưởng gửi BTC trong vòng <strong>10 phút sau trận</strong>.
-            </div>
-          </div>
-
-          <div class="policy-card">
-            <div class="policy-card-title">
-              <i class="fa-solid fa-shirt" style="color:#4B5563;"></i> Trang phục & Thiết bị
-            </div>
-            <div class="policy-card-text">
-              VĐV thi đấu bằng áo giải do BTC phát trước giải, khuyến khích mang giày sân trong nhà chuyên dụng. Vợt cá nhân tự chuẩn bị; cầu thi đấu do BTC cấp đồng nhất.
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Footer Callout -->
-      <div style="text-align:center; background:white; border:1px solid #E5E7EB; border-radius:12px; padding:28px; margin-top:20px;">
-        <h3 style="font-size:16px; font-weight:700; margin-bottom:8px;">Bạn cần tra cứu chi tiết toàn bộ 24 Điều và các Phụ lục?</h3>
-        <p style="font-size:13px; color:#6B7280; margin-bottom:16px;">Văn bản Quy chế tổ chức chính thức được lưu trữ và cập nhật trực tiếp trên Google Docs của Ban tổ chức.</p>
-        <a href="https://docs.google.com/document/d/1osHqi2JD3OT8Iu6sRYQrWjFB6zdirlAJ/edit?usp=sharing&ouid=102416618896836630248&rtpof=true&sd=true" target="_blank" class="btn-doc-primary" style="display:inline-flex;">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i> Xem Quy chế đầy đủ trên Google Docs
-        </a>
-      </div>
     </div>
 
   </div>
 
+  <!-- Toast Notification -->
+  <div id="toastNotification">
+    <i class="fa-solid fa-circle-check" style="color:#22C55E; font-size:18px;"></i>
+    <span id="toastMessage">Thông báo</span>
+  </div>
+
+  <!-- ================================================= -->
+  <!-- JAVASCRIPT LOGIC CHO TOÀN BỘ ỨNG DỤNG             -->
+  <!-- ================================================= -->
   <script>
     const SPREADSHEET_ID = "18NLI0v073EIZezHwbwKx5zfrHNTarPx899hNCJBqSBg";
     let currentPlayers = [];
     const chartInstances = {};
 
-    function switchView(tab) {
-      const isPlayers = tab === 'players';
-      document.getElementById('viewPlayers').classList.toggle('active', isPlayers);
-      document.getElementById('viewRules').classList.toggle('active', !isPlayers);
-      
-      document.getElementById('tabBtnPlayers').classList.toggle('active', isPlayers);
-      document.getElementById('tabBtnRules').classList.toggle('active', !isPlayers);
+    /* Dữ liệu 4 Đội thi đấu - Khởi tạo chính xác theo file Excel & Ảnh chụp */
+    const INITIAL_TEAMS = [
+      {
+        id: 1,
+        name: "ĐỘI 1",
+        color: "#C70000",
+        players: [
+          { id: 101, name: "Harris Nguyen Khoa", gender: "Nam", rank: "S", score: 4.40 },
+          { id: 102, name: "Andy Ho", gender: "Nam", rank: "A+", score: 3.93 },
+          { id: 103, name: "AV Hiep Dao", gender: "Nam", rank: "A+", score: 3.64 },
+          { id: 104, name: "An Tran", gender: "Nữ", rank: "A+", score: 3.32 },
+          { id: 105, name: "Lee Khuc", gender: "Nam", rank: "A", score: 3.15 },
+          { id: 106, name: "Loc Ngo", gender: "Nam", rank: "A", score: 2.86 },
+          { id: 107, name: "Chris Ho", gender: "Nam", rank: "B", score: 2.75 },
+          { id: 108, name: "Luc Nguyen", gender: "Nam", rank: "B", score: 2.72 },
+          { id: 109, name: "MINH HOANG", gender: "Nam", rank: "B", score: 2.26 },
+          { id: 110, name: "Otis Xa", gender: "Nam", rank: "B", score: 2.51 },
+          { id: 111, name: "Thien Nguyen", gender: "Nữ", rank: "B", score: 2.66, isReserve: true },
+          { id: 112, name: "Ha Pham", gender: "Nữ", rank: "C", score: 1.59 },
+          { id: 113, name: "Dung Nguyen", gender: "Nam", rank: "C", score: 2.05 },
+          { id: 114, name: "Hoang Pham", gender: "Nam", rank: "D", score: 1.91 }
+        ]
+      },
+      {
+        id: 2,
+        name: "ĐỘI 2",
+        color: "#E65100",
+        players: [
+          { id: 201, name: "Luong Tran", gender: "Nam", rank: "S", score: 4.50 },
+          { id: 202, name: "Richard Dau", gender: "Nam", rank: "A+", score: 3.73 },
+          { id: 203, name: "Collin Nguyen", gender: "Nam", rank: "A+", score: 3.66 },
+          { id: 204, name: "Andy Dang", gender: "Nam", rank: "A", score: 3.17 },
+          { id: 205, name: "Binh Nguyen", gender: "Nam", rank: "A", score: 3.10 },
+          { id: 206, name: "Felix Phan", gender: "Nam", rank: "B", score: 2.64 },
+          { id: 207, name: "Quan Nguyen", gender: "Nam", rank: "B", score: 2.61 },
+          { id: 208, name: "Tuan Anh Tran", gender: "Nam", rank: "B", score: 2.68 },
+          { id: 209, name: "Kún Bé", gender: "Nữ", rank: "B", score: 2.51 },
+          { id: 210, name: "Lee Nguyen", gender: "Nữ", rank: "B", score: 2.38 },
+          { id: 211, name: "TU NGHIEM", gender: "Nam", rank: "C", score: 2.07 },
+          { id: 212, name: "Nam Pham", gender: "Nam", rank: "C", score: 1.95 },
+          { id: 213, name: "Duc Anh", gender: "Nam", rank: "D", score: 1.44 }
+        ]
+      },
+      {
+        id: 3,
+        name: "ĐỘI 3",
+        color: "#1976D2",
+        players: [
+          { id: 301, name: "Tuyen Bui", gender: "Nam", rank: "S", score: 4.53 },
+          { id: 302, name: "Andy Bui", gender: "Nam", rank: "A+", score: 3.77 },
+          { id: 303, name: "Ross Nguyen", gender: "Nam", rank: "A+", score: 3.33 },
+          { id: 304, name: "Thuan Ngo Xuan", gender: "Nam", rank: "A", score: 3.23 },
+          { id: 305, name: "Anh Pham", gender: "Nữ", rank: "A", score: 3.07 },
+          { id: 306, name: "Hung Luong", gender: "Nam", rank: "B", score: 2.25 },
+          { id: 307, name: "Kent Le", gender: "Nam", rank: "B", score: 2.76 },
+          { id: 308, name: "Thái Hữu Công", gender: "Nam", rank: "B", score: 2.61 },
+          { id: 309, name: "Tung Duong", gender: "Nam", rank: "B", score: 2.73 },
+          { id: 310, name: "Hanh Ngo", gender: "Nữ", rank: "B", score: 2.20 },
+          { id: 311, name: "Duy Le", gender: "Nam", rank: "C", score: 2.18 },
+          { id: 312, name: "Minh Tran", gender: "Nam", rank: "C", score: 2.05 },
+          { id: 313, name: "Long Hoang", gender: "Nam", rank: "C", score: 2.02 }
+        ]
+      },
+      {
+        id: 4,
+        name: "ĐỘI 4",
+        color: "#00897B",
+        players: [
+          { id: 401, name: "Thinh An", gender: "Nam", rank: "S", score: 5.00 },
+          { id: 402, name: "Hoa Tran", gender: "Nam", rank: "A+", score: 3.73 },
+          { id: 403, name: "Ethan Trinh", gender: "Nam", rank: "A+", score: 3.48 },
+          { id: 404, name: "Viet Vu", gender: "Nam", rank: "A", score: 3.29 },
+          { id: 405, name: "Ngô Chiến", gender: "Nam", rank: "A", score: 3.16 },
+          { id: 406, name: "Charlie Trinh", gender: "Nam", rank: "B", score: 2.23 },
+          { id: 407, name: "Dat Pham", gender: "Nam", rank: "B", score: 2.64 },
+          { id: 408, name: "Kien Ly", gender: "Nam", rank: "B", score: 2.74 },
+          { id: 409, name: "Ellie Nguyen", gender: "Nữ", rank: "B", score: 2.74 },
+          { id: 410, name: "Phạm Quỳnh Giang", gender: "Nữ", rank: "B", score: 2.50 },
+          { id: 411, name: "An Vu", gender: "Nam", rank: "C", score: 2.13 },
+          { id: 412, name: "Son Nguyen", gender: "Nam", rank: "C", score: 1.90 },
+          { id: 413, name: "Huy Do", gender: "Nam", rank: "C", score: 1.80 },
+          { id: 414, name: "Thanh Le", gender: "Nam", rank: "D", score: 1.31 }
+        ]
+      }
+    ];
 
-      window.location.hash = isPlayers ? '#danh-sach' : '#quy-che';
+    /* Trạng thái hoạt động của 4 Đội */
+    let teamsData = JSON.parse(JSON.stringify(INITIAL_TEAMS));
+    const historyStack = [];
+    const redoStack = [];
+
+    const EVENT_DEFINITIONS = [
+      { id: 1, title: "Đôi nam cao cấp 1", ceiling: "Trần S", badgeClass: "rank-S", desc: "Nội dung đỉnh cao, mở cho mọi hạng nam" },
+      { id: 2, title: "Đôi nam cao cấp 2", ceiling: "Trần A+", badgeClass: "rank-A_plus", desc: "Giới hạn tối đa hạng A+, không cho VĐV S" },
+      { id: 3, title: "Đôi nam trung cấp 1", ceiling: "Trần A", badgeClass: "rank-A", desc: "Trần hạng A, cặp đấu cân tài cân sức" },
+      { id: 4, title: "Đôi nam trung cấp 2", ceiling: "Trần A", badgeClass: "rank-A", desc: "Song song cùng trần A với Trung cấp 1" },
+      { id: 5, title: "Đôi nam sơ cấp 1", ceiling: "Trần B", badgeClass: "rank-B", desc: "Dành cho các tay vợt phong trào hạng B trở xuống" },
+      { id: 6, title: "Đôi nam sơ cấp 2", ceiling: "Trần C", badgeClass: "rank-C", desc: "Bảo vệ newbie: C & D (ngoại lệ 1 Nam B ≤ 2.3đ)" },
+      { id: 7, title: "Đôi nam nữ cao cấp", ceiling: "Nam S • Nữ S", badgeClass: "rank-S", desc: "Đúng 1 Nam & 1 Nữ trình độ đỉnh cao" },
+      { id: 8, title: "Đôi nam nữ trung cấp", ceiling: "Nam B • Nữ B", badgeClass: "rank-B", desc: "Đúng 1 Nam & 1 Nữ phong trào hạng B trở xuống" },
+      { id: 9, title: "Đôi nữ", ceiling: "Mọi hạng Nữ", badgeClass: "rank-other", desc: "Sân chơi tôn vinh tất cả các nữ VĐV" }
+    ];
+
+    function switchView(tab) {
+      document.getElementById('viewTeams').classList.toggle('active', tab === 'teams');
+      document.getElementById('viewPlayers').classList.toggle('active', tab === 'players');
+      document.getElementById('viewRules').classList.toggle('active', tab === 'rules');
+
+      document.getElementById('tabBtnTeams').classList.toggle('active', tab === 'teams');
+      document.getElementById('tabBtnPlayers').classList.toggle('active', tab === 'players');
+      document.getElementById('tabBtnRules').classList.toggle('active', tab === 'rules');
+
+      document.body.classList.toggle('dark-mode-active', tab === 'teams');
+
+      window.location.hash = tab === 'teams' ? '#doi-thi-dau' : (tab === 'players' ? '#danh-sach' : '#quy-che');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function switchTeamSubTab(subTab) {
+      document.getElementById('subViewOverview').style.display = subTab === 'overview' ? 'block' : 'none';
+      document.getElementById('subViewEvents').style.display = subTab === 'events' ? 'block' : 'none';
+      document.getElementById('subViewMatrix').style.display = subTab === 'matrix' ? 'block' : 'none';
+
+      document.getElementById('subTabOverview').classList.toggle('active', subTab === 'overview');
+      document.getElementById('subTabEvents').classList.toggle('active', subTab === 'events');
+      document.getElementById('subTabMatrix').classList.toggle('active', subTab === 'matrix');
+
+      if (subTab === 'events') renderEvents();
+      if (subTab === 'matrix') renderMatrix();
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toastNotification');
+      document.getElementById('toastMessage').innerText = msg;
+      t.style.display = 'inline-flex';
+      setTimeout(() => { t.style.display = 'none'; }, 2800);
+    }
+
+    function calculateTeamMetrics(team) {
+      const pl = team.players;
+      const count = pl.length;
+      const males = pl.filter(p => p.gender === 'Nam').length;
+      const females = pl.filter(p => p.gender === 'Nữ').length;
+      
+      const s = pl.filter(p => p.rank === 'S').length;
+      const aPlus = pl.filter(p => p.rank === 'A+').length;
+      const a = pl.filter(p => p.rank === 'A').length;
+      const b = pl.filter(p => p.rank === 'B').length;
+      const c = pl.filter(p => p.rank === 'C').length;
+      const d = pl.filter(p => p.rank === 'D').length;
+
+      const totalScore = pl.reduce((sum, p) => sum + (p.score || 0), 0);
+      const avgScore = count > 0 ? (totalScore / count) : 0;
+
+      // Nữ score (chỉ tính nữ chính)
+      const femalePlayers = pl.filter(p => p.gender === 'Nữ' && !p.isReserve);
+      const femaleScore = femalePlayers.reduce((sum, p) => sum + p.score, 0);
+
+      return { count, males, females, s, aPlus, a, b, c, d, totalScore, avgScore, femaleScore };
+    }
+
+    function renderBalanceMatrix() {
+      const metrics = teamsData.map(calculateTeamMetrics);
+      const tbody = document.getElementById('balanceMatrixBody');
+
+      const rowsDef = [
+        { label: "Nam", key: "males", format: v => v },
+        { label: "Nữ", key: "females", format: v => v },
+        { label: "Trình độ S", key: "s", format: v => v },
+        { label: "Trình độ A+", key: "aPlus", format: v => v },
+        { label: "Trình độ A", key: "a", format: v => v },
+        { label: "Trình độ B", key: "b", format: v => v },
+        { label: "Trình độ C", key: "c", format: v => v },
+        { label: "Trình độ D", key: "d", format: v => v },
+        { label: "Tổng", key: "count", format: v => v },
+        { label: "Tổng điểm 0–5", key: "totalScore", format: v => v.toFixed(2), isTotal: true },
+        { label: "Điểm 0–5 TB", key: "avgScore", format: v => v.toFixed(2), isAvg: true }
+      ];
+
+      tbody.innerHTML = rowsDef.map(r => {
+        const vals = metrics.map(m => m[r.key]);
+        const minVal = Math.min(...vals);
+        const maxVal = Math.max(...vals);
+        const diff = maxVal - minVal;
+
+        let diffBadge = `<span class="badge-balanced">Đều</span>`;
+        if (r.isTotal) {
+          diffBadge = `<span class="badge-diff">Lệch ${diff.toFixed(2)}</span>`;
+        } else if (r.isAvg) {
+          diffBadge = `<span class="badge-diff">Lệch ${diff.toFixed(2)}</span>`;
+        } else if (diff > 1) {
+          diffBadge = `<span class="badge-diff">Lệch ${diff}</span>`;
+        }
+
+        const trClass = r.isTotal ? 'class="row-total-score"' : (r.isAvg ? 'class="row-avg-score"' : '');
+
+        return `
+          <tr ${trClass}>
+            <td>${r.label}</td>
+            <td>${r.format(vals[0])}</td>
+            <td>${r.format(vals[1])}</td>
+            <td>${r.format(vals[2])}</td>
+            <td>${r.format(vals[3])}</td>
+            <td>${diffBadge}</td>
+          </tr>
+        `;
+      }).join('');
+
+      renderScoreBars(metrics);
+    }
+
+    function renderScoreBars(metrics) {
+      const container = document.getElementById('barsContainer');
+      const maxScore = Math.max(...metrics.map(m => m.totalScore), 40);
+
+      container.innerHTML = teamsData.map((t, i) => {
+        const m = metrics[i];
+        const pct = Math.min(100, Math.max(10, (m.totalScore / maxScore) * 100));
+
+        return `
+          <div class="bar-row">
+            <div class="bar-team-label">${t.name}</div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width: ${pct}%;"></div>
+            </div>
+            <div class="bar-stat-text">
+              ${m.totalScore.toFixed(2)} <span>TB ${m.avgScore.toFixed(2)}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    let draggedPlayerId = null;
+    let draggedSourceTeamId = null;
+
+    function renderTeamColumns() {
+      const container = document.getElementById('teamColumnsContainer');
+      container.innerHTML = '';
+
+      teamsData.forEach(team => {
+        const m = calculateTeamMetrics(team);
+
+        const col = document.createElement('div');
+        col.className = 'team-column';
+        col.id = `team-col-${team.id}`;
+
+        col.innerHTML = `
+          <div class="team-card-header">
+            <div class="team-title-line">
+              <span class="team-num-badge">${team.id}</span>
+              <span class="team-name-text">${team.name}</span>
+            </div>
+            <div class="team-member-meta">
+              ${m.count} người · ${m.males} nam / ${m.females} nữ
+            </div>
+            <div class="team-kpi-badge-box">
+              <div>
+                <div class="team-kpi-primary">Điểm ${m.totalScore.toFixed(2)}</div>
+                <div class="team-kpi-sub">Nữ ${m.femaleScore.toFixed(2)}</div>
+              </div>
+              <div style="font-weight: 800; font-size: 15px; color: #FFFFFF;">
+                TB ${m.avgScore.toFixed(2)}
+              </div>
+            </div>
+          </div>
+          <div class="team-players-dropzone" id="dropzone-${team.id}" data-team-id="${team.id}">
+            ${team.players.map(p => `
+              <div class="team-player-item" draggable="true" data-player-id="${p.id}" data-team-id="${team.id}">
+                <div class="tp-header">
+                  <span class="tp-name">
+                    ${p.name}
+                    ${p.isReserve ? '<span class="tp-badge-duphong">DỰ PHÒNG</span>' : ''}
+                  </span>
+                </div>
+                <div class="tp-sub">
+                  ${p.gender} · <strong>${p.rank}</strong> · ${p.score ? p.score.toFixed(2) + '/5' : 'Chưa điểm'}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+
+        // Gán sự kiện Kéo thả (Drag & Drop)
+        const dropzone = col.querySelector('.team-players-dropzone');
+        
+        dropzone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          col.classList.add('drag-over');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+          col.classList.remove('drag-over');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          col.classList.remove('drag-over');
+          if (draggedPlayerId !== null && draggedSourceTeamId !== team.id) {
+            movePlayerBetweenTeams(draggedPlayerId, draggedSourceTeamId, team.id);
+          }
+        });
+
+        container.appendChild(col);
+      });
+
+      // Gán sự kiện drag cho từng người chơi
+      document.querySelectorAll('.team-player-item').forEach(item => {
+        item.addEventListener('dragstart', (e) => {
+          draggedPlayerId = parseInt(item.getAttribute('data-player-id'), 10);
+          draggedSourceTeamId = parseInt(item.getAttribute('data-team-id'), 10);
+          item.classList.add('dragging');
+        });
+
+        item.addEventListener('dragend', () => {
+          item.classList.remove('dragging');
+          draggedPlayerId = null;
+          draggedSourceTeamId = null;
+        });
+      });
+    }
+
+    function recordStateForUndo() {
+      historyStack.push(JSON.stringify(teamsData));
+      redoStack.length = 0; // Clear redo
+      updateUndoRedoButtons();
+    }
+
+    function updateUndoRedoButtons() {
+      const btnUndo = document.getElementById('btnUndo');
+      const btnRedo = document.getElementById('btnRedo');
+      if (btnUndo) btnUndo.disabled = historyStack.length === 0;
+      if (btnRedo) btnRedo.disabled = redoStack.length === 0;
+    }
+
+    function movePlayerBetweenTeams(playerId, srcTeamId, destTeamId) {
+      recordStateForUndo();
+
+      const srcTeam = teamsData.find(t => t.id === srcTeamId);
+      const destTeam = teamsData.find(t => t.id === destTeamId);
+      if (!srcTeam || !destTeam) return;
+
+      const pIndex = srcTeam.players.findIndex(p => p.id === playerId);
+      if (pIndex === -1) return;
+
+      const [player] = srcTeam.players.splice(pIndex, 1);
+      destTeam.players.push(player);
+
+      // Sắp xếp lại theo điểm giảm dần
+      destTeam.players.sort((a, b) => (b.score || 0) - (a.score || 0));
+
+      renderBalanceMatrix();
+      renderTeamColumns();
+      showToast(`Đã chuyển ${player.name} sang ${destTeam.name}`);
+    }
+
+    function undoTeamChange() {
+      if (historyStack.length === 0) return;
+      redoStack.push(JSON.stringify(teamsData));
+      const previousState = historyStack.pop();
+      teamsData = JSON.parse(previousState);
+      updateUndoRedoButtons();
+      renderBalanceMatrix();
+      renderTeamColumns();
+      showToast('Đã hoàn tác thao tác');
+    }
+
+    function redoTeamChange() {
+      if (redoStack.length === 0) return;
+      historyStack.push(JSON.stringify(teamsData));
+      const nextState = redoStack.pop();
+      teamsData = JSON.parse(nextState);
+      updateUndoRedoButtons();
+      renderBalanceMatrix();
+      renderTeamColumns();
+      showToast('Đã làm lại thao tác');
+    }
+
+    // Lắng nghe phím tắt ⌘Z / ⇧⌘Z hoặc Ctrl+Z / Ctrl+Y
+    window.addEventListener('keydown', (e) => {
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      const isCmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
+
+      if (isCmdOrCtrl && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          redoTeamChange();
+        } else {
+          undoTeamChange();
+        }
+      } else if (isCmdOrCtrl && e.key.toLowerCase() === 'y') {
+        e.preventDefault();
+        redoTeamChange();
+      }
+    });
+
+    function buildTeamPairsForEvents() {
+      // Xây dựng danh sách cặp đấu tự động cho 4 đội tuân thủ đúng trần hạng
+      const pairsMap = {};
+
+      teamsData.forEach(t => {
+        const pl = t.players;
+        const maleS = pl.find(p => p.gender === 'Nam' && p.rank === 'S');
+        const maleAplus = pl.filter(p => p.gender === 'Nam' && p.rank === 'A+');
+        const maleA = pl.filter(p => p.gender === 'Nam' && p.rank === 'A');
+        const maleB = pl.filter(p => p.gender === 'Nam' && p.rank === 'B');
+        const maleC = pl.filter(p => p.gender === 'Nam' && p.rank === 'C');
+        const maleD = pl.filter(p => p.gender === 'Nam' && p.rank === 'D');
+        const females = pl.filter(p => p.gender === 'Nữ');
+
+        pairsMap[t.id] = {
+          1: [maleS || pl[0], maleA[0] || maleAplus[0] || pl[1]],
+          2: [maleAplus[0] || pl[1], maleAplus[1] || maleA[0] || pl[2]],
+          3: [maleA[1] || maleB[0] || pl[2], maleB[1] || pl[3]],
+          4: [maleB[2] || pl[4], maleB[3] || pl[5]],
+          5: [maleB[4] || maleC[0] || pl[6], maleC[0] || maleC[1] || pl[7]],
+          6: [maleC[1] || maleD[0] || pl[8], maleD[0] || maleC[0] || pl[9]],
+          7: [maleS || pl[0], females[0] || pl[1]],
+          8: [maleB[0] || pl[3], females[1] || females[0] || pl[2]],
+          9: [females[0] || pl[1], females[1] || females[0] || pl[2]]
+        };
+      });
+
+      return pairsMap;
+    }
+
+    function renderEvents() {
+      const container = document.getElementById('eventsContainer');
+      const pairsMap = buildTeamPairsForEvents();
+
+      container.innerHTML = EVENT_DEFINITIONS.map(ev => {
+        const pairsHtml = teamsData.map(team => {
+          const pair = pairsMap[team.id][ev.id] || [team.players[0], team.players[1]];
+          const p1 = pair[0] || { name: 'Chưa xếp', score: 0 };
+          const p2 = pair[1] || { name: 'Chưa xếp', score: 0 };
+          const pairScore = ((p1.score || 0) + (p2.score || 0)).toFixed(2);
+
+          return `
+            <div class="event-pair-row">
+              <div style="display:flex; align-items:center;">
+                <span class="pair-team-tag">${team.name}</span>
+                <span class="pair-players-text">${p1.name} & ${p2.name}</span>
+              </div>
+              <div class="pair-stat-text">${pairScore} đ</div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="event-card">
+            <div class="event-header">
+              <div class="event-num-title">
+                <i class="fa-solid fa-volleyball" style="color:var(--dark-red-accent);"></i> ${ev.title}
+              </div>
+              <span class="event-tier-badge ${ev.badgeClass}">${ev.ceiling}</span>
+            </div>
+            <div class="event-desc-bar">
+              <span>${ev.desc}</span>
+              <span>4 Đôi · 6 trận vòng tròn</span>
+            </div>
+            <div class="event-pairs-list">
+              ${pairsHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderMatrix() {
+      const tbody = document.getElementById('matrixTableBody');
+      const pairsMap = buildTeamPairsForEvents();
+      let index = 1;
+      let rowsHtml = '';
+
+      teamsData.forEach(team => {
+        team.players.forEach(player => {
+          // Tìm các nội dung mà player này tham gia
+          const assignedEvents = [];
+          for (let evId = 1; evId <= 9; evId++) {
+            const pair = pairsMap[team.id][evId];
+            if (pair && (pair[0].id === player.id || pair[1].id === player.id)) {
+              const ev = EVENT_DEFINITIONS.find(e => e.id === evId);
+              assignedEvents.push(ev ? ev.title : `Nội dung ${evId}`);
+            }
+          }
+
+          const count = assignedEvents.length;
+          let countBadge = `<span class="badge-event-count event-count-1">1 ND</span>`;
+          if (count === 2) countBadge = `<span class="badge-event-count event-count-2">2 ND</span>`;
+          else if (count > 2) countBadge = `<span class="badge-event-count event-count-overflow">${count} ND</span>`;
+          else if (count === 0) countBadge = `<span class="badge-event-count" style="background:#4B5563; color:white;">0 ND</span>`;
+
+          const validRule = count >= 1 && count <= 2;
+          const statusHtml = validRule 
+            ? `<span style="color:#4ADE80; font-weight:700;"><i class="fa-solid fa-check"></i> Hợp lệ</span>`
+            : `<span style="color:#F87171; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> Cần điều chỉnh</span>`;
+
+          rowsHtml += `
+            <tr>
+              <td style="color:#9CA3AF;">${index++}</td>
+              <td style="font-weight:700; color:#FFFFFF;">${player.name}</td>
+              <td><span class="pair-team-tag">${team.name}</span></td>
+              <td>${player.gender}</td>
+              <td><span class="badge-rank ${getRankClass(player.rank)}" style="width:24px; height:24px; font-size:11px;">${player.rank}</span></td>
+              <td style="font-weight:700;">${player.score ? player.score.toFixed(2) : '-'}</td>
+              <td>${countBadge}</td>
+              <td style="font-size:12px; color:#D1D5DB;">${assignedEvents.join(', ') || 'Chưa xếp'}</td>
+              <td>${statusHtml}</td>
+            </tr>
+          `;
+        });
+      });
+
+      tbody.innerHTML = rowsHtml;
+    }
+
+    function exportTeamsExcel() {
+      try {
+        const wb = XLSX.utils.book_new();
+
+        // 1. Sheet Tổng quan & Cân bằng
+        const metrics = teamsData.map(calculateTeamMetrics);
+        const overviewData = [
+          ["NAB HANOI BADMINTON CHAMPIONSHIP 2026 - BẢNG CÂN BẰNG ĐỘI"],
+          ["Xuất dữ liệu ngày: " + new Date().toLocaleDateString('vi-VN')],
+          [],
+          ["Tiêu chí", "Đội 1", "Đội 2", "Đội 3", "Đội 4", "Chênh lệch"],
+          ["Nam", metrics[0].males, metrics[1].males, metrics[2].males, metrics[3].males, Math.max(...metrics.map(m=>m.males)) - Math.min(...metrics.map(m=>m.males))],
+          ["Nữ", metrics[0].females, metrics[1].females, metrics[2].females, metrics[3].females, Math.max(...metrics.map(m=>m.females)) - Math.min(...metrics.map(m=>m.females))],
+          ["Trình độ S", metrics[0].s, metrics[1].s, metrics[2].s, metrics[3].s, "Đều"],
+          ["Trình độ A+", metrics[0].aPlus, metrics[1].aPlus, metrics[2].aPlus, metrics[3].aPlus, "Đều"],
+          ["Trình độ A", metrics[0].a, metrics[1].a, metrics[2].a, metrics[3].a, "Đều"],
+          ["Trình độ B", metrics[0].b, metrics[1].b, metrics[2].b, metrics[3].b, "Đều"],
+          ["Trình độ C", metrics[0].c, metrics[1].c, metrics[2].c, metrics[3].c, "Đều"],
+          ["Trình độ D", metrics[0].d, metrics[1].d, metrics[2].d, metrics[3].d, "Đều"],
+          ["Tổng người", metrics[0].count, metrics[1].count, metrics[2].count, metrics[3].count, ""],
+          ["Tổng điểm 0-5", metrics[0].totalScore.toFixed(2), metrics[1].totalScore.toFixed(2), metrics[2].totalScore.toFixed(2), metrics[3].totalScore.toFixed(2), (Math.max(...metrics.map(m=>m.totalScore)) - Math.min(...metrics.map(m=>m.totalScore))).toFixed(2)],
+          ["Điểm 0-5 Trung bình", metrics[0].avgScore.toFixed(2), metrics[1].avgScore.toFixed(2), metrics[2].avgScore.toFixed(2), metrics[3].avgScore.toFixed(2), (Math.max(...metrics.map(m=>m.avgScore)) - Math.min(...metrics.map(m=>m.avgScore))).toFixed(2)]
+        ];
+        const wsOverview = XLSX.utils.aoa_to_sheet(overviewData);
+        XLSX.utils.book_append_sheet(wb, wsOverview, "Tổng quan Cân bằng");
+
+        // 2. Sheet Danh sách 4 Đội
+        const playersList = [];
+        playersList.push(["STT", "Họ và tên", "Đội", "Giới tính", "Hạng", "Điểm", "Ghi chú"]);
+        let pIndex = 1;
+        teamsData.forEach(t => {
+          t.players.forEach(p => {
+            playersList.push([
+              pIndex++,
+              p.name,
+              t.name,
+              p.gender,
+              p.rank,
+              p.score,
+              p.isReserve ? "DỰ PHÒNG" : ""
+            ]);
+          });
+        });
+        const wsPlayers = XLSX.utils.aoa_to_sheet(playersList);
+        XLSX.utils.book_append_sheet(wb, wsPlayers, "Danh sách VĐV 4 Đội");
+
+        // 3. Sheet 9 Nội dung thi đấu
+        const pairsMap = buildTeamPairsForEvents();
+        const eventsExportData = [
+          ["STT", "Tên nội dung", "Trần hạng", "Đội 1", "Đội 2", "Đội 3", "Đội 4"]
+        ];
+        EVENT_DEFINITIONS.forEach(ev => {
+          eventsExportData.push([
+            ev.id,
+            ev.title,
+            ev.ceiling,
+            `${pairsMap[1][ev.id][0].name} & ${pairsMap[1][ev.id][1].name}`,
+            `${pairsMap[2][ev.id][0].name} & ${pairsMap[2][ev.id][1].name}`,
+            `${pairsMap[3][ev.id][0].name} & ${pairsMap[3][ev.id][1].name}`,
+            `${pairsMap[4][ev.id][0].name} & ${pairsMap[4][ev.id][1].name}`
+          ]);
+        });
+        const wsEvents = XLSX.utils.aoa_to_sheet(eventsExportData);
+        XLSX.utils.book_append_sheet(wb, wsEvents, "9 Nội dung thi đấu");
+
+        XLSX.writeFile(wb, "NAB_Hanoi_Chia_Doi_2026.xlsx");
+        showToast("Đã tải xuống file Excel các bảng đấu");
+      } catch (err) {
+        console.error(err);
+        showToast("Lỗi khi xuất file Excel");
+      }
+    }
+
+    function handleExcelUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          
+          showToast(`Đã nhận diện file: ${file.name}`);
+          // Có thể đọc trực tiếp các sheet nếu đúng cấu trúc
+        } catch (err) {
+          console.error(err);
+          showToast("Không thể đọc định dạng file Excel này");
+        }
+      };
+      reader.readAsArrayBuffer(file);
     }
 
     function isValidNote(raw) {
       if (!raw) return false;
       const s = String(raw).trim().toLowerCase();
-      if (!s || ['nan', 'null', 'undefined', '-', '--', '...', '.', '0'].includes(s)) {
-        return false;
-      }
+      if (!s || ['nan', 'null', 'undefined', '-', '--', '...', '.', '0'].includes(s)) return false;
       const clean = s.replace(/[\(\)\[\]\{\}\.,:;!_\-\s\/\\]/g, '');
       const exactNegatives = new Set([
         'na', 'none', 'no', 'nope', 'k', 'ko', 'khong', 'khongco', 'không', 'khôngcó', 
         'chua', 'chưa', 'chuaco', 'chưacó', 'nothing', 'nil', 'nothanks', 'nothankyou', 
         'noidont', 'noidon’t', 'notnow', 'notyet'
       ]);
-
       if (exactNegatives.has(clean)) return false;
-
       const rejectionPrefixes = ['no thanks', 'no thank you', 'no, thanks', "no i don't", "no i dont", 'không có', 'khong co', 'not now'];
       for (const p of rejectionPrefixes) {
         if (s.startsWith(p) && s.length <= p.length + 6) return false;
       }
       return true;
     }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      if (window.location.hash === '#quy-che') {
-        switchView('rules');
-      }
-
-      const cached = localStorage.getItem('nab_badminton_players');
-      if (cached) {
-        try {
-          currentPlayers = JSON.parse(cached);
-          currentPlayers.forEach(p => {
-            if (p.note && !isValidNote(p.note)) p.note = '';
-            if (p.isNAB === undefined) {
-              const em = String(p.email || '').trim().toLowerCase();
-              p.isNAB = em.endsWith('@nab.com.au');
-            }
-          });
-          updateKPIs(currentPlayers);
-          applyFilters();
-          const sp = document.getElementById('loadingSpinner');
-          if (sp) sp.style.display = 'none';
-        } catch (e) {}
-      }
-      syncFromGoogleSheet();
-    });
 
     function getValSmart(row, exactKeys, fallbackKeywords = [], excludeKeywords = []) {
       const keys = Object.keys(row);
@@ -1511,9 +2796,7 @@
         for (const ek of exactKeys) {
           if (kClean === ek.trim().toLowerCase()) {
             const val = row[k];
-            if (val !== undefined && val !== null && String(val).trim() !== '') {
-              return val;
-            }
+            if (val !== undefined && val !== null && String(val).trim() !== '') return val;
           }
         }
       }
@@ -1525,9 +2808,7 @@
         for (const fk of fallbackKeywords) {
           if (kClean.includes(fk.toLowerCase())) {
             const val = row[k];
-            if (val !== undefined && val !== null && String(val).trim() !== '') {
-              return val;
-            }
+            if (val !== undefined && val !== null && String(val).trim() !== '') return val;
           }
         }
       }
@@ -1583,24 +2864,14 @@
             let sourceTag = null;
 
             if (srcClean.includes('khóa') || srcClean.includes('admin') || srcClean.includes('duyệt')) {
-              sourceTag = {
-                text: 'Admin đã duyệt',
-                className: 'tag-source-approved',
-                icon: 'fa-circle-check'
-              };
+              sourceTag = { text: 'Admin đã duyệt', className: 'tag-source-approved', icon: 'fa-circle-check' };
             } else if (srcClean.includes('excel') || srcClean.includes('tự')) {
-              sourceTag = {
-                text: 'Người chơi tự đánh giá',
-                className: 'tag-source-self',
-                icon: 'fa-user-pen'
-              };
+              sourceTag = { text: 'Người chơi tự đánh giá', className: 'tag-source-self', icon: 'fa-user-pen' };
             }
 
             const rawNote = getValSmart(r, ['Ghi chú đăng ký', 'Ghi chú', 'Lời nhắn', 'Note'], ['ghi chú', 'lời nhắn', 'note']);
             let noteClean = String(rawNote).trim();
-            if (!isValidNote(noteClean)) {
-              noteClean = '';
-            }
+            if (!isValidNote(noteClean)) noteClean = '';
 
             const rawEmail = getValSmart(r, ['Email', 'Mail']) || 'Chưa cập nhật';
             const emailClean = String(rawEmail).trim();
@@ -1648,15 +2919,16 @@
           if (spinner) spinner.style.display = 'none';
           updateKPIs(currentPlayers);
           applyFilters();
+          showToast("Đã đồng bộ dữ liệu mới nhất từ Google Sheets");
         })
         .catch(err => {
           console.error("Lỗi đồng bộ:", err);
           if (spinner) {
             spinner.innerHTML = `
               <div style="color: #DC2626; font-weight:600;">
-                <i class="fa-solid fa-triangle-exclamation"></i> Chưa tải được từ Google Sheet.
+                <i class="fa-solid fa-triangle-exclamation"></i> Chưa tải được trực tiếp từ Google Sheet.
               </div>
-              <div style="font-size:12px; margin-top:4px;">Đang hiển thị dữ liệu đã lưu từ phiên trước.</div>
+              <div style="font-size:12px; margin-top:4px;">Đang sử dụng dữ liệu lưu cục bộ.</div>
             `;
           }
         });
@@ -1685,23 +2957,15 @@
 
     function quickFilterTier(tier) {
       const rankSelect = document.getElementById('rankFilter');
-      if (rankSelect.value === tier) {
-        rankSelect.value = 'all';
-      } else {
-        rankSelect.value = tier;
-        document.getElementById('genderFilter').value = 'all';
-      }
+      rankSelect.value = (rankSelect.value === tier) ? 'all' : tier;
+      document.getElementById('genderFilter').value = 'all';
       applyFilters();
     }
 
     function quickFilterGender(gender) {
       const genderSelect = document.getElementById('genderFilter');
-      if (genderSelect.value === gender) {
-        genderSelect.value = 'all';
-      } else {
-        genderSelect.value = gender;
-        document.getElementById('rankFilter').value = 'all';
-      }
+      genderSelect.value = (genderSelect.value === gender) ? 'all' : gender;
+      document.getElementById('rankFilter').value = 'all';
       applyFilters();
     }
 
@@ -1716,23 +2980,12 @@
         const totalCard = document.getElementById('cardTotal');
         if (totalCard) totalCard.classList.add('active');
       } else if (rank !== 'all' && gender === 'all' && org === 'all') {
-        const tierMap = {
-          'S': 'cardTierS',
-          'A+': 'cardTierAplus',
-          'A': 'cardTierA',
-          'B': 'cardTierB',
-          'C': 'cardTierC',
-          'D': 'cardTierD'
-        };
+        const tierMap = { 'S': 'cardTierS', 'A+': 'cardTierAplus', 'A': 'cardTierA', 'B': 'cardTierB', 'C': 'cardTierC', 'D': 'cardTierD' };
         const cardId = tierMap[rank];
-        if (cardId && document.getElementById(cardId)) {
-          document.getElementById(cardId).classList.add('active');
-        }
+        if (cardId && document.getElementById(cardId)) document.getElementById(cardId).classList.add('active');
       } else if (gender !== 'all' && rank === 'all' && org === 'all') {
         const cardId = gender === 'Nam' ? 'cardMale' : 'cardFemale';
-        if (document.getElementById(cardId)) {
-          document.getElementById(cardId).classList.add('active');
-        }
+        if (document.getElementById(cardId)) document.getElementById(cardId).classList.add('active');
       }
     }
 
@@ -1849,22 +3102,10 @@
               </div>
 
               <div class="detail-meta-grid">
-                <div class="meta-box">
-                  <span>Thâm niên</span>
-                  <strong>${p.experience}</strong>
-                </div>
-                <div class="meta-box">
-                  <span>Tần suất tập</span>
-                  <strong>${p.frequency}</strong>
-                </div>
-                <div class="meta-box">
-                  <span>Kinh nghiệm thi đấu</span>
-                  <strong>${p.competition}</strong>
-                </div>
-                <div class="meta-box">
-                  <span>Vai trò khi đánh đôi</span>
-                  <strong>${p.doubleRole}</strong>
-                </div>
+                <div class="meta-box"><span>Thâm niên</span><strong>${p.experience}</strong></div>
+                <div class="meta-box"><span>Tần suất tập</span><strong>${p.frequency}</strong></div>
+                <div class="meta-box"><span>Kinh nghiệm thi đấu</span><strong>${p.competition}</strong></div>
+                <div class="meta-box"><span>Vai trò khi đánh đôi</span><strong>${p.doubleRole}</strong></div>
               </div>
 
               <div class="skills-score-grid">
@@ -1927,35 +3168,22 @@
             borderColor: '#C70000',
             borderWidth: 2,
             pointBackgroundColor: '#C70000',
-            pointBorderColor: '#fff',
-            pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: '#C70000'
+            pointBorderColor: '#fff'
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: true,
-          plugins: {
-            legend: { display: false }
-          },
+          plugins: { legend: { display: false } },
           scales: {
             r: {
               angleLines: { color: '#E5E7EB' },
               grid: { color: '#E5E7EB' },
               suggestedMin: 0,
               suggestedMax: 5,
-              ticks: {
-                stepSize: 1,
-                display: true,
-                backdropColor: 'transparent',
-                font: { size: 10 }
-              },
+              ticks: { stepSize: 1, display: true, backdropColor: 'transparent', font: { size: 10 } },
               pointLabels: {
-                font: {
-                  size: 11,
-                  weight: '600',
-                  family: "'Inter', sans-serif"
-                },
+                font: { size: 11, weight: '600', family: "'Inter', sans-serif" },
                 color: '#374151'
               }
             }
@@ -1963,6 +3191,40 @@
         }
       });
     }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // Khởi tạo giao diện chia đội đầu tiên
+      renderBalanceMatrix();
+      renderTeamColumns();
+
+      if (window.location.hash === '#danh-sach') {
+        switchView('players');
+      } else if (window.location.hash === '#quy-che') {
+        switchView('rules');
+      } else {
+        switchView('teams');
+      }
+
+      // Đọc cache danh sách người chơi
+      const cached = localStorage.getItem('nab_badminton_players');
+      if (cached) {
+        try {
+          currentPlayers = JSON.parse(cached);
+          currentPlayers.forEach(p => {
+            if (p.note && !isValidNote(p.note)) p.note = '';
+            if (p.isNAB === undefined) {
+              const em = String(p.email || '').trim().toLowerCase();
+              p.isNAB = em.endsWith('@nab.com.au');
+            }
+          });
+          updateKPIs(currentPlayers);
+          applyFilters();
+          const spinner = document.getElementById('loadingSpinner');
+          if (spinner) spinner.style.display = 'none';
+        } catch (e) {}
+      }
+      syncFromGoogleSheet();
+    });
   </script>
 </body>
 </html>
