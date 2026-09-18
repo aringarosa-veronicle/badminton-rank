@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Danh sách người chơi NAB HANOI BADMINTON CHAMPIONSHIP 2026</title>
+  <title>NAB HANOI BADMINTON CHAMPIONSHIP 2026</title>
   
   <!-- Favicon ngôi sao đỏ NAB 7 cánh -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpolygon points='32.0,2.0 37.6,20.3 55.5,13.3 44.7,29.1 61.2,38.7 42.2,40.1 45.0,59.0 32.0,45.0 19.0,59.0 21.8,40.1 2.8,38.7 19.3,29.1 8.5,13.3 26.4,20.3' fill='%23C70000'/%3E%3C/svg%3E">
@@ -45,18 +45,19 @@
       padding-bottom: 60px;
     }
 
-    /* Top Brand Bar */
     header {
       background: #FFFFFF;
       border-bottom: 3px solid var(--nab-red);
-      padding: 14px 28px;
+      padding: 12px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
       position: sticky;
       top: 0;
-      z-index: 50;
+      z-index: 100;
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
     .brand-title {
@@ -76,14 +77,48 @@
     }
 
     h1 {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 700;
       color: var(--nab-black);
     }
 
+    .nav-tabs {
+      display: flex;
+      background: #F3F4F6;
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid #E5E7EB;
+    }
+
+    .nav-tab-btn {
+      padding: 7px 16px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 600;
+      color: #4B5563;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.2s;
+    }
+
+    .nav-tab-btn:hover {
+      color: var(--nab-black);
+    }
+
+    .nav-tab-btn.active {
+      background: #FFFFFF;
+      color: var(--nab-red);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      font-weight: 700;
+    }
+
     .header-actions {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
     }
 
@@ -97,6 +132,7 @@
       align-items: center;
       gap: 6px;
       border: 1px solid transparent;
+      text-decoration: none;
       transition: all 0.2s;
     }
 
@@ -109,24 +145,32 @@
       background: var(--nab-red-dark);
     }
 
-    .btn-sheet {
+    .btn-doc {
       background: #FFFFFF;
-      color: #374151;
-      border-color: #D1D5DB;
+      color: #1E40AF;
+      border-color: #BFDBFE;
     }
 
-    .btn-sheet:hover {
-      background: #F9FAFB;
+    .btn-doc:hover {
+      background: #EFF6FF;
     }
 
-    /* Container */
     .container {
       max-width: 1240px;
       margin: 20px auto;
       padding: 0 16px;
     }
 
-    /* Stats KPI Bar */
+    .tab-view {
+      display: none;
+    }
+
+    .tab-view.active {
+      display: block;
+      animation: fadeIn 0.25s ease;
+    }
+
+    /* KPI Cards */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
@@ -185,7 +229,6 @@
       margin-top: 4px;
     }
 
-    /* Filters Card */
     .filter-card {
       background: var(--nab-card-bg);
       border-radius: 10px;
@@ -257,7 +300,6 @@
       color: var(--nab-text-muted);
     }
 
-    /* List Table Header */
     .list-header {
       display: grid;
       grid-template-columns: 45px 2.2fr 75px 80px 90px 130px 1.8fr 100px 90px;
@@ -268,7 +310,6 @@
       align-items: center;
     }
 
-    /* Player Card */
     .player-card {
       background: var(--nab-card-bg);
       border: 1px solid var(--nab-border);
@@ -320,7 +361,6 @@
       color: var(--nab-text-muted);
     }
 
-    /* Tag Non-NAB */
     .tag-non-nab {
       font-size: 10px;
       font-weight: 700;
@@ -329,7 +369,6 @@
       background: #F1F5F9;
       color: #475569;
       border: 1px solid #CBD5E1;
-      letter-spacing: 0.3px;
       display: inline-flex;
       align-items: center;
     }
@@ -340,7 +379,6 @@
       cursor: help;
     }
 
-    /* Tags Nguồn điểm */
     .tag-source {
       display: inline-flex;
       align-items: center;
@@ -365,7 +403,6 @@
       border: 1px solid #FED7AA;
     }
 
-    /* Rank Badges */
     .badge-rank {
       width: 32px;
       height: 32px;
@@ -443,7 +480,6 @@
       border-color: #1A1A1A;
     }
 
-    /* Detail Drawer Panel */
     .player-detail-panel {
       display: none;
       background: #FAFAFA;
@@ -592,7 +628,315 @@
       border-top: 1px solid #E5E7EB;
     }
 
-    /* Loading Spinner */
+    /* RULES TAB STYLES */
+    .rules-hero {
+      background: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%);
+      color: white;
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+      border-left: 6px solid var(--nab-red);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    .rules-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(199, 0, 0, 0.25);
+      border: 1px solid rgba(199, 0, 0, 0.5);
+      color: #FECACA;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .rules-hero h2 {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .rules-hero p {
+      color: #D1D5DB;
+      font-size: 14px;
+      max-width: 800px;
+      line-height: 1.6;
+    }
+
+    .rules-hero-actions {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .btn-doc-primary {
+      background: var(--nab-red);
+      color: white;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+
+    .btn-doc-primary:hover {
+      background: var(--nab-red-dark);
+    }
+
+    .rules-stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .rule-kpi-card {
+      background: white;
+      border: 1px solid var(--nab-border);
+      border-radius: 10px;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    .rule-kpi-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .rule-kpi-info h4 {
+      font-size: 12px;
+      text-transform: uppercase;
+      color: var(--nab-text-muted);
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .rule-kpi-info div {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--nab-black);
+    }
+
+    .rules-section {
+      background: white;
+      border: 1px solid var(--nab-border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    .section-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--nab-black);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #F3F4F6;
+    }
+
+    .section-title i {
+      color: var(--nab-red);
+    }
+
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    .roadmap-step {
+      background: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: 10px;
+      padding: 16px;
+      transition: all 0.2s;
+    }
+
+    .roadmap-step:hover {
+      border-color: var(--nab-red);
+      background: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--nab-black);
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+
+    .step-num.red {
+      background: var(--nab-red);
+    }
+
+    .step-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--nab-black);
+      margin-bottom: 6px;
+    }
+
+    .step-desc {
+      font-size: 12.5px;
+      color: #4B5563;
+      line-height: 1.5;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    .rules-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      text-align: left;
+    }
+
+    .rules-table th {
+      background: #F9FAFB;
+      padding: 12px 16px;
+      font-weight: 700;
+      color: #374151;
+      border-bottom: 2px solid #E5E7EB;
+      white-space: nowrap;
+    }
+
+    .rules-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #E5E7EB;
+      color: #1F2937;
+    }
+
+    .rules-table tr:hover td {
+      background: #FDF2F2;
+    }
+
+    .tier-pill {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 800;
+      font-size: 11.5px;
+      color: white;
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .compare-box {
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .compare-box.round-robin {
+      background: #F0FDF4;
+      border-color: #BBF7D0;
+    }
+
+    .compare-box.medal {
+      background: #FEF3C7;
+      border-color: #FDE68A;
+    }
+
+    .compare-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .compare-box ul {
+      padding-left: 20px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #374151;
+    }
+
+    .policy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .policy-card {
+      border: 1px solid #E5E7EB;
+      border-radius: 10px;
+      padding: 16px;
+      background: #FFFFFF;
+      transition: transform 0.2s;
+    }
+
+    .policy-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .policy-card-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--nab-black);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .policy-card-text {
+      font-size: 12.5px;
+      color: #4B5563;
+      line-height: 1.55;
+    }
+
+    .badge-punish {
+      font-weight: 700;
+      color: #B91C1C;
+      background: #FEE2E2;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11.5px;
+      display: inline-block;
+      margin-top: 4px;
+    }
+
     #loadingSpinner {
       text-align: center;
       padding: 60px 20px;
@@ -615,7 +959,7 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-4px); }
+      from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -628,6 +972,9 @@
       .player-detail-panel.open {
         grid-template-columns: 1fr;
       }
+      .compare-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -636,11 +983,22 @@
   <header>
     <div class="brand-title">
       <span class="nab-star">NAB</span>
-      <h1>Danh sách người chơi NAB HANOI BADMINTON CHAMPIONSHIP 2026</h1>
+      <h1>NAB HANOI BADMINTON CHAMPIONSHIP 2026</h1>
     </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+      <button class="nav-tab-btn active" id="tabBtnPlayers" onclick="switchView('players')">
+        <i class="fa-solid fa-users"></i> Danh sách người chơi
+      </button>
+      <button class="nav-tab-btn" id="tabBtnRules" onclick="switchView('rules')">
+        <i class="fa-solid fa-book-open"></i> Quy chế & Thể thức giải
+      </button>
+    </div>
+
     <div class="header-actions">
-      <a href="https://docs.google.com/spreadsheets/d/18NLI0v073EIZezHwbwKx5zfrHNTarPx899hNCJBqSBg/edit" target="_blank" class="btn-header btn-sheet">
-        <i class="fa-solid fa-arrow-up-right-from-square"></i> Mở Google Sheet
+      <a href="https://docs.google.com/document/d/1osHqi2JD3OT8Iu6sRYQrWjFB6zdirlAJ/edit?usp=sharing&ouid=102416618896836630248&rtpof=true&sd=true" target="_blank" class="btn-header btn-doc" title="Mở văn bản Quy chế chính thức trên Google Docs">
+        <i class="fa-solid fa-file-word"></i> Xem Doc Quy chế
       </a>
       <button class="btn-header btn-sync" onclick="syncFromGoogleSheet()">
         <i class="fa-solid fa-rotate"></i> Đồng bộ Sheet
@@ -649,119 +1007,455 @@
   </header>
 
   <div class="container">
-    <!-- Top Stats Cards -->
-    <div class="stats-grid">
-      <div class="stat-card active" id="cardTotal" onclick="resetAllFilters()">
-        <div class="stat-title"><i class="fa-solid fa-users"></i> Tổng số</div>
-        <div class="stat-num" id="statTotal">0</div>
-      </div>
-      <div class="stat-card" id="cardMale" onclick="quickFilterGender('Nam')">
-        <div class="stat-title"><i class="fa-solid fa-mars" style="color:#2563EB;"></i> Nam</div>
-        <div class="stat-num" id="statMale">0</div>
-      </div>
-      <div class="stat-card" id="cardFemale" onclick="quickFilterGender('Nữ')">
-        <div class="stat-title"><i class="fa-solid fa-venus" style="color:#DB2777;"></i> Nữ</div>
-        <div class="stat-num" id="statFemale">0</div>
-      </div>
-      <div class="stat-card" id="cardTierS" onclick="quickFilterTier('S')">
-        <div class="stat-title"><i class="fa-solid fa-crown" style="color:#C70000;"></i> Hạng S</div>
-        <div class="stat-num" id="statTierS">0</div>
-      </div>
-      <div class="stat-card" id="cardTierAplus" onclick="quickFilterTier('A+')">
-        <div class="stat-title"><i class="fa-solid fa-medal" style="color:#D9381E;"></i> Hạng A+</div>
-        <div class="stat-num" id="statTierAplus">0</div>
-      </div>
-      <div class="stat-card" id="cardTierA" onclick="quickFilterTier('A')">
-        <div class="stat-title"><i class="fa-solid fa-medal" style="color:#E65100;"></i> Hạng A</div>
-        <div class="stat-num" id="statTierA">0</div>
-      </div>
-      <div class="stat-card" id="cardTierB" onclick="quickFilterTier('B')">
-        <div class="stat-title"><i class="fa-solid fa-star" style="color:#1976D2;"></i> Hạng B</div>
-        <div class="stat-num" id="statTierB">0</div>
-      </div>
-      <div class="stat-card" id="cardTierC" onclick="quickFilterTier('C')">
-        <div class="stat-title"><i class="fa-solid fa-shield-halved" style="color:#00897B;"></i> Hạng C</div>
-        <div class="stat-num" id="statTierC">0</div>
-      </div>
-      <div class="stat-card" id="cardTierD" onclick="quickFilterTier('D')">
-        <div class="stat-title"><i class="fa-solid fa-circle-dot" style="color:#546E7A;"></i> Hạng D</div>
-        <div class="stat-num" id="statTierD">0</div>
-      </div>
-    </div>
-
-    <!-- Filter Bar -->
-    <div class="filter-card">
-      <div class="filter-row">
-        <div class="filter-input">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="searchInput" placeholder="Tìm tên, nickname, email, nội dung lời nhắn..." oninput="applyFilters()" />
+    
+    <!-- TAB 1: DANH SÁCH NGƯỜI CHƠI -->
+    <div id="viewPlayers" class="tab-view active">
+      <div class="stats-grid">
+        <div class="stat-card active" id="cardTotal" onclick="resetAllFilters()">
+          <div class="stat-title"><i class="fa-solid fa-users"></i> Tổng số</div>
+          <div class="stat-num" id="statTotal">0</div>
         </div>
-        <select class="filter-select" id="rankFilter" onchange="applyFilters()">
-          <option value="all">Tất cả các hạng</option>
-          <option value="S">Hạng S</option>
-          <option value="A+">Hạng A+</option>
-          <option value="A">Hạng A</option>
-          <option value="B">Hạng B</option>
-          <option value="C">Hạng C</option>
-          <option value="D">Hạng D</option>
-        </select>
-        <select class="filter-select" id="genderFilter" onchange="applyFilters()">
-          <option value="all">Nam và nữ</option>
-          <option value="Nam">Nam</option>
-          <option value="Nữ">Nữ</option>
-        </select>
-        <select class="filter-select" id="statusFilter" onchange="applyFilters()">
-          <option value="all">Đăng ký giải: tất cả</option>
-          <option value="Đã đăng ký">Đã đăng ký</option>
-          <option value="Chưa đăng ký">Chưa đăng ký</option>
-        </select>
-        <!-- Bộ lọc Nhân viên của NAB -->
-        <select class="filter-select" id="orgFilter" onchange="applyFilters()">
-          <option value="all">Nhân viên của NAB: Tất cả</option>
-          <option value="nab">NAB</option>
-          <option value="non-nab">Non-NAB</option>
-        </select>
-        <select class="filter-select" id="sortFilter" onchange="applyFilters()">
-          <option value="default">Hạng & điểm (mặc định)</option>
-          <option value="score-desc">Điểm: Cao đến thấp</option>
-          <option value="score-asc">Điểm: Thấp đến cao</option>
-          <option value="name-asc">Tên: A - Z</option>
-        </select>
+        <div class="stat-card" id="cardMale" onclick="quickFilterGender('Nam')">
+          <div class="stat-title"><i class="fa-solid fa-mars" style="color:#2563EB;"></i> Nam</div>
+          <div class="stat-num" id="statMale">0</div>
+        </div>
+        <div class="stat-card" id="cardFemale" onclick="quickFilterGender('Nữ')">
+          <div class="stat-title"><i class="fa-solid fa-venus" style="color:#DB2777;"></i> Nữ</div>
+          <div class="stat-num" id="statFemale">0</div>
+        </div>
+        <div class="stat-card" id="cardTierS" onclick="quickFilterTier('S')">
+          <div class="stat-title"><i class="fa-solid fa-crown" style="color:#C70000;"></i> Hạng S</div>
+          <div class="stat-num" id="statTierS">0</div>
+        </div>
+        <div class="stat-card" id="cardTierAplus" onclick="quickFilterTier('A+')">
+          <div class="stat-title"><i class="fa-solid fa-medal" style="color:#D9381E;"></i> Hạng A+</div>
+          <div class="stat-num" id="statTierAplus">0</div>
+        </div>
+        <div class="stat-card" id="cardTierA" onclick="quickFilterTier('A')">
+          <div class="stat-title"><i class="fa-solid fa-medal" style="color:#E65100;"></i> Hạng A</div>
+          <div class="stat-num" id="statTierA">0</div>
+        </div>
+        <div class="stat-card" id="cardTierB" onclick="quickFilterTier('B')">
+          <div class="stat-title"><i class="fa-solid fa-star" style="color:#1976D2;"></i> Hạng B</div>
+          <div class="stat-num" id="statTierB">0</div>
+        </div>
+        <div class="stat-card" id="cardTierC" onclick="quickFilterTier('C')">
+          <div class="stat-title"><i class="fa-solid fa-shield-halved" style="color:#00897B;"></i> Hạng C</div>
+          <div class="stat-num" id="statTierC">0</div>
+        </div>
+        <div class="stat-card" id="cardTierD" onclick="quickFilterTier('D')">
+          <div class="stat-title"><i class="fa-solid fa-circle-dot" style="color:#546E7A;"></i> Hạng D</div>
+          <div class="stat-num" id="statTierD">0</div>
+        </div>
       </div>
 
-      <div class="filter-meta">
-        <div><i class="fa-solid fa-bolt" style="color:var(--nab-red);"></i> Dữ liệu đồng bộ trực tiếp từ Google Sheets</div>
-        <div id="playerCounter" style="font-weight: 600;">Đang hiển thị: 0 người</div>
+      <div class="filter-card">
+        <div class="filter-row">
+          <div class="filter-input">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" placeholder="Tìm tên, nickname, email, nội dung lời nhắn..." oninput="applyFilters()" />
+          </div>
+          <select class="filter-select" id="rankFilter" onchange="applyFilters()">
+            <option value="all">Tất cả các hạng</option>
+            <option value="S">Hạng S</option>
+            <option value="A+">Hạng A+</option>
+            <option value="A">Hạng A</option>
+            <option value="B">Hạng B</option>
+            <option value="C">Hạng C</option>
+            <option value="D">Hạng D</option>
+          </select>
+          <select class="filter-select" id="genderFilter" onchange="applyFilters()">
+            <option value="all">Nam và nữ</option>
+            <option value="Nam">Nam</option>
+            <option value="Nữ">Nữ</option>
+          </select>
+          <select class="filter-select" id="statusFilter" onchange="applyFilters()">
+            <option value="all">Đăng ký giải: tất cả</option>
+            <option value="Đã đăng ký">Đã đăng ký</option>
+            <option value="Chưa đăng ký">Chưa đăng ký</option>
+          </select>
+          <select class="filter-select" id="orgFilter" onchange="applyFilters()">
+            <option value="all">Nhân viên của NAB: Tất cả</option>
+            <option value="nab">NAB</option>
+            <option value="non-nab">Non-NAB</option>
+          </select>
+          <select class="filter-select" id="sortFilter" onchange="applyFilters()">
+            <option value="default">Hạng & điểm (mặc định)</option>
+            <option value="score-desc">Điểm: Cao đến thấp</option>
+            <option value="score-asc">Điểm: Thấp đến cao</option>
+            <option value="name-asc">Tên: A - Z</option>
+          </select>
+        </div>
+
+        <div class="filter-meta">
+          <div><i class="fa-solid fa-bolt" style="color:var(--nab-red);"></i> Dữ liệu đồng bộ trực tiếp từ Google Sheets</div>
+          <div id="playerCounter" style="font-weight: 600;">Đang hiển thị: 0 người</div>
+        </div>
+      </div>
+
+      <div class="list-header">
+        <div>#</div>
+        <div>Người chơi</div>
+        <div>Hạng</div>
+        <div>Điểm</div>
+        <div>Giới tính</div>
+        <div>Đã đăng ký giải</div>
+        <div>Email</div>
+        <div>Cập nhật</div>
+        <div style="text-align: right;">Thao tác</div>
+      </div>
+
+      <div id="loadingSpinner">
+        <div class="spinner"></div>
+        <div>Đang đồng bộ dữ liệu từ Google Sheets...</div>
+      </div>
+
+      <div id="playerListContainer"></div>
+    </div>
+
+    <!-- TAB 2: QUY CHẾ & THỂ THỨC TỔ CHỨC GIẢI -->
+    <div id="viewRules" class="tab-view">
+      <div class="rules-hero">
+        <div class="rules-badge"><i class="fa-solid fa-certificate"></i> Quy chế chính thức ban hành 17/09/2026</div>
+        <h2>QUY CHẾ GIẢI NAB HANOI BADMINTON CHAMPIONSHIP 2026</h2>
+        <p>
+          Giải thi đấu phong trào đồng đội nội bộ giữa 4 đội nhằm tôn vinh tinh thần fair-play, giao lưu kết nối và an toàn. 
+          Mọi thành viên đều được ra sân tranh tài qua 9 nội dung hấp dẫn.
+        </p>
+        <div class="rules-hero-actions">
+          <a href="https://docs.google.com/document/d/1osHqi2JD3OT8Iu6sRYQrWjFB6zdirlAJ/edit?usp=sharing&ouid=102416618896836630248&rtpof=true&sd=true" target="_blank" class="btn-doc-primary">
+            <i class="fa-solid fa-file-word"></i> Mở văn bản gốc trên Google Docs <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:11px;"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="rules-stats-bar">
+        <div class="rule-kpi-card">
+          <div class="rule-kpi-icon" style="background:#FEE2E2; color:var(--nab-red);">
+            <i class="fa-solid fa-people-group"></i>
+          </div>
+          <div class="rule-kpi-info">
+            <h4>Quy mô</h4>
+            <div>4 Đội tranh tài</div>
+          </div>
+        </div>
+        <div class="rule-kpi-card">
+          <div class="rule-kpi-icon" style="background:#FEF3C7; color:#D97706;">
+            <i class="fa-solid fa-trophy"></i>
+          </div>
+          <div class="rule-kpi-info">
+            <h4>Nội dung</h4>
+            <div>9 Nội dung thi đấu</div>
+          </div>
+        </div>
+        <div class="rule-kpi-card">
+          <div class="rule-kpi-icon" style="background:#E0E7FF; color:#4338CA;">
+            <i class="fa-solid fa-volleyball"></i>
+          </div>
+          <div class="rule-kpi-info">
+            <h4>Quy mô trận</h4>
+            <div>72 Trận toàn giải</div>
+          </div>
+        </div>
+        <div class="rule-kpi-card">
+          <div class="rule-kpi-icon" style="background:#DCFCE7; color:#15803D;">
+            <i class="fa-solid fa-award"></i>
+          </div>
+          <div class="rule-kpi-info">
+            <h4>Điểm tối đa</h4>
+            <div>54 Điểm / Đội</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lộ trình thể thức -->
+      <div class="rules-section">
+        <div class="section-title">
+          <i class="fa-solid fa-diagram-project"></i> Lộ trình & Thể thức thi đấu từng nội dung
+        </div>
+        <div class="roadmap-grid">
+          <div class="roadmap-step">
+            <div class="step-num">1</div>
+            <div class="step-title">Chia 4 Đội cân bằng</div>
+            <div class="step-desc">
+              Thuật toán tự động cân bằng số nam, số nữ, cơ cấu trình độ và tổng sức mạnh. Mỗi đội có 18 suất (9 nội dung × 2 VĐV). <strong>Mỗi VĐV tham gia tối thiểu 1, tối đa 2 nội dung</strong>.
+            </div>
+          </div>
+
+          <div class="roadmap-step">
+            <div class="step-num">2</div>
+            <div class="step-title">Vòng tròn 1 lượt</div>
+            <div class="step-desc">
+              4 đôi thi đấu vòng tròn với nhau (tổng 6 trận/nội dung, mỗi đôi đánh 3 trận). <strong>Set 15 điểm (trần 21)</strong> để chọn ra các vị trí Hạng 1, 2, 3, 4.
+            </div>
+          </div>
+
+          <div class="roadmap-step">
+            <div class="step-num red">3</div>
+            <div class="step-title">Tranh Huy Chương</div>
+            <div class="step-desc">
+              • <strong>Hạng 1 vs Hạng 2</strong>: Tranh Huy chương Vàng 🥇 & Bạc 🥈.<br>
+              • <strong>Hạng 3 vs Hạng 4</strong>: Tranh Huy chương Đồng 🥉 & Kỷ niệm chương Hạng 4 🏅.<br>
+              Áp dụng <strong>Set 17 điểm (trần 21)</strong>.
+            </div>
+          </div>
+
+          <div class="roadmap-step">
+            <div class="step-num red">4</div>
+            <div class="step-title">Quy đổi Điểm đội</div>
+            <div class="step-desc">
+              Sau vòng tranh huy chương, điểm số được phân bổ trực tiếp cho bảng tổng sắp đội: 
+              <strong>Vàng = 6đ | Bạc = 4đ | Đồng = 2đ | Hạng 4 = 1đ</strong>.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9 Nội dung & Trần hạng -->
+      <div class="rules-section">
+        <div class="section-title">
+          <i class="fa-solid fa-layer-group"></i> 9 Nội dung thi đấu & Quy định Trần hạng (Điều 9)
+        </div>
+        <p style="font-size:13px; color:#4B5563; margin-bottom:14px;">
+          Thứ tự trình độ: <span style="font-weight:800; color:var(--nab-red);">S (cao nhất) > A+ > A > B > C > D</span>. 
+          <strong>Nguyên tắc vàng:</strong> VĐV được phép "đánh lên" (hạng thấp được đánh nội dung trần cao), tuyệt đối không được "đánh xuống" (vượt trần hạng).
+        </p>
+        <div class="table-responsive">
+          <table class="rules-table">
+            <thead>
+              <tr>
+                <th style="width:60px;">STT</th>
+                <th>Tên nội dung</th>
+                <th style="width:130px;">Trần hạng</th>
+                <th>Hạng được phép tham gia</th>
+                <th>Lưu ý đặc biệt</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1</strong></td>
+                <td><strong>Đôi nam cao cấp 1</strong></td>
+                <td><span class="tier-pill rank-S">Trần S</span></td>
+                <td>S, A+, A, B, C, D</td>
+                <td>Nội dung đỉnh cao, mở cho mọi trình độ nam</td>
+              </tr>
+              <tr>
+                <td><strong>2</strong></td>
+                <td><strong>Đôi nam cao cấp 2</strong></td>
+                <td><span class="tier-pill rank-A_plus">Trần A+</span></td>
+                <td>A+, A, B, C, D</td>
+                <td>Không dành cho VĐV hạng S</td>
+              </tr>
+              <tr>
+                <td><strong>3</strong></td>
+                <td><strong>Đôi nam trung cấp 1</strong></td>
+                <td><span class="tier-pill rank-A">Trần A</span></td>
+                <td>A, B, C, D</td>
+                <td>Song song cùng trần với Trung cấp 2, đội tự bố trí</td>
+              </tr>
+              <tr>
+                <td><strong>4</strong></td>
+                <td><strong>Đôi nam trung cấp 2</strong></td>
+                <td><span class="tier-pill rank-A">Trần A</span></td>
+                <td>A, B, C, D</td>
+                <td>Song song cùng trần với Trung cấp 1, đội tự bố trí</td>
+              </tr>
+              <tr>
+                <td><strong>5</strong></td>
+                <td><strong>Đôi nam sơ cấp 1</strong></td>
+                <td><span class="tier-pill rank-B">Trần B</span></td>
+                <td>B, C, D</td>
+                <td>Sân chơi cho các tay vợt phong trào hạng B trở xuống</td>
+              </tr>
+              <tr>
+                <td><strong>6</strong></td>
+                <td><strong>Đôi nam sơ cấp 2</strong></td>
+                <td><span class="tier-pill rank-C">Trần C</span></td>
+                <td>C, D (Ngoại lệ: 1 Nam B)</td>
+                <td>
+                  <strong>Bảo vệ Newbie:</strong> Chỉ cử tối đa 1 Nam B khi thiếu C/D; Nam B phải có điểm ≤ 2.3 và tổng điểm đôi ≤ 4.4.
+                </td>
+              </tr>
+              <tr>
+                <td><strong>7</strong></td>
+                <td><strong>Đôi nam nữ cao cấp</strong></td>
+                <td><span class="tier-pill rank-S">Nam S • Nữ S</span></td>
+                <td>Mọi hạng Nam & Nữ</td>
+                <td>Đúng 1 Nam và 1 Nữ, quy tụ các tay vợt mạnh nhất</td>
+              </tr>
+              <tr>
+                <td><strong>8</strong></td>
+                <td><strong>Đôi nam nữ trung cấp</strong></td>
+                <td><span class="tier-pill rank-B">Nam B • Nữ B</span></td>
+                <td>Nam B, C, D & Nữ B, C, D</td>
+                <td>Đội thiếu nữ B trở xuống được BTC xét miễn trần nữ</td>
+              </tr>
+              <tr>
+                <td><strong>9</strong></td>
+                <td><strong>Đôi nữ</strong></td>
+                <td><span class="tier-pill rank-other" style="background:#DB2777;">Không giới hạn</span></td>
+                <td>Mọi hạng Nữ</td>
+                <td>Sân chơi tôn vinh tất cả các nữ VĐV của CLB</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Thang điểm thi đấu & Điểm đội -->
+      <div class="rules-section">
+        <div class="section-title">
+          <i class="fa-solid fa-stopwatch"></i> Thang điểm trận đấu & Hệ thống điểm đội (Điều 11 & 14)
+        </div>
+        <div class="compare-grid">
+          <div class="compare-box round-robin">
+            <div class="compare-title" style="color:#166534;">
+              <i class="fa-solid fa-rotate"></i> Trận Vòng tròn một lượt (6 trận)
+            </div>
+            <ul>
+              <li>Thi đấu <strong>3 set thắng 2</strong> (Rally point).</li>
+              <li>Mỗi set <strong>15 điểm</strong>.</li>
+              <li>Bên thắng phải hơn đối phương ít nhất <strong>2 điểm</strong>.</li>
+              <li>Nếu hòa 20–20: Đội chạm <strong>21 điểm trước sẽ thắng</strong> (Trần tối đa 21).</li>
+              <li>Nghỉ giữa set 2 phút; Set 3 đổi sân khi một bên chạm 8 điểm.</li>
+            </ul>
+          </div>
+
+          <div class="compare-box medal">
+            <div class="compare-title" style="color:#92400E;">
+              <i class="fa-solid fa-medal"></i> Trận Tranh Huy Chương (Vàng/Bạc/Đồng)
+            </div>
+            <ul>
+              <li>Thi đấu <strong>3 set thắng 2</strong> (Rally point).</li>
+              <li>Mỗi set nâng lên <strong>17 điểm</strong> để tăng tính kịch tính.</li>
+              <li>Bên thắng phải hơn đối phương ít nhất <strong>2 điểm</strong>.</li>
+              <li>Nếu hòa 20–20: Đội chạm <strong>21 điểm trước sẽ thắng</strong> (Trần tối đa 21).</li>
+              <li>Đôi thắng nhận HCV/HCĐ; Đôi thua nhận HCB/Kỷ niệm chương Hạng 4.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="margin-top:20px; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:16px;">
+          <h4 style="font-size:14px; font-weight:700; margin-bottom:8px; color:var(--nab-black);">
+            <i class="fa-solid fa-calculator" style="color:var(--nab-red);"></i> Thang điểm tích lũy vào Bảng xếp hạng Đội:
+          </h4>
+          <div style="display:flex; flex-wrap:wrap; gap:16px; font-size:13.5px; margin-top:10px;">
+            <div style="background:white; padding:8px 14px; border-radius:6px; border:1px solid #CBD5E1;">
+              🥇 <strong>Huy chương Vàng:</strong> <span style="color:var(--nab-red); font-weight:800; font-size:16px;">6 điểm</span>
+            </div>
+            <div style="background:white; padding:8px 14px; border-radius:6px; border:1px solid #CBD5E1;">
+              🥈 <strong>Huy chương Bạc:</strong> <span style="color:var(--nab-red); font-weight:800; font-size:16px;">4 điểm</span>
+            </div>
+            <div style="background:white; padding:8px 14px; border-radius:6px; border:1px solid #CBD5E1;">
+              🥉 <strong>Huy chương Đồng:</strong> <span style="color:var(--nab-red); font-weight:800; font-size:16px;">2 điểm</span>
+            </div>
+            <div style="background:white; padding:8px 14px; border-radius:6px; border:1px solid #CBD5E1;">
+              🏅 <strong>Hạng Tư:</strong> <span style="color:#4B5563; font-weight:800; font-size:16px;">1 điểm</span>
+            </div>
+            <div style="background:white; padding:8px 14px; border-radius:6px; border:1px solid #FECACA; color:#B91C1C;">
+              ❌ <strong>Bỏ cuộc (Walk-over):</strong> <span style="font-weight:800; font-size:16px;">0 điểm</span>
+            </div>
+          </div>
+          <div style="font-size:12.5px; color:#64748B; margin-top:10px; line-height:1.5;">
+            * Mỗi nội dung phân phối cố định 13 điểm cho 4 đội. Tổng điểm tối đa một đội có thể đạt được là <strong>54 điểm</strong> (9 nội dung × 6đ).<br>
+            * Nếu bằng điểm, xét lần lượt: <strong>Số HCV > Số HCB > Số HCĐ > Tổng trận thắng > Hiệu số set > Hiệu số điểm > Play-off 1 set 21 điểm</strong>.
+          </div>
+        </div>
+      </div>
+
+      <!-- Kỷ luật & Fair-play -->
+      <div class="rules-section">
+        <div class="section-title">
+          <i class="fa-solid fa-shield-halved"></i> Quy định Kỷ luật, Walk-over & Fair-Play (Điều 4, 8, 16, 21)
+        </div>
+        <div class="policy-grid">
+          <div class="policy-card">
+            <div class="policy-card-title">
+              <i class="fa-solid fa-clock-rotate-left" style="color:#EA580C;"></i> Đến trễ thi đấu
+            </div>
+            <div class="policy-card-text">
+              Đôi không có đủ 2 người trên sân sau <strong>5 phút</strong> kể từ giờ thi đấu (sau khi BTC đã gọi tên 3 lần) sẽ bị xử thua <strong>Walk-over (0–2)</strong>.
+            </div>
+            <div class="badge-punish">Thua 0-15 (vòng tròn) / 0-17 (chung kết)</div>
+          </div>
+
+          <div class="policy-card">
+            <div class="policy-card-title">
+              <i class="fa-solid fa-user-slash" style="color:#DC2626;"></i> Nghiêm cấm đánh thay
+            </div>
+            <div class="policy-card-text">
+              Chỉ VĐV có tên trong danh sách 4 đội mới được ra sân. Nghiêm cấm mượn người ngoài hoặc đội khác đánh thay.
+            </div>
+            <div class="badge-punish">Xử thua 0–2 & Trừ 3 điểm đội</div>
+          </div>
+
+          <div class="policy-card">
+            <div class="policy-card-title">
+              <i class="fa-solid fa-handshake-simple" style="color:#0284C7;"></i> Fair-play & Dàn xếp
+            </div>
+            <div class="policy-card-text">
+              Nghiêm cấm thi đấu dưới sức, nhường điểm hoặc dàn xếp thứ hạng vòng tròn. Tuyệt đối không sử dụng rượu bia trước khi ra sân.
+            </div>
+            <div class="badge-punish">Hủy kết quả nội dung & Trừ 6 điểm đội</div>
+          </div>
+
+          <div class="policy-card">
+            <div class="policy-card-title">
+              <i class="fa-solid fa-user-injured" style="color:#16A34A;"></i> Thay người đột xuất
+            </div>
+            <div class="policy-card-text">
+              Chỉ được thay khi có chấn thương/ốm/việc bất khả kháng có báo BTC. Người thay phải cùng đội, không vượt trần hạng và sau khi thay vẫn <strong>không quá 2 nội dung</strong>.
+            </div>
+          </div>
+
+          <div class="policy-card">
+            <div class="policy-card-title">
+              <i class="fa-solid fa-scale-balanced" style="color:#7C3AED;"></i> Trọng tài & Khiếu nại
+            </div>
+            <div class="policy-card-text">
+              Các đôi tự tính điểm theo tinh thần fair-play (hoặc theo trọng tài do BTC cử). Mọi khiếu nại phải do Đội trưởng gửi BTC trong vòng <strong>10 phút sau trận</strong>.
+            </div>
+          </div>
+
+          <div class="policy-card">
+            <div class="policy-card-title">
+              <i class="fa-solid fa-shirt" style="color:#4B5563;"></i> Trang phục & Thiết bị
+            </div>
+            <div class="policy-card-text">
+              VĐV thi đấu bằng áo giải do BTC phát trước giải, khuyến khích mang giày sân trong nhà chuyên dụng. Vợt cá nhân tự chuẩn bị; cầu thi đấu do BTC cấp đồng nhất.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Callout -->
+      <div style="text-align:center; background:white; border:1px solid #E5E7EB; border-radius:12px; padding:28px; margin-top:20px;">
+        <h3 style="font-size:16px; font-weight:700; margin-bottom:8px;">Bạn cần tra cứu chi tiết toàn bộ 24 Điều và các Phụ lục?</h3>
+        <p style="font-size:13px; color:#6B7280; margin-bottom:16px;">Văn bản Quy chế tổ chức chính thức được lưu trữ và cập nhật trực tiếp trên Google Docs của Ban tổ chức.</p>
+        <a href="https://docs.google.com/document/d/1osHqi2JD3OT8Iu6sRYQrWjFB6zdirlAJ/edit?usp=sharing&ouid=102416618896836630248&rtpof=true&sd=true" target="_blank" class="btn-doc-primary" style="display:inline-flex;">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Xem Quy chế đầy đủ trên Google Docs
+        </a>
       </div>
     </div>
 
-    <!-- Table Header -->
-    <div class="list-header">
-      <div>#</div>
-      <div>Người chơi</div>
-      <div>Hạng</div>
-      <div>Điểm</div>
-      <div>Giới tính</div>
-      <div>Đã đăng ký giải</div>
-      <div>Email</div>
-      <div>Cập nhật</div>
-      <div style="text-align: right;">Thao tác</div>
-    </div>
-
-    <!-- Loading State -->
-    <div id="loadingSpinner">
-      <div class="spinner"></div>
-      <div>Đang đồng bộ dữ liệu từ Google Sheets...</div>
-    </div>
-
-    <!-- List Container -->
-    <div id="playerListContainer"></div>
   </div>
 
   <script>
     const SPREADSHEET_ID = "18NLI0v073EIZezHwbwKx5zfrHNTarPx899hNCJBqSBg";
     let currentPlayers = [];
     const chartInstances = {};
+
+    function switchView(tab) {
+      const isPlayers = tab === 'players';
+      document.getElementById('viewPlayers').classList.toggle('active', isPlayers);
+      document.getElementById('viewRules').classList.toggle('active', !isPlayers);
+      
+      document.getElementById('tabBtnPlayers').classList.toggle('active', isPlayers);
+      document.getElementById('tabBtnRules').classList.toggle('active', !isPlayers);
+
+      window.location.hash = isPlayers ? '#danh-sach' : '#quy-che';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
     function isValidNote(raw) {
       if (!raw) return false;
@@ -786,6 +1480,10 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
+      if (window.location.hash === '#quy-che') {
+        switchView('rules');
+      }
+
       const cached = localStorage.getItem('nab_badminton_players');
       if (cached) {
         try {
@@ -799,7 +1497,8 @@
           });
           updateKPIs(currentPlayers);
           applyFilters();
-          document.getElementById('loadingSpinner').style.display = 'none';
+          const sp = document.getElementById('loadingSpinner');
+          if (sp) sp.style.display = 'none';
         } catch (e) {}
       }
       syncFromGoogleSheet();
@@ -843,7 +1542,7 @@
 
     function syncFromGoogleSheet() {
       const spinner = document.getElementById('loadingSpinner');
-      spinner.style.display = 'block';
+      if (spinner) spinner.style.display = 'block';
 
       const gvizUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&tq=&timestamp=${Date.now()}`;
 
@@ -903,7 +1602,6 @@
               noteClean = '';
             }
 
-            // Email & Kiểm tra nhân viên NAB
             const rawEmail = getValSmart(r, ['Email', 'Mail']) || 'Chưa cập nhật';
             const emailClean = String(rawEmail).trim();
             const isNAB = emailClean.toLowerCase().endsWith('@nab.com.au');
@@ -947,18 +1645,20 @@
           });
 
           localStorage.setItem('nab_badminton_players', JSON.stringify(currentPlayers));
-          spinner.style.display = 'none';
+          if (spinner) spinner.style.display = 'none';
           updateKPIs(currentPlayers);
           applyFilters();
         })
         .catch(err => {
           console.error("Lỗi đồng bộ:", err);
-          spinner.innerHTML = `
-            <div style="color: #DC2626; font-weight:600;">
-              <i class="fa-solid fa-triangle-exclamation"></i> Chưa tải được từ Google Sheet.
-            </div>
-            <div style="font-size:12px; margin-top:4px;">Đang hiển thị dữ liệu đã lưu từ phiên trước.</div>
-          `;
+          if (spinner) {
+            spinner.innerHTML = `
+              <div style="color: #DC2626; font-weight:600;">
+                <i class="fa-solid fa-triangle-exclamation"></i> Chưa tải được từ Google Sheet.
+              </div>
+              <div style="font-size:12px; margin-top:4px;">Đang hiển thị dữ liệu đã lưu từ phiên trước.</div>
+            `;
+          }
         });
     }
 
@@ -1120,7 +1820,6 @@
             </div>
           </div>
 
-          <!-- Drawer Panel -->
           <div class="player-detail-panel" id="detail-${p.id}">
             <div class="radar-container">
               <canvas id="radar-${p.id}"></canvas>
@@ -1131,7 +1830,6 @@
                 ${!p.isNAB ? `<span class="tag-non-nab" style="font-size:11px;">Non-NAB</span>` : ''}
               </div>
 
-              <!-- Lời nhắn vui vẻ gửi BTC -->
               ${p.note ? `
                 <div class="note-callout">
                   <div class="note-callout-icon">
