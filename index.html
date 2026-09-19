@@ -19,15 +19,13 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    /* ===================================================
-       THEME VARIABLES: LIGHT (MẶC ĐỊNH) & DARK MODE
-       =================================================== */
+    /* THEME VARIABLES */
     :root {
       --nab-red: #C70000;
       --nab-red-dark: #9E0000;
       --nab-red-light: #FDE8E8;
       
-      /* Light Theme (Mặc định) */
+      /* Light Theme */
       --bg-primary: #F4F5F7;
       --bg-card: #FFFFFF;
       --bg-card-inner: #F8FAFC;
@@ -114,7 +112,6 @@
       padding-bottom: 60px;
     }
 
-    /* Top Brand Bar */
     header {
       background: var(--header-bg);
       border-bottom: 3px solid var(--nab-red);
@@ -152,7 +149,6 @@
       color: var(--text-primary);
     }
 
-    /* Navigation Tabs */
     .nav-tabs {
       display: flex;
       background: var(--tab-nav-bg);
@@ -230,7 +226,6 @@
       border-color: #1E3A8A;
     }
 
-    /* Nút Bật/Tắt Dark Mode */
     .btn-theme {
       background: var(--bg-card);
       color: var(--text-primary);
@@ -257,9 +252,7 @@
       animation: fadeIn 0.25s ease;
     }
 
-    /* ===================================================
-       TAB 1: ĐỘI THI ĐẤU & CÂN BẰNG
-       =================================================== */
+    /* TAB 1: ĐỘI THI ĐẤU & CÂN BẰNG */
     .teams-container {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -342,7 +335,6 @@
       background: var(--nab-red-dark);
     }
 
-    /* Bảng Cân Bằng */
     .balance-table-wrapper {
       margin-top: 16px;
       overflow-x: auto;
@@ -387,7 +379,6 @@
       font-weight: 700;
     }
 
-    /* Thanh Điểm Progress Bar */
     .score-progress-section {
       margin-top: 24px;
       background: var(--bg-card-inner);
@@ -460,7 +451,6 @@
       margin-left: 4px;
     }
 
-    /* 4 Cột Đội Drag & Drop */
     .teams-grid-4 {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -599,9 +589,7 @@
       color: var(--text-primary);
     }
 
-    /* ===================================================
-       TAB 2: DANH SÁCH NGƯỜI CHƠI
-       =================================================== */
+    /* TAB 2: DANH SÁCH NGƯỜI CHƠI */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
@@ -746,10 +734,6 @@
       margin-bottom: 10px;
       overflow: hidden;
       box-shadow: var(--shadow-sm);
-    }
-
-    .player-card:hover {
-      border-color: var(--border-color);
     }
 
     .player-main-row {
@@ -931,9 +915,7 @@
       color: var(--text-primary);
     }
 
-    /* ===================================================
-       TAB 3: QUY CHẾ & THỂ THỨC GIẢI
-       =================================================== */
+    /* TAB 3: QUY CHẾ & THỂ THỨC GIẢI */
     .rules-hero {
       background: var(--hero-bg);
       color: white;
@@ -970,11 +952,49 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      margin-top: 16px;
+      transition: background 0.2s;
     }
 
     .btn-doc-primary:hover {
       background: var(--nab-red-dark);
+    }
+
+    /* Style cho Nút Tải File PDF */
+    .btn-doc-pdf {
+      background: #FFFFFF;
+      color: #1A1A1A;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #E2E8F0;
+      transition: all 0.2s;
+    }
+
+    .btn-doc-pdf:hover {
+      background: #F8FAFC;
+      border-color: #CBD5E1;
+      transform: translateY(-1px);
+    }
+
+    .btn-doc-pdf i {
+      color: var(--nab-red);
+      font-size: 15px;
+    }
+
+    body.dark-mode .btn-doc-pdf {
+      background: #242B3A;
+      color: #F8FAFC;
+      border-color: #384256;
+    }
+
+    body.dark-mode .btn-doc-pdf:hover {
+      background: #2D374A;
+      border-color: #4B5563;
     }
 
     .rules-stats-bar {
@@ -1202,7 +1222,6 @@
       color: #F87171;
     }
 
-    /* Loading Spinner */
     #loadingSpinner {
       text-align: center;
       padding: 60px 20px;
@@ -1450,9 +1469,16 @@
           Giải thi đấu phong trào đồng đội nội bộ giữa 4 đội nhằm tôn vinh tinh thần fair-play, giao lưu kết nối và an toàn. 
           Mọi thành viên đều được ra sân tranh tài qua 9 nội dung hấp dẫn.
         </p>
-        <a href="https://docs.google.com/document/d/1osHqi2JD3OT8Iu6sRYQrWjFB6zdirlAJ/edit?usp=sharing" target="_blank" class="btn-doc-primary">
-          <i class="fa-solid fa-file-word"></i> Mở văn bản gốc trên Google Docs <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:11px;"></i>
-        </a>
+        
+        <!-- Cụm 2 nút bấm: Mở Google Docs & Tải PDF -->
+        <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:16px; align-items:center;">
+          <a href="https://docs.google.com/document/d/1osHqi2JD3OT8Iu6sRYQrWjFB6zdirlAJ/edit?usp=sharing" target="_blank" class="btn-doc-primary" style="margin-top:0;">
+            <i class="fa-solid fa-file-word"></i> Mở văn bản gốc trên Google Docs <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:11px;"></i>
+          </a>
+          <a href="https://docs.google.com/document/d/1osHqi2JD3OT8Iu6sRYQrWjFB6zdirlAJ/export?format=pdf" target="_blank" class="btn-doc-pdf" style="margin-top:0;">
+            <i class="fa-solid fa-file-pdf"></i> Tải File PDF tóm tắt thể lệ
+          </a>
+        </div>
       </div>
 
       <div class="rules-stats-bar">
@@ -1583,14 +1609,25 @@
           </div>
         </div>
       </div>
+
+      <!-- Footer Callout -->
+      <div style="text-align:center; background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; padding:28px; margin-top:20px;">
+        <h3 style="font-size:16px; font-weight:700; margin-bottom:8px;">Bạn cần tra cứu chi tiết toàn bộ 24 Điều và các Phụ lục?</h3>
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">Văn bản Quy chế tổ chức chính thức được lưu trữ và cập nhật trực tiếp trên Google Docs của Ban tổ chức.</p>
+        <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+          <a href="https://docs.google.com/document/d/1osHqi2JD3OT8Iu6sRYQrWjFB6zdirlAJ/edit?usp=sharing" target="_blank" class="btn-doc-primary" style="display:inline-flex; margin-top:0;">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Xem Quy chế đầy đủ trên Google Docs
+          </a>
+          <a href="https://docs.google.com/document/d/1osHqi2JD3OT8Iu6sRYQrWjFB6zdirlAJ/export?format=pdf" target="_blank" class="btn-doc-pdf" style="display:inline-flex; margin-top:0;">
+            <i class="fa-solid fa-file-pdf"></i> Tải File PDF thể lệ
+          </a>
+        </div>
+      </div>
     </div>
 
   </div>
 
   <script>
-    // ===================================================
-    // QUẢN LÝ CHẾ ĐỘ DARK / LIGHT MODE
-    // ===================================================
     function applyTheme(isDark) {
       document.body.classList.toggle('dark-mode', isDark);
       const icon = document.getElementById('themeIcon');
@@ -1607,8 +1644,6 @@
       }
       
       localStorage.setItem('nab_theme', isDark ? 'dark' : 'light');
-
-      // Cập nhật màu lưới & chữ cho biểu đồ Radar đang mở
       updateRadarChartsTheme(isDark);
     }
 
@@ -1619,7 +1654,6 @@
 
     function initTheme() {
       const savedTheme = localStorage.getItem('nab_theme');
-      // Mặc định dark-mode cho đúng phong cách dashboard thể thao
       const prefersDark = savedTheme ? (savedTheme === 'dark') : true;
       applyTheme(prefersDark);
     }
@@ -1638,9 +1672,6 @@
       });
     }
 
-    // ===================================================
-    // DỮ LIỆU ĐỘI THI ĐẤU CHUẨN XÁC 100% TỪ FILE EXCEL
-    // ===================================================
     const INITIAL_TEAMS_DATA = {
       team1: {
         id: "team1",
@@ -1781,7 +1812,6 @@
       const sumDiff = (Math.max(...allSums) - Math.min(...allSums)).toFixed(2);
       const avgDiff = (Math.max(...allAvgs) - Math.min(...allAvgs)).toFixed(2);
 
-      // 1. Render Balance Table
       const balanceBody = document.getElementById('balanceTableBody');
       const rows = [
         { label: "Nam", v1: t1.nam, v2: t2.nam, v3: t3.nam, v4: t4.nam, note: "Đều" },
@@ -1808,7 +1838,6 @@
         </tr>
       `).join('');
 
-      // 2. Render Score Progress Bars
       const maxScore = Math.max(...allSums, 45);
       const scoreBarsEl = document.getElementById('scoreProgressBars');
       const teamsArr = [
@@ -1833,7 +1862,6 @@
         `;
       }).join('');
 
-      // 3. Render 4 Columns with Drag & Drop
       const colContainer = document.getElementById('teamsColumnContainer');
       colContainer.innerHTML = ['team1', 'team2', 'team3', 'team4'].map(key => {
         const t = teamsState[key];
@@ -1877,7 +1905,6 @@
       }).join('');
     }
 
-    // Kéo thả (Drag & Drop)
     let draggedPlayerId = null;
     let sourceTeamId = null;
 
@@ -1964,9 +1991,6 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // ===================================================
-    // TAB DANH SÁCH NGƯỜI CHƠI (TỰ ĐỒNG BỘ GOOGLE SHEET)
-    // ===================================================
     const SPREADSHEET_ID = "18NLI0v073EIZezHwbwKx5zfrHNTarPx899hNCJBqSBg";
     let currentPlayers = [];
     const chartInstances = {};
@@ -1981,13 +2005,8 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      // Khởi tạo Theme
       initTheme();
-
-      // Khởi tạo tab Đội thi đấu
       renderTeamsView();
-
-      // Nạp dữ liệu Tab danh sách người chơi
       syncFromGoogleSheet();
     });
 
@@ -2268,11 +2287,9 @@
 
       if (isOpen) {
         panel.classList.remove('open');
-        btn.classList.remove('active');
         btn.innerText = 'Chi tiết';
       } else {
         panel.classList.add('open');
-        btn.classList.add('active');
         btn.innerText = 'Đóng';
         renderRadarChart(id);
       }
