@@ -335,6 +335,7 @@
       background: var(--nab-red-dark);
     }
 
+    /* Bảng Cân Bằng */
     .balance-table-wrapper {
       margin-top: 16px;
       overflow-x: auto;
@@ -379,6 +380,7 @@
       font-weight: 700;
     }
 
+    /* Thanh Điểm Progress Bar */
     .score-progress-section {
       margin-top: 24px;
       background: var(--bg-card-inner);
@@ -451,6 +453,7 @@
       margin-left: 4px;
     }
 
+    /* 4 Cột Đội Kéo Thả */
     .teams-grid-4 {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -959,7 +962,6 @@
       background: var(--nab-red-dark);
     }
 
-    /* Style cho Nút Tải File PDF */
     .btn-doc-pdf {
       background: #FFFFFF;
       color: #1A1A1A;
@@ -1470,7 +1472,7 @@
           Mọi thành viên đều được ra sân tranh tài qua 9 nội dung hấp dẫn.
         </p>
         
-        <!-- Cụm 2 nút bấm: Mở Google Docs & Tải PDF -->
+        <!-- Cụm 2 nút: Mở Google Docs & Tải PDF -->
         <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:16px; align-items:center;">
           <a href="https://docs.google.com/document/d/1osHqi2JD3OT8Iu6sRYQrWjFB6zdirlAJ/edit?usp=sharing" target="_blank" class="btn-doc-primary" style="margin-top:0;">
             <i class="fa-solid fa-file-word"></i> Mở văn bản gốc trên Google Docs <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:11px;"></i>
@@ -1672,6 +1674,9 @@
       });
     }
 
+    // ===================================================
+    // DỮ LIỆU ĐÃ ĐỔI CHỖ: PETER DO (ĐỘI 2) & TU NGHIEM (ĐỘI 4)
+    // ===================================================
     const INITIAL_TEAMS_DATA = {
       team1: {
         id: "team1",
@@ -1709,7 +1714,7 @@
           { id: 22, name: "Tuan Anh Tran", email: "tuananh.tran@nab.com.au", gender: "Nam", tier: "B", score: 2.68, isBackup: false },
           { id: 23, name: "Kún Bé", email: "phuongnam.ttdn28@gmail.com", gender: "Nữ", tier: "B", score: 2.51, isBackup: false },
           { id: 24, name: "Lee Nguyen", email: "lee.nguyen1@nab.com.au", gender: "Nữ", tier: "B", score: 2.38, isBackup: false },
-          { id: 25, name: "TU NGHIEM", email: "tu.nghiem@nab.com.au", gender: "Nam", tier: "C", score: 2.07, isBackup: false },
+          { id: 52, name: "Peter Do", email: "peter.do1@nab.com.au", gender: "Nam", tier: "C", score: 1.95, isBackup: false },
           { id: 26, name: "Vincent Dinh", email: "thanh.dinh1@nab.com.au", gender: "Nam", tier: "C", score: 1.91, isBackup: false },
           { id: 27, name: "Adrian Tran", email: "adrian.tran@nab.com.au", gender: "Nam", tier: "D", score: 1.48, isBackup: false }
         ]
@@ -1750,7 +1755,7 @@
           { id: 49, name: "Ellie Nguyen", email: "ellie.nguyen20@nab.com.au", gender: "Nữ", tier: "B", score: 2.74, isBackup: false },
           { id: 50, name: "Phạm Quỳnh Giang", email: "quynhgiang.hnc@gmail.com", gender: "Nữ", tier: "B", score: 2.50, isBackup: false },
           { id: 51, name: "An Vu", email: "an.vu1@nab.com.au", gender: "Nam", tier: "C", score: 2.13, isBackup: false },
-          { id: 52, name: "Peter Do", email: "peter.do1@nab.com.au", gender: "Nam", tier: "C", score: 1.95, isBackup: false },
+          { id: 25, name: "TU NGHIEM", email: "tu.nghiem@nab.com.au", gender: "Nam", tier: "C", score: 2.07, isBackup: false },
           { id: 53, name: "Son Vu", email: "vu.son@nab.com.au", gender: "Nam", tier: "C", score: 2.06, isBackup: false },
           { id: 54, name: "Hai Nguyen", email: "hai.nguyen1@nab.com.au", gender: "Nam", tier: "D", score: 1.00, isBackup: false }
         ]
