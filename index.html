@@ -999,6 +999,26 @@
       border-color: #4B5563;
     }
 
+    /* Styles cho Nút bản đồ & Hướng dẫn di chuyển */
+    .btn-map-primary {
+      background: #2563EB;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-map-primary:hover {
+      background: #1D4ED8;
+      transform: translateY(-1px);
+    }
+
     .rules-stats-bar {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -1279,6 +1299,10 @@
       </button>
       <button class="nav-tab-btn" id="tabBtnRules" onclick="switchView('rules')">
         <i class="fa-solid fa-book-open"></i> Quy chế & Thể thức giải
+      </button>
+      <!-- Tab Mới: Hướng dẫn di chuyển -->
+      <button class="nav-tab-btn" id="tabBtnLocation" onclick="switchView('location')">
+        <i class="fa-solid fa-map-location-dot"></i> Hướng dẫn di chuyển
       </button>
     </div>
 
@@ -1627,6 +1651,106 @@
       </div>
     </div>
 
+    <!-- ================================================= -->
+    <!-- TAB 4: HƯỚNG DẪN DI CHUYỂN ĐẾN SÂN              -->
+    <!-- ================================================= -->
+    <div id="viewLocation" class="tab-view">
+      <!-- Location Hero Banner -->
+      <div class="rules-hero" style="border-left-color: #2563EB;">
+        <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(37,99,235,0.3); border:1px solid rgba(37,99,235,0.6); color:#BFDBFE; font-size:12px; font-weight:700; padding:4px 10px; border-radius:20px; margin-bottom:10px; text-transform:uppercase;">
+          <i class="fa-solid fa-location-dot"></i> Địa điểm tổ chức thi đấu
+        </div>
+        <h2>NAB BADMINTON CHAMPIONSHIP 2026</h2>
+        <p style="font-size:14.5px; margin-bottom:6px;">
+          <strong><i class="fa-regular fa-clock" style="color:#60A5FA;"></i> Thời gian:</strong> 7h00 ngày 17/10/2026
+        </p>
+        <p style="font-size:14.5px; margin-bottom:6px;">
+          <strong><i class="fa-solid fa-building" style="color:#60A5FA;"></i> Địa điểm:</strong> Sân cầu Phạm Tu Badminton
+        </p>
+        <p style="font-size:14.5px;">
+          <strong><i class="fa-solid fa-map-pin" style="color:#60A5FA;"></i> Địa chỉ:</strong> Phạm Tu, Thanh Liệt, Hà Nội
+        </p>
+        
+        <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:18px; align-items:center;">
+          <a href="https://maps.app.goo.gl/zga2NTGspYErhftN7" target="_blank" class="btn-map-primary">
+            <i class="fa-solid fa-diamond-turn-right"></i> Mở chỉ đường Google Maps <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:11px;"></i>
+          </a>
+          <a href="https://drive.google.com/file/d/10f9jLfjcqjZdyOu1m-FRIes5QHzbo8cL/view?usp=sharing" target="_blank" class="btn-doc-pdf">
+            <i class="fa-solid fa-image" style="color:#2563EB;"></i> Mở ảnh gốc trên Drive
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick KPI Cards for Court -->
+      <div class="rules-stats-bar">
+        <div class="rule-kpi-card">
+          <div class="rule-kpi-icon" style="background:#EFF6FF; color:#2563EB;"><i class="fa-regular fa-clock"></i></div>
+          <div class="rule-kpi-info"><h4>Giờ khai mạc</h4><div>7:00 Sáng</div></div>
+        </div>
+        <div class="rule-kpi-card">
+          <div class="rule-kpi-icon" style="background:#F0FDF4; color:#16A34A;"><i class="fa-solid fa-calendar-day"></i></div>
+          <div class="rule-kpi-info"><h4>Ngày thi đấu</h4><div>17/10/2026</div></div>
+        </div>
+        <div class="rule-kpi-card">
+          <div class="rule-kpi-icon" style="background:#FEF3C7; color:#D97706;"><i class="fa-solid fa-square-parking"></i></div>
+          <div class="rule-kpi-info"><h4>Bãi đỗ xe</h4><div>Ô tô & Xe máy</div></div>
+        </div>
+        <div class="rule-kpi-card">
+          <div class="rule-kpi-icon" style="background:#FDF2F8; color:#DB2777;"><i class="fa-solid fa-shirt"></i></div>
+          <div class="rule-kpi-info">
+            <h4>Áo thi đấu</h4>
+            <div style="font-size: 14.5px; line-height: 1.35;">Phát trước trên công ty hoặc tại sân</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sơ đồ & Ảnh Hướng dẫn di chuyển -->
+      <div class="rules-section">
+        <div class="section-title">
+          <i class="fa-solid fa-route" style="color:#2563EB;"></i> Sơ đồ & Ảnh thực tế hướng dẫn vào sân
+        </div>
+        <p style="font-size:13.5px; color:var(--text-muted); margin-bottom:18px; line-height:1.6;">
+          Dưới đây là hình ảnh hướng dẫn lối rẽ và đường đi vào <strong>Sân cầu Phạm Tu Badminton</strong>. 
+          Các vận động viên vui lòng có mặt trước <strong>15–20 phút</strong> để nhận áo đấu, làm thủ tục check-in và khởi động trước khi vào trận.
+        </p>
+
+        <!-- Khung hiển thị ảnh hướng dẫn trực tiếp -->
+        <div style="text-align: center; background: var(--bg-card-inner); padding: 18px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+          <img 
+            src="https://lh3.googleusercontent.com/d/10f9jLfjcqjZdyOu1m-FRIes5QHzbo8cL" 
+            onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=10f9jLfjcqjZdyOu1m-FRIes5QHzbo8cL&sz=w2000';" 
+            alt="Ảnh hướng dẫn di chuyển đến sân Phạm Tu Badminton" 
+            style="max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: var(--shadow-md); display: inline-block;"
+            loading="lazy"
+          />
+          <div style="margin-top: 14px; font-size: 13px; color: var(--text-muted);">
+            <i class="fa-solid fa-circle-info"></i> Nếu ảnh tải chậm do mạng, bạn có thể <a href="https://drive.google.com/file/d/10f9jLfjcqjZdyOu1m-FRIes5QHzbo8cL/view?usp=sharing" target="_blank" style="color:var(--nab-red); font-weight:700; text-decoration:underline;">bấm vào đây để xem trực tiếp trên Google Drive</a>.
+          </div>
+        </div>
+      </div>
+
+      <!-- Lời khuyên & Lưu ý di chuyển -->
+      <div class="rules-section">
+        <div class="section-title">
+          <i class="fa-solid fa-circle-exclamation" style="color:#EA580C;"></i> Lưu ý quan trọng cho Vận động viên & Cổ động viên
+        </div>
+        <div class="policy-grid">
+          <div class="policy-card">
+            <div class="policy-card-title"><i class="fa-solid fa-stopwatch" style="color:#EA580C;"></i> Đúng giờ thi đấu</div>
+            <div class="policy-card-text">Theo Điều 4 Quy chế giải, các cặp đấu không có mặt sau <strong>5 phút</strong> kể từ giờ gọi trận sẽ bị xử thua Walk-over (0–2). Hãy chủ động xuất phát sớm.</div>
+          </div>
+          <div class="policy-card">
+            <div class="policy-card-title"><i class="fa-solid fa-motorcycle" style="color:#2563EB;"></i> Phương tiện & Gửi xe</div>
+            <div class="policy-card-text">Sân có bãi gửi xe máy và vị trí đậu ô tô thuận tiện ngay phía ngoài sân cầu. Vui lòng xếp xe theo hướng dẫn của bảo vệ sân.</div>
+          </div>
+          <div class="policy-card">
+            <div class="policy-card-title"><i class="fa-solid fa-person-running" style="color:#16A34A;"></i> Trang bị cá nhân</div>
+            <div class="policy-card-text">Mang giày sân trong nhà (non-marking) chuyên dụng, vợt cá nhân, khăn lau và bình nước. Áo thi đấu phát trước trên công ty hoặc tại sân; cầu thi đấu do BTC cấp.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script>
@@ -1900,7 +2024,7 @@
                     </span>
                   </div>
                   <div class="player-card-meta">
-                    ${p.gender} · <strong>${p.tier}</strong> ·${p.score.toFixed(2)}/5
+                    ${p.gender} · <strong>${p.tier}</strong> · ${p.score.toFixed(2)}/5
                   </div>
                 </div>
               `).join('')}
@@ -1989,10 +2113,12 @@
       document.getElementById('viewTeams').classList.toggle('active', tab === 'teams');
       document.getElementById('viewPlayers').classList.toggle('active', tab === 'players');
       document.getElementById('viewRules').classList.toggle('active', tab === 'rules');
+      document.getElementById('viewLocation').classList.toggle('active', tab === 'location');
 
       document.getElementById('tabBtnTeams').classList.toggle('active', tab === 'teams');
       document.getElementById('tabBtnPlayers').classList.toggle('active', tab === 'players');
       document.getElementById('tabBtnRules').classList.toggle('active', tab === 'rules');
+      document.getElementById('tabBtnLocation').classList.toggle('active', tab === 'location');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -2013,6 +2139,15 @@
       initTheme();
       renderTeamsView();
       syncFromGoogleSheet();
+
+      // Hỗ trợ mở trực tiếp bằng URL Hash
+      if (window.location.hash === '#huong-dan' || window.location.hash === '#di-chuyen') {
+        switchView('location');
+      } else if (window.location.hash === '#quy-che') {
+        switchView('rules');
+      } else if (window.location.hash === '#danh-sach') {
+        switchView('players');
+      }
     });
 
     function getValSmart(row, exactKeys, fallbackKeywords = [], excludeKeywords = []) {
