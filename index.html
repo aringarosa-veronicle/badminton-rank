@@ -14,9 +14,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-  <!-- SheetJS & Chart.js -->
+  <!-- SheetJS dùng cho nút tải Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     /* THEME VARIABLES */
@@ -115,7 +114,6 @@
       margin: 0;
       padding: 0;
       font-family: 'Inter', sans-serif;
-      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
     }
 
     body {
@@ -565,6 +563,30 @@
 
     /* Matches Section Accordions / Cards */
 
+    #playerFilter {
+      min-width: 220px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: var(--input-bg);
+      color: var(--text-primary);
+      font: inherit;
+    }
+
+    .player-filter-summary {
+      margin: 0 0 12px;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .match-team-info mark {
+      background: rgba(199, 0, 0, 0.16);
+      color: inherit;
+      border-radius: 4px;
+      padding: 0 2px;
+    }
+
     .schedule-rest-banner {
       display: flex;
       align-items: center;
@@ -852,6 +874,43 @@
       max-width: 480px;
       width: 100%;
       box-shadow: var(--shadow-md);
+    }
+
+    .modal-box.wide {
+      max-width: 720px;
+      max-height: calc(100vh - 32px);
+      overflow: auto;
+    }
+
+    .sheet-score-status {
+      margin: 10px 0 0;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--text-muted);
+    }
+
+    .sheet-score-status button {
+      margin-left: 8px;
+      background: none;
+      border: none;
+      color: var(--nab-red);
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .sheet-script-box {
+      width: 100%;
+      min-height: 220px;
+      margin: 10px 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11.5px;
+      line-height: 1.4;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px;
+      background: var(--bg-card-inner);
+      color: var(--text-primary);
     }
 
     .modal-title {
@@ -1929,12 +1988,18 @@
             <option value="4">Team Mattari</option>
           </select>
 
+          <input id="playerFilter" list="playerNameList" placeholder="Lọc theo vận động viên" oninput="renderMatchesList()" />
+          <datalist id="playerNameList"></datalist>
+
           <button class="btn-dark-tool" onclick="toggleAllRounds(false)" title="Mở rộng tất cả lượt trận"><i class="fa-solid fa-angles-down"></i> Mở tất cả</button>
           <button class="btn-dark-tool" onclick="toggleAllRounds(true)" title="Thu gọn tất cả lượt trận"><i class="fa-solid fa-angles-up"></i> Thu gọn</button>
           <button class="btn-dark-tool" onclick="populateSampleScores()" title="Tự động điền điểm mẫu mô phỏng"><i class="fa-solid fa-wand-magic-sparkles"></i> Điểm mẫu</button>
           <button class="btn-dark-tool" onclick="resetAllScores()" title="Đặt lại điểm số về 0-0"><i class="fa-solid fa-arrows-rotate"></i> Reset</button>
+          <button class="btn-dark-tool" onclick="loadScoresFromSheet(false)" title="Tải điểm từ Google Sheet Thứ tự trận"><i class="fa-solid fa-cloud-arrow-down"></i> Tải điểm từ Sheet</button>
+          <button class="btn-dark-export" onclick="pushScoresToSheet()" title="Ghi điểm đang có trên trang vào Google Sheet"><i class="fa-solid fa-cloud-arrow-up"></i> Ghi điểm lên Sheet</button>
         </div>
       </div>
+      <p id="sheetScoreStatus" class="sheet-score-status"></p>
 
       <!-- Danh sách trận đấu hiển thị (Có hỗ trợ Collapse/Expand) -->
       <div id="matchesListContainer"></div>
@@ -2384,7 +2449,36 @@
 
       <div class="modal-actions">
         <button class="btn-dark-tool" onclick="closeScoreModal()">Hủy</button>
-        <button class="btn-dark-export" onclick="saveScoreModal()">Lưu tỉ số</button>
+        <button class="btn-dark-export" onclick="saveScoreModal()">Lưu trên trang</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="sheetScriptModal">
+    <div class="modal-box wide">
+      <div class="modal-title">
+        <i class="fa-solid fa-cloud-arrow-up" style="color:var(--nab-red);"></i>
+        <span>Ghi điểm lên Google Sheet</span>
+      </div>
+      <div class="modal-subtitle">
+        Trang HTML không ghi thẳng được vào Sheet, kể cả khi file để “Bất kỳ ai có đường liên kết” được sửa.
+        Gắn Apps Script một lần trên chính file Thứ tự trận. Sau đó nút này ghi các ô Nhà 1, Khách 1… theo điểm trên trang.
+      </div>
+      <ol style="margin:0 0 8px 18px; font-size:13px; line-height:1.5;">
+        <li>Mở Google Sheet → Tiện ích → Apps Script.</li>
+        <li>Xóa code cũ, dán đoạn bên dưới, rồi lưu.</li>
+        <li>Triển khai → Triển khai mới → loại Ứng dụng web.</li>
+        <li>Thực thi với tư cách: Tôi. Quyền truy cập: Bất kỳ ai.</li>
+        <li>Dán URL kết thúc bằng <strong>/exec</strong> vào ô dưới.</li>
+      </ol>
+      <textarea id="sheetScriptSource" class="sheet-script-box" readonly></textarea>
+      <div class="modal-actions" style="margin-bottom:10px;">
+        <button class="btn-dark-tool" type="button" onclick="copySheetScript()">Sao chép script</button>
+      </div>
+      <input id="sheetScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%; padding:8px 10px; border-radius:6px; border:1px solid var(--border-color); background:var(--bg-card-inner); color:var(--text-primary);" />
+      <div class="modal-actions">
+        <button class="btn-dark-tool" type="button" onclick="closeSheetScriptModal()">Đóng</button>
+        <button class="btn-dark-export" type="button" onclick="saveSheetScriptUrl()">Lưu URL và ghi điểm</button>
       </div>
     </div>
   </div>
@@ -2513,1333 +2607,118 @@
     // =========================================================
     // 72 TRẬN ĐẤU THEO LỊCH CHÍNH THỨC (webapp)
     // Vòng tròn 07:00–09:31, nghỉ 15', huy chương 09:46–12:46
-    // =========================================================
-    const MATCH_SCHEDULE = [
-  {
-    id: 1,
-    round: 'Lượt 1',
-    roundLabel: '07:00–07:16 · Vòng tròn đợt 1 · vòng 1',
-    eventId: 'nam_cc1',
-    eventName: 'Đôi nam cao cấp 1',
-    court: 'Sân 1',
-    time: '07:00 - 07:16',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 2
-  },
-  {
-    id: 2,
-    round: 'Lượt 1',
-    roundLabel: '07:00–07:16 · Vòng tròn đợt 1 · vòng 1',
-    eventId: 'nam_cc1',
-    eventName: 'Đôi nam cao cấp 1',
-    court: 'Sân 2',
-    time: '07:00 - 07:16',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 3,
-    teamB: 4
-  },
-  {
-    id: 3,
-    round: 'Lượt 1',
-    roundLabel: '07:00–07:16 · Vòng tròn đợt 1 · vòng 1',
-    eventId: 'nam_tc1',
-    eventName: 'Đôi nam trung cấp 1',
-    court: 'Sân 3',
-    time: '07:00 - 07:16',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 2
-  },
-  {
-    id: 4,
-    round: 'Lượt 1',
-    roundLabel: '07:00–07:16 · Vòng tròn đợt 1 · vòng 1',
-    eventId: 'nam_tc1',
-    eventName: 'Đôi nam trung cấp 1',
-    court: 'Sân 4',
-    time: '07:00 - 07:16',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 3,
-    teamB: 4
-  },
-  {
-    id: 5,
-    round: 'Lượt 1',
-    roundLabel: '07:00–07:16 · Vòng tròn đợt 1 · vòng 1',
-    eventId: 'nam_sc1',
-    eventName: 'Đôi nam sơ cấp 1',
-    court: 'Sân 5',
-    time: '07:00 - 07:16',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 2
-  },
-  {
-    id: 6,
-    round: 'Lượt 1',
-    roundLabel: '07:00–07:16 · Vòng tròn đợt 1 · vòng 1',
-    eventId: 'nam_sc1',
-    eventName: 'Đôi nam sơ cấp 1',
-    court: 'Sân 6',
-    time: '07:00 - 07:16',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 3,
-    teamB: 4
-  },
-  {
-    id: 7,
-    round: 'Lượt 1',
-    roundLabel: '07:00–07:16 · Vòng tròn đợt 1 · vòng 1',
-    eventId: 'nu',
-    eventName: 'Đôi nữ',
-    court: 'Sân 7',
-    time: '07:00 - 07:16',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 3,
-    teamB: 4
-  },
-  {
-    id: 8,
-    round: 'Lượt 1',
-    roundLabel: '07:00–07:16 · Vòng tròn đợt 1 · vòng 1',
-    eventId: 'nu',
-    eventName: 'Đôi nữ',
-    court: 'Sân 8',
-    time: '07:00 - 07:16',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 2
-  },
-  {
-    id: 9,
-    round: 'Lượt 1',
-    roundLabel: '07:00–07:16 · Vòng tròn đợt 1 · vòng 1',
-    eventId: 'nam_sc2',
-    eventName: 'Đôi nam sơ cấp 2',
-    court: 'Sân 9',
-    time: '07:00 - 07:16',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 2
-  },
-  {
-    id: 10,
-    round: 'Lượt 1',
-    roundLabel: '07:00–07:16 · Vòng tròn đợt 1 · vòng 1',
-    eventId: 'nam_sc2',
-    eventName: 'Đôi nam sơ cấp 2',
-    court: 'Sân 10',
-    time: '07:00 - 07:16',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 3,
-    teamB: 4
-  },
-  {
-    id: 11,
-    round: 'Lượt 2',
-    roundLabel: '07:26–07:42 · Vòng tròn đợt 1 · vòng 2',
-    eventId: 'nam_cc1',
-    eventName: 'Đôi nam cao cấp 1',
-    court: 'Sân 1',
-    time: '07:26 - 07:42',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 3
-  },
-  {
-    id: 12,
-    round: 'Lượt 2',
-    roundLabel: '07:26–07:42 · Vòng tròn đợt 1 · vòng 2',
-    eventId: 'nam_cc1',
-    eventName: 'Đôi nam cao cấp 1',
-    court: 'Sân 2',
-    time: '07:26 - 07:42',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 2,
-    teamB: 4
-  },
-  {
-    id: 13,
-    round: 'Lượt 2',
-    roundLabel: '07:26–07:42 · Vòng tròn đợt 1 · vòng 2',
-    eventId: 'nam_tc1',
-    eventName: 'Đôi nam trung cấp 1',
-    court: 'Sân 3',
-    time: '07:26 - 07:42',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 3
-  },
-  {
-    id: 14,
-    round: 'Lượt 2',
-    roundLabel: '07:26–07:42 · Vòng tròn đợt 1 · vòng 2',
-    eventId: 'nam_tc1',
-    eventName: 'Đôi nam trung cấp 1',
-    court: 'Sân 4',
-    time: '07:26 - 07:42',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 2,
-    teamB: 4
-  },
-  {
-    id: 15,
-    round: 'Lượt 2',
-    roundLabel: '07:26–07:42 · Vòng tròn đợt 1 · vòng 2',
-    eventId: 'nam_sc1',
-    eventName: 'Đôi nam sơ cấp 1',
-    court: 'Sân 5',
-    time: '07:26 - 07:42',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 3
-  },
-  {
-    id: 16,
-    round: 'Lượt 2',
-    roundLabel: '07:26–07:42 · Vòng tròn đợt 1 · vòng 2',
-    eventId: 'nam_sc1',
-    eventName: 'Đôi nam sơ cấp 1',
-    court: 'Sân 6',
-    time: '07:26 - 07:42',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 2,
-    teamB: 4
-  },
-  {
-    id: 17,
-    round: 'Lượt 2',
-    roundLabel: '07:26–07:42 · Vòng tròn đợt 1 · vòng 2',
-    eventId: 'nu',
-    eventName: 'Đôi nữ',
-    court: 'Sân 7',
-    time: '07:26 - 07:42',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 2,
-    teamB: 4
-  },
-  {
-    id: 18,
-    round: 'Lượt 2',
-    roundLabel: '07:26–07:42 · Vòng tròn đợt 1 · vòng 2',
-    eventId: 'nu',
-    eventName: 'Đôi nữ',
-    court: 'Sân 8',
-    time: '07:26 - 07:42',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 3
-  },
-  {
-    id: 19,
-    round: 'Lượt 2',
-    roundLabel: '07:26–07:42 · Vòng tròn đợt 1 · vòng 2',
-    eventId: 'nam_sc2',
-    eventName: 'Đôi nam sơ cấp 2',
-    court: 'Sân 9',
-    time: '07:26 - 07:42',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 3
-  },
-  {
-    id: 20,
-    round: 'Lượt 2',
-    roundLabel: '07:26–07:42 · Vòng tròn đợt 1 · vòng 2',
-    eventId: 'nam_sc2',
-    eventName: 'Đôi nam sơ cấp 2',
-    court: 'Sân 10',
-    time: '07:26 - 07:42',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 2,
-    teamB: 4
-  },
-  {
-    id: 21,
-    round: 'Lượt 3',
-    roundLabel: '07:52–08:08 · Vòng tròn đợt 1 · vòng 3',
-    eventId: 'nam_cc1',
-    eventName: 'Đôi nam cao cấp 1',
-    court: 'Sân 1',
-    time: '07:52 - 08:08',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 4
-  },
-  {
-    id: 22,
-    round: 'Lượt 3',
-    roundLabel: '07:52–08:08 · Vòng tròn đợt 1 · vòng 3',
-    eventId: 'nam_cc1',
-    eventName: 'Đôi nam cao cấp 1',
-    court: 'Sân 2',
-    time: '07:52 - 08:08',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 2,
-    teamB: 3
-  },
-  {
-    id: 23,
-    round: 'Lượt 3',
-    roundLabel: '07:52–08:08 · Vòng tròn đợt 1 · vòng 3',
-    eventId: 'nam_tc1',
-    eventName: 'Đôi nam trung cấp 1',
-    court: 'Sân 3',
-    time: '07:52 - 08:08',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 4
-  },
-  {
-    id: 24,
-    round: 'Lượt 3',
-    roundLabel: '07:52–08:08 · Vòng tròn đợt 1 · vòng 3',
-    eventId: 'nam_tc1',
-    eventName: 'Đôi nam trung cấp 1',
-    court: 'Sân 4',
-    time: '07:52 - 08:08',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 2,
-    teamB: 3
-  },
-  {
-    id: 25,
-    round: 'Lượt 3',
-    roundLabel: '07:52–08:08 · Vòng tròn đợt 1 · vòng 3',
-    eventId: 'nam_sc1',
-    eventName: 'Đôi nam sơ cấp 1',
-    court: 'Sân 5',
-    time: '07:52 - 08:08',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 4
-  },
-  {
-    id: 26,
-    round: 'Lượt 3',
-    roundLabel: '07:52–08:08 · Vòng tròn đợt 1 · vòng 3',
-    eventId: 'nam_sc1',
-    eventName: 'Đôi nam sơ cấp 1',
-    court: 'Sân 6',
-    time: '07:52 - 08:08',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 2,
-    teamB: 3
-  },
-  {
-    id: 27,
-    round: 'Lượt 3',
-    roundLabel: '07:52–08:08 · Vòng tròn đợt 1 · vòng 3',
-    eventId: 'nu',
-    eventName: 'Đôi nữ',
-    court: 'Sân 7',
-    time: '07:52 - 08:08',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 2,
-    teamB: 3
-  },
-  {
-    id: 28,
-    round: 'Lượt 3',
-    roundLabel: '07:52–08:08 · Vòng tròn đợt 1 · vòng 3',
-    eventId: 'nu',
-    eventName: 'Đôi nữ',
-    court: 'Sân 8',
-    time: '07:52 - 08:08',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 4
-  },
-  {
-    id: 29,
-    round: 'Lượt 3',
-    roundLabel: '07:52–08:08 · Vòng tròn đợt 1 · vòng 3',
-    eventId: 'nam_sc2',
-    eventName: 'Đôi nam sơ cấp 2',
-    court: 'Sân 9',
-    time: '07:52 - 08:08',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 4
-  },
-  {
-    id: 30,
-    round: 'Lượt 3',
-    roundLabel: '07:52–08:08 · Vòng tròn đợt 1 · vòng 3',
-    eventId: 'nam_sc2',
-    eventName: 'Đôi nam sơ cấp 2',
-    court: 'Sân 10',
-    time: '07:52 - 08:08',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 2,
-    teamB: 3
-  },
-  {
-    id: 31,
-    round: 'Lượt 1',
-    roundLabel: '08:23–08:39 · Vòng tròn đợt 2 · vòng 1',
-    eventId: 'nam_cc2',
-    eventName: 'Đôi nam cao cấp 2',
-    court: 'Sân 1',
-    time: '08:23 - 08:39',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 2
-  },
-  {
-    id: 32,
-    round: 'Lượt 1',
-    roundLabel: '08:23–08:39 · Vòng tròn đợt 2 · vòng 1',
-    eventId: 'nam_cc2',
-    eventName: 'Đôi nam cao cấp 2',
-    court: 'Sân 2',
-    time: '08:23 - 08:39',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 3,
-    teamB: 4
-  },
-  {
-    id: 33,
-    round: 'Lượt 1',
-    roundLabel: '08:23–08:39 · Vòng tròn đợt 2 · vòng 1',
-    eventId: 'nam_tc2',
-    eventName: 'Đôi nam trung cấp 2',
-    court: 'Sân 3',
-    time: '08:23 - 08:39',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 2
-  },
-  {
-    id: 34,
-    round: 'Lượt 1',
-    roundLabel: '08:23–08:39 · Vòng tròn đợt 2 · vòng 1',
-    eventId: 'nam_tc2',
-    eventName: 'Đôi nam trung cấp 2',
-    court: 'Sân 4',
-    time: '08:23 - 08:39',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 3,
-    teamB: 4
-  },
-  {
-    id: 35,
-    round: 'Lượt 1',
-    roundLabel: '08:23–08:39 · Vòng tròn đợt 2 · vòng 1',
-    eventId: 'mix_cc',
-    eventName: 'Đôi nam nữ cao cấp',
-    court: 'Sân 5',
-    time: '08:23 - 08:39',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 2
-  },
-  {
-    id: 36,
-    round: 'Lượt 1',
-    roundLabel: '08:23–08:39 · Vòng tròn đợt 2 · vòng 1',
-    eventId: 'mix_cc',
-    eventName: 'Đôi nam nữ cao cấp',
-    court: 'Sân 6',
-    time: '08:23 - 08:39',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 3,
-    teamB: 4
-  },
-  {
-    id: 37,
-    round: 'Lượt 1',
-    roundLabel: '08:23–08:39 · Vòng tròn đợt 2 · vòng 1',
-    eventId: 'mix_tc',
-    eventName: 'Đôi nam nữ trung cấp',
-    court: 'Sân 7',
-    time: '08:23 - 08:39',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 2
-  },
-  {
-    id: 38,
-    round: 'Lượt 1',
-    roundLabel: '08:23–08:39 · Vòng tròn đợt 2 · vòng 1',
-    eventId: 'mix_tc',
-    eventName: 'Đôi nam nữ trung cấp',
-    court: 'Sân 8',
-    time: '08:23 - 08:39',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 3,
-    teamB: 4
-  },
-  {
-    id: 39,
-    round: 'Lượt 2',
-    roundLabel: '08:49–09:05 · Vòng tròn đợt 2 · vòng 2',
-    eventId: 'nam_cc2',
-    eventName: 'Đôi nam cao cấp 2',
-    court: 'Sân 1',
-    time: '08:49 - 09:05',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 3
-  },
-  {
-    id: 40,
-    round: 'Lượt 2',
-    roundLabel: '08:49–09:05 · Vòng tròn đợt 2 · vòng 2',
-    eventId: 'nam_cc2',
-    eventName: 'Đôi nam cao cấp 2',
-    court: 'Sân 2',
-    time: '08:49 - 09:05',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 2,
-    teamB: 4
-  },
-  {
-    id: 41,
-    round: 'Lượt 2',
-    roundLabel: '08:49–09:05 · Vòng tròn đợt 2 · vòng 2',
-    eventId: 'nam_tc2',
-    eventName: 'Đôi nam trung cấp 2',
-    court: 'Sân 3',
-    time: '08:49 - 09:05',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 3
-  },
-  {
-    id: 42,
-    round: 'Lượt 2',
-    roundLabel: '08:49–09:05 · Vòng tròn đợt 2 · vòng 2',
-    eventId: 'nam_tc2',
-    eventName: 'Đôi nam trung cấp 2',
-    court: 'Sân 4',
-    time: '08:49 - 09:05',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 2,
-    teamB: 4
-  },
-  {
-    id: 43,
-    round: 'Lượt 2',
-    roundLabel: '08:49–09:05 · Vòng tròn đợt 2 · vòng 2',
-    eventId: 'mix_cc',
-    eventName: 'Đôi nam nữ cao cấp',
-    court: 'Sân 5',
-    time: '08:49 - 09:05',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 3
-  },
-  {
-    id: 44,
-    round: 'Lượt 2',
-    roundLabel: '08:49–09:05 · Vòng tròn đợt 2 · vòng 2',
-    eventId: 'mix_cc',
-    eventName: 'Đôi nam nữ cao cấp',
-    court: 'Sân 6',
-    time: '08:49 - 09:05',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 2,
-    teamB: 4
-  },
-  {
-    id: 45,
-    round: 'Lượt 2',
-    roundLabel: '08:49–09:05 · Vòng tròn đợt 2 · vòng 2',
-    eventId: 'mix_tc',
-    eventName: 'Đôi nam nữ trung cấp',
-    court: 'Sân 7',
-    time: '08:49 - 09:05',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 3
-  },
-  {
-    id: 46,
-    round: 'Lượt 2',
-    roundLabel: '08:49–09:05 · Vòng tròn đợt 2 · vòng 2',
-    eventId: 'mix_tc',
-    eventName: 'Đôi nam nữ trung cấp',
-    court: 'Sân 8',
-    time: '08:49 - 09:05',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 2,
-    teamB: 4
-  },
-  {
-    id: 47,
-    round: 'Lượt 3',
-    roundLabel: '09:15–09:31 · Vòng tròn đợt 2 · vòng 3',
-    eventId: 'nam_cc2',
-    eventName: 'Đôi nam cao cấp 2',
-    court: 'Sân 1',
-    time: '09:15 - 09:31',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 4
-  },
-  {
-    id: 48,
-    round: 'Lượt 3',
-    roundLabel: '09:15–09:31 · Vòng tròn đợt 2 · vòng 3',
-    eventId: 'nam_cc2',
-    eventName: 'Đôi nam cao cấp 2',
-    court: 'Sân 2',
-    time: '09:15 - 09:31',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 2,
-    teamB: 3
-  },
-  {
-    id: 49,
-    round: 'Lượt 3',
-    roundLabel: '09:15–09:31 · Vòng tròn đợt 2 · vòng 3',
-    eventId: 'nam_tc2',
-    eventName: 'Đôi nam trung cấp 2',
-    court: 'Sân 3',
-    time: '09:15 - 09:31',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 4
-  },
-  {
-    id: 50,
-    round: 'Lượt 3',
-    roundLabel: '09:15–09:31 · Vòng tròn đợt 2 · vòng 3',
-    eventId: 'nam_tc2',
-    eventName: 'Đôi nam trung cấp 2',
-    court: 'Sân 4',
-    time: '09:15 - 09:31',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 2,
-    teamB: 3
-  },
-  {
-    id: 51,
-    round: 'Lượt 3',
-    roundLabel: '09:15–09:31 · Vòng tròn đợt 2 · vòng 3',
-    eventId: 'mix_cc',
-    eventName: 'Đôi nam nữ cao cấp',
-    court: 'Sân 5',
-    time: '09:15 - 09:31',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 4
-  },
-  {
-    id: 52,
-    round: 'Lượt 3',
-    roundLabel: '09:15–09:31 · Vòng tròn đợt 2 · vòng 3',
-    eventId: 'mix_cc',
-    eventName: 'Đôi nam nữ cao cấp',
-    court: 'Sân 6',
-    time: '09:15 - 09:31',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 2,
-    teamB: 3
-  },
-  {
-    id: 53,
-    round: 'Lượt 3',
-    roundLabel: '09:15–09:31 · Vòng tròn đợt 2 · vòng 3',
-    eventId: 'mix_tc',
-    eventName: 'Đôi nam nữ trung cấp',
-    court: 'Sân 7',
-    time: '09:15 - 09:31',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 1,
-    teamB: 4
-  },
-  {
-    id: 54,
-    round: 'Lượt 3',
-    roundLabel: '09:15–09:31 · Vòng tròn đợt 2 · vòng 3',
-    eventId: 'mix_tc',
-    eventName: 'Đôi nam nữ trung cấp',
-    court: 'Sân 8',
-    time: '09:15 - 09:31',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    teamA: 2,
-    teamB: 3
-  },
-  {
-    id: 55,
-    round: 'Chung kết',
-    roundLabel: '09:46–10:16 · Tranh huy chương',
-    eventId: 'nam_tc2',
-    eventName: 'Đôi nam trung cấp 2',
-    court: 'Sân 1',
-    time: '09:46 - 10:16',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    medalType: 'gold',
-    teamA: 1,
-    teamB: 2,
-    sets: [
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      }
-    ],
-    setsWonA: 0,
-    setsWonB: 0
-  },
-  {
-    id: 56,
-    round: 'Chung kết',
-    roundLabel: '09:46–10:16 · Tranh huy chương',
-    eventId: 'nam_tc2',
-    eventName: 'Đôi nam trung cấp 2',
-    court: 'Sân 2',
-    time: '09:46 - 10:16',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    medalType: 'bronze',
-    teamA: 3,
-    teamB: 4,
-    sets: [
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      }
-    ],
-    setsWonA: 0,
-    setsWonB: 0
-  },
-  {
-    id: 57,
-    round: 'Chung kết',
-    roundLabel: '09:46–10:16 · Tranh huy chương',
-    eventId: 'mix_tc',
-    eventName: 'Đôi nam nữ trung cấp',
-    court: 'Sân 3',
-    time: '09:46 - 10:16',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    medalType: 'gold',
-    teamA: 1,
-    teamB: 2,
-    sets: [
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      }
-    ],
-    setsWonA: 0,
-    setsWonB: 0
-  },
-  {
-    id: 58,
-    round: 'Chung kết',
-    roundLabel: '09:46–10:16 · Tranh huy chương',
-    eventId: 'mix_tc',
-    eventName: 'Đôi nam nữ trung cấp',
-    court: 'Sân 4',
-    time: '09:46 - 10:16',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    medalType: 'bronze',
-    teamA: 3,
-    teamB: 4,
-    sets: [
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      }
-    ],
-    setsWonA: 0,
-    setsWonB: 0
-  },
-  {
-    id: 59,
-    round: 'Chung kết',
-    roundLabel: '10:16–10:46 · Tranh huy chương',
-    eventId: 'mix_cc',
-    eventName: 'Đôi nam nữ cao cấp',
-    court: 'Sân 1',
-    time: '10:16 - 10:46',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    medalType: 'gold',
-    teamA: 1,
-    teamB: 2,
-    sets: [
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      }
-    ],
-    setsWonA: 0,
-    setsWonB: 0
-  },
-  {
-    id: 60,
-    round: 'Chung kết',
-    roundLabel: '10:16–10:46 · Tranh huy chương',
-    eventId: 'mix_cc',
-    eventName: 'Đôi nam nữ cao cấp',
-    court: 'Sân 2',
-    time: '10:16 - 10:46',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    medalType: 'bronze',
-    teamA: 3,
-    teamB: 4,
-    sets: [
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      }
-    ],
-    setsWonA: 0,
-    setsWonB: 0
-  },
-  {
-    id: 61,
-    round: 'Chung kết',
-    roundLabel: '10:46–11:16 · Tranh huy chương',
-    eventId: 'nam_cc2',
-    eventName: 'Đôi nam cao cấp 2',
-    court: 'Sân 1',
-    time: '10:46 - 11:16',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    medalType: 'gold',
-    teamA: 1,
-    teamB: 2,
-    sets: [
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      }
-    ],
-    setsWonA: 0,
-    setsWonB: 0
-  },
-  {
-    id: 62,
-    round: 'Chung kết',
-    roundLabel: '10:46–11:16 · Tranh huy chương',
-    eventId: 'nam_cc2',
-    eventName: 'Đôi nam cao cấp 2',
-    court: 'Sân 2',
-    time: '10:46 - 11:16',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    medalType: 'bronze',
-    teamA: 3,
-    teamB: 4,
-    sets: [
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      }
-    ],
-    setsWonA: 0,
-    setsWonB: 0
-  },
-  {
-    id: 63,
-    round: 'Chung kết',
-    roundLabel: '11:16–11:46 · Tranh huy chương',
-    eventId: 'nam_sc1',
-    eventName: 'Đôi nam sơ cấp 1',
-    court: 'Sân 1',
-    time: '11:16 - 11:46',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    medalType: 'gold',
-    teamA: 1,
-    teamB: 2,
-    sets: [
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      }
-    ],
-    setsWonA: 0,
-    setsWonB: 0
-  },
-  {
-    id: 64,
-    round: 'Chung kết',
-    roundLabel: '11:16–11:46 · Tranh huy chương',
-    eventId: 'nam_sc1',
-    eventName: 'Đôi nam sơ cấp 1',
-    court: 'Sân 2',
-    time: '11:16 - 11:46',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    medalType: 'bronze',
-    teamA: 3,
-    teamB: 4,
-    sets: [
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      }
-    ],
-    setsWonA: 0,
-    setsWonB: 0
-  },
-  {
-    id: 65,
-    round: 'Chung kết',
-    roundLabel: '11:16–11:46 · Tranh huy chương',
-    eventId: 'nam_sc2',
-    eventName: 'Đôi nam sơ cấp 2',
-    court: 'Sân 3',
-    time: '11:16 - 11:46',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    medalType: 'gold',
-    teamA: 1,
-    teamB: 2,
-    sets: [
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      }
-    ],
-    setsWonA: 0,
-    setsWonB: 0
-  },
-  {
-    id: 66,
-    round: 'Chung kết',
-    roundLabel: '11:16–11:46 · Tranh huy chương',
-    eventId: 'nam_sc2',
-    eventName: 'Đôi nam sơ cấp 2',
-    court: 'Sân 4',
-    time: '11:16 - 11:46',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    medalType: 'bronze',
-    teamA: 3,
-    teamB: 4,
-    sets: [
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      }
-    ],
-    setsWonA: 0,
-    setsWonB: 0
-  },
-  {
-    id: 67,
-    round: 'Chung kết',
-    roundLabel: '11:46–12:16 · Tranh huy chương',
-    eventId: 'nam_tc1',
-    eventName: 'Đôi nam trung cấp 1',
-    court: 'Sân 1',
-    time: '11:46 - 12:16',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    medalType: 'gold',
-    teamA: 1,
-    teamB: 2,
-    sets: [
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      }
-    ],
-    setsWonA: 0,
-    setsWonB: 0
-  },
-  {
-    id: 68,
-    round: 'Chung kết',
-    roundLabel: '11:46–12:16 · Tranh huy chương',
-    eventId: 'nam_tc1',
-    eventName: 'Đôi nam trung cấp 1',
-    court: 'Sân 2',
-    time: '11:46 - 12:16',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    medalType: 'bronze',
-    teamA: 3,
-    teamB: 4,
-    sets: [
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      }
-    ],
-    setsWonA: 0,
-    setsWonB: 0
-  },
-  {
-    id: 69,
-    round: 'Chung kết',
-    roundLabel: '11:46–12:16 · Tranh huy chương',
-    eventId: 'nu',
-    eventName: 'Đôi nữ',
-    court: 'Sân 3',
-    time: '11:46 - 12:16',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    medalType: 'gold',
-    teamA: 1,
-    teamB: 2,
-    sets: [
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      }
-    ],
-    setsWonA: 0,
-    setsWonB: 0
-  },
-  {
-    id: 70,
-    round: 'Chung kết',
-    roundLabel: '11:46–12:16 · Tranh huy chương',
-    eventId: 'nu',
-    eventName: 'Đôi nữ',
-    court: 'Sân 4',
-    time: '11:46 - 12:16',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    medalType: 'bronze',
-    teamA: 3,
-    teamB: 4,
-    sets: [
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      }
-    ],
-    setsWonA: 0,
-    setsWonB: 0
-  },
-  {
-    id: 71,
-    round: 'Chung kết',
-    roundLabel: '12:16–12:46 · Tranh huy chương',
-    eventId: 'nam_cc1',
-    eventName: 'Đôi nam cao cấp 1',
-    court: 'Sân 1',
-    time: '12:16 - 12:46',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    medalType: 'gold',
-    teamA: 1,
-    teamB: 2,
-    sets: [
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      }
-    ],
-    setsWonA: 0,
-    setsWonB: 0
-  },
-  {
-    id: 72,
-    round: 'Chung kết',
-    roundLabel: '12:16–12:46 · Tranh huy chương',
-    eventId: 'nam_cc1',
-    eventName: 'Đôi nam cao cấp 1',
-    court: 'Sân 2',
-    time: '12:16 - 12:46',
-    scoreA: 0,
-    scoreB: 0,
-    played: false,
-    medalType: 'bronze',
-    teamA: 3,
-    teamB: 4,
-    sets: [
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      },
-      {
-        scoreA: 0,
-        scoreB: 0
-      }
-    ],
-    setsWonA: 0,
-    setsWonB: 0
-  }
-];
+    // Mỗi dòng: bắt đầu, kết thúc, vòng (1/2/3 hoặc g/b), nội dung, sân, đội A, đội B
+    const MATCH_ROWS = [
+      ['07:00','07:16','1','nam_cc1',1,1,2],
+      ['07:00','07:16','1','nam_cc1',2,3,4],
+      ['07:00','07:16','1','nam_tc1',3,1,2],
+      ['07:00','07:16','1','nam_tc1',4,3,4],
+      ['07:00','07:16','1','nam_sc1',5,1,2],
+      ['07:00','07:16','1','nam_sc1',6,3,4],
+      ['07:00','07:16','1','nu',7,3,4],
+      ['07:00','07:16','1','nu',8,1,2],
+      ['07:00','07:16','1','nam_sc2',9,1,2],
+      ['07:00','07:16','1','nam_sc2',10,3,4],
+      ['07:26','07:42','2','nam_cc1',1,1,3],
+      ['07:26','07:42','2','nam_cc1',2,2,4],
+      ['07:26','07:42','2','nam_tc1',3,1,3],
+      ['07:26','07:42','2','nam_tc1',4,2,4],
+      ['07:26','07:42','2','nam_sc1',5,1,3],
+      ['07:26','07:42','2','nam_sc1',6,2,4],
+      ['07:26','07:42','2','nu',7,2,4],
+      ['07:26','07:42','2','nu',8,1,3],
+      ['07:26','07:42','2','nam_sc2',9,1,3],
+      ['07:26','07:42','2','nam_sc2',10,2,4],
+      ['07:52','08:08','3','nam_cc1',1,1,4],
+      ['07:52','08:08','3','nam_cc1',2,2,3],
+      ['07:52','08:08','3','nam_tc1',3,1,4],
+      ['07:52','08:08','3','nam_tc1',4,2,3],
+      ['07:52','08:08','3','nam_sc1',5,1,4],
+      ['07:52','08:08','3','nam_sc1',6,2,3],
+      ['07:52','08:08','3','nu',7,2,3],
+      ['07:52','08:08','3','nu',8,1,4],
+      ['07:52','08:08','3','nam_sc2',9,1,4],
+      ['07:52','08:08','3','nam_sc2',10,2,3],
+      ['08:23','08:39','1','nam_cc2',1,1,2],
+      ['08:23','08:39','1','nam_cc2',2,3,4],
+      ['08:23','08:39','1','nam_tc2',3,1,2],
+      ['08:23','08:39','1','nam_tc2',4,3,4],
+      ['08:23','08:39','1','mix_cc',5,1,2],
+      ['08:23','08:39','1','mix_cc',6,3,4],
+      ['08:23','08:39','1','mix_tc',7,1,2],
+      ['08:23','08:39','1','mix_tc',8,3,4],
+      ['08:49','09:05','2','nam_cc2',1,1,3],
+      ['08:49','09:05','2','nam_cc2',2,2,4],
+      ['08:49','09:05','2','nam_tc2',3,1,3],
+      ['08:49','09:05','2','nam_tc2',4,2,4],
+      ['08:49','09:05','2','mix_cc',5,1,3],
+      ['08:49','09:05','2','mix_cc',6,2,4],
+      ['08:49','09:05','2','mix_tc',7,1,3],
+      ['08:49','09:05','2','mix_tc',8,2,4],
+      ['09:15','09:31','3','nam_cc2',1,1,4],
+      ['09:15','09:31','3','nam_cc2',2,2,3],
+      ['09:15','09:31','3','nam_tc2',3,1,4],
+      ['09:15','09:31','3','nam_tc2',4,2,3],
+      ['09:15','09:31','3','mix_cc',5,1,4],
+      ['09:15','09:31','3','mix_cc',6,2,3],
+      ['09:15','09:31','3','mix_tc',7,1,4],
+      ['09:15','09:31','3','mix_tc',8,2,3],
+      ['09:46','10:16','g','nam_tc2',1,1,2],
+      ['09:46','10:16','b','nam_tc2',2,3,4],
+      ['09:46','10:16','g','mix_tc',3,1,2],
+      ['09:46','10:16','b','mix_tc',4,3,4],
+      ['10:16','10:46','g','mix_cc',1,1,2],
+      ['10:16','10:46','b','mix_cc',2,3,4],
+      ['10:46','11:16','g','nam_cc2',1,1,2],
+      ['10:46','11:16','b','nam_cc2',2,3,4],
+      ['11:16','11:46','g','nam_sc1',1,1,2],
+      ['11:16','11:46','b','nam_sc1',2,3,4],
+      ['11:16','11:46','g','nam_sc2',3,1,2],
+      ['11:16','11:46','b','nam_sc2',4,3,4],
+      ['11:46','12:16','g','nam_tc1',1,1,2],
+      ['11:46','12:16','b','nam_tc1',2,3,4],
+      ['11:46','12:16','g','nu',3,1,2],
+      ['11:46','12:16','b','nu',4,3,4],
+      ['12:16','12:46','g','nam_cc1',1,1,2],
+      ['12:16','12:46','b','nam_cc1',2,3,4]
+    ];
 
     let MATCHES = [];
 
     function init72Matches() {
-      MATCHES = MATCH_SCHEDULE.map(m => {
-        const copy = { ...m };
-        if (m.sets) {
-          copy.sets = m.sets.map(s => ({ ...s }));
+      const eventName = Object.fromEntries(TOURNAMENT_EVENTS.map(event => [event.id, event.name]));
+      const wave1 = new Set(['nam_cc1', 'nam_tc1', 'nam_sc1', 'nam_sc2', 'nu']);
+      MATCHES = MATCH_ROWS.map((row, index) => {
+        const [start, end, kind, eventId, court, teamA, teamB] = row;
+        const isMedal = kind === 'g' || kind === 'b';
+        const match = {
+          id: index + 1,
+          sheetKey: sheetKeyFor(kind, eventId, teamA, teamB),
+          round: isMedal ? 'Chung kết' : 'Lượt ' + kind,
+          roundLabel: isMedal
+            ? start + '–' + end + ' · Tranh huy chương'
+            : start + '–' + end + ' · Vòng tròn ' + (wave1.has(eventId) ? 'đợt 1' : 'đợt 2') + ' · vòng ' + kind,
+          eventId,
+          eventName: eventName[eventId],
+          court: 'Sân ' + court,
+          time: start + ' - ' + end,
+          teamA,
+          teamB,
+          scoreA: 0,
+          scoreB: 0,
+          played: false,
+        };
+        if (isMedal) {
+          match.medalType = kind === 'g' ? 'gold' : 'bronze';
+          match.sets = [
+            { scoreA: 0, scoreB: 0 },
+            { scoreA: 0, scoreB: 0 },
+            { scoreA: 0, scoreB: 0 },
+          ];
+          match.setsWonA = 0;
+          match.setsWonB = 0;
         }
-        return copy;
+        return match;
       });
     }
 
@@ -4087,16 +2966,66 @@
       renderMatchesList();
     }
 
+    function foldName(value) {
+      return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase();
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (ch) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[ch]));
+    }
+
+    function highlightPair(text, query) {
+      const needle = foldName(query);
+      return String(text).split(' & ').map((name) => {
+        const safe = escapeHtml(name);
+        return needle && foldName(name).includes(needle) ? `<mark>${safe}</mark>` : safe;
+      }).join(' & ');
+    }
+
+    function eventHasResults(eventId) {
+      return MATCHES.some((match) => match.eventId === eventId && match.round !== 'Chung kết' && match.played);
+    }
+
+    function matchIncludesPlayer(match, query) {
+      const needle = foldName(query);
+      if (!needle) return true;
+      const pairs = EVENT_PAIRS[match.eventId] || {};
+      if (match.round !== 'Chung kết' || eventHasResults(match.eventId)) {
+        const pairA = pairs['t' + match.teamA] || '';
+        const pairB = pairs['t' + match.teamB] || '';
+        return foldName(pairA).includes(needle) || foldName(pairB).includes(needle);
+      }
+      return Object.values(pairs).some((text) => foldName(text).includes(needle));
+    }
+
+    function fillPlayerNames() {
+      const list = document.getElementById('playerNameList');
+      if (!list) return;
+      const names = new Set();
+      Object.values(EVENT_PAIRS).forEach((pairs) => {
+        Object.values(pairs).forEach((text) => {
+          String(text).split(' & ').forEach((name) => names.add(name.trim()));
+        });
+      });
+      list.innerHTML = [...names]
+        .sort((a, b) => a.localeCompare(b, 'vi'))
+        .map((name) => `<option value="${escapeHtml(name)}"></option>`)
+        .join('');
+    }
+
     function renderMatchesList() {
       const courtFilter = document.getElementById('courtFilter').value;
       const teamFilter = document.getElementById('teamFilter').value;
+      const playerQuery = (document.getElementById('playerFilter')?.value || '').trim();
       const container = document.getElementById('matchesListContainer');
 
       let filtered = MATCHES.filter(m => {
         const matchRound = (currentRoundFilter === 'all') || (m.round === currentRoundFilter);
         const matchCourt = (courtFilter === 'all') || (m.court === courtFilter);
         const matchTeam = (teamFilter === 'all') || (m.teamA == teamFilter || m.teamB == teamFilter);
-        return matchRound && matchCourt && matchTeam;
+        return matchRound && matchCourt && matchTeam && matchIncludesPlayer(m, playerQuery);
       });
 
       // Nhóm theo khung giờ / vòng đấu, sắp xếp theo thời gian
@@ -4116,9 +3045,17 @@
         const tb = grouped[b][0]?.time || '';
         return ta.localeCompare(tb) || a.localeCompare(b);
       });
+      const allTimes = {};
+      MATCHES.forEach((match) => {
+        if (!allTimes[match.roundLabel]) allTimes[match.roundLabel] = match.time || '';
+      });
+      const allLabels = Object.keys(allTimes).sort((a, b) => allTimes[a].localeCompare(allTimes[b]) || a.localeCompare(b));
+      const playerSummary = playerQuery
+        ? `<div class="player-filter-summary">${filtered.length} trận có tên khớp với “${escapeHtml(playerQuery)}”. Tranh huy chương hiện cả trận vàng và đồng khi vòng tròn chưa xong.</div>`
+        : '';
 
       if (groupLabels.length === 0) {
-        container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted);">Không tìm thấy trận đấu phù hợp</div>`;
+        container.innerHTML = playerSummary + `<div style="text-align:center; padding:30px; color:var(--text-muted);">Không tìm thấy trận đấu phù hợp</div>`;
         return;
       }
 
@@ -4132,7 +3069,7 @@
       }
 
       container.innerHTML = groupLabels.map((label, idx) => {
-        const isCollapsed = !!collapsedRounds[label];
+        const isCollapsed = playerQuery ? false : !!collapsedRounds[label];
         const safeId = 'roundGroup_' + idx;
         const encodedLabel = encodeURIComponent(label);
         const currentMatches = grouped[label];
@@ -4143,7 +3080,8 @@
           const previousMatches = grouped[previousLabel];
           const previousTime = parseSlotTime(previousMatches[0]);
           const gap = clockMinutes(currentTime.start) - clockMinutes(previousTime.end);
-          if (gap >= 15) {
+          const adjacent = allLabels.indexOf(label) === allLabels.indexOf(previousLabel) + 1;
+          if (adjacent && gap >= 15) {
             const prevIsRr = previousMatches.every(m => m.round !== 'Chung kết');
             const currIsMedal = currentMatches.every(m => m.round === 'Chung kết');
             const restLabel = prevIsRr && currIsMedal
@@ -4159,6 +3097,7 @@
         }
 
         return `
+          ${idx === 0 ? playerSummary : ''}
           ${restHtml}
           <div class="round-group ${isCollapsed ? 'collapsed' : ''}" id="${safeId}" data-label="${label}">
             <div class="round-group-header" onclick="toggleRoundGroup('${encodedLabel}', '${safeId}')" role="button" tabindex="0" title="Nhấn để ${isCollapsed ? 'mở rộng' : 'thu gọn'}">
@@ -4210,19 +3149,20 @@
                       </div>
                     </div>
                     ${seedHint ? `<div class="match-sets-detail"><i class="fa-solid fa-ranking-star"></i> ${seedHint}</div>` : ''}
+                    ${playerQuery && isMedalMatch && !eventHasResults(m.eventId) ? `<div class="match-sets-detail">Có tên trong nội dung này. Hạng vòng tròn chưa chốt.</div>` : ''}
 
                     <div class="match-teams-box">
                       <div class="match-team-row">
                         <div class="match-team-info">
                           <span class="event-pair-badge t${m.teamA}" title="${TEAM_NAMES[m.teamA]}">T${m.teamA}</span>
-                          <span>${pairA}</span>
+                          <span>${highlightPair(pairA, playerQuery)}</span>
                         </div>
                         <span class="match-score-pill ${isWinnerA ? 'winner' : ''}">${scoreDisplayA}</span>
                       </div>
                       <div class="match-team-row">
                         <div class="match-team-info">
                           <span class="event-pair-badge t${m.teamB}" title="${TEAM_NAMES[m.teamB]}">T${m.teamB}</span>
-                          <span>${pairB}</span>
+                          <span>${highlightPair(pairB, playerQuery)}</span>
                         </div>
                         <span class="match-score-pill ${isWinnerB ? 'winner' : ''}">${scoreDisplayB}</span>
                       </div>
@@ -4348,6 +3288,7 @@
       }
 
       closeScoreModal();
+      persistHtmlScores();
       renderMatchesBoard();
     }
 
@@ -4403,6 +3344,7 @@
           m.scoreB = m.scoreA === 25 ? Math.floor(Math.random() * 8) + 15 : 25;
         }
       });
+      persistHtmlScores();
       renderMatchesBoard();
     }
 
@@ -4417,6 +3359,7 @@
           m.setsWonB = 0;
         }
       });
+      persistHtmlScores();
       renderMatchesBoard();
     }
 
@@ -4650,13 +3593,46 @@
     const SPREADSHEET_ID = "18NLI0v073EIZezHwbwKx5zfrHNTarPx899hNCJBqSBg";
     let currentPlayers = [];
 
+    function publishPlayers(players) {
+      currentPlayers = players;
+      document.getElementById('loadingSpinner').style.display = 'none';
+      document.getElementById('statTotal').innerText = currentPlayers.length;
+      document.getElementById('statMale').innerText = currentPlayers.filter(p => p.gender === 'Nam').length;
+      document.getElementById('statFemale').innerText = currentPlayers.filter(p => p.gender === 'Nữ').length;
+      document.getElementById('statTierS').innerText = currentPlayers.filter(p => p.rank === 'S').length;
+      document.getElementById('statTierAplus').innerText = currentPlayers.filter(p => p.rank === 'A+').length;
+      document.getElementById('statTierA').innerText = currentPlayers.filter(p => p.rank === 'A').length;
+      document.getElementById('statTierB').innerText = currentPlayers.filter(p => p.rank === 'B').length;
+      document.getElementById('statTierC').innerText = currentPlayers.filter(p => p.rank === 'C').length;
+      document.getElementById('statTierD').innerText = currentPlayers.filter(p => p.rank === 'D').length;
+      applyFilters();
+    }
+
+    function loadLocalPlayers() {
+      publishPlayers(Object.values(INITIAL_TEAMS_DATA).flatMap(team => team.players.map(player => ({
+        id: player.id,
+        name: player.name,
+        gender: player.gender,
+        rank: player.tier,
+        score: Number(player.score).toFixed(2),
+        email: player.email || '',
+      }))));
+    }
+
     function syncFromGoogleSheet() {
+      const spinner = document.getElementById('loadingSpinner');
+      const spinnerText = spinner.querySelector('div:last-child');
+      spinner.style.display = '';
+      spinner.querySelector('.spinner').style.display = '';
+      spinnerText.textContent = 'Đang đồng bộ dữ liệu người chơi...';
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
       const gvizUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&tq=&timestamp=${Date.now()}`;
-      fetch(gvizUrl)
+      fetch(gvizUrl, { signal: controller.signal })
         .then(r => r.text())
         .then(t => {
           const m = t.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/);
-          if (!m) return;
+          if (!m) throw new Error('Sheet không trả dữ liệu');
           const json = JSON.parse(m[1]);
           const cols = json.table.cols.map(c => (c && c.label) || '');
           const rows = json.table.rows.map(r => {
@@ -4665,7 +3641,7 @@
             return obj;
           });
 
-          currentPlayers = rows.map((r, idx) => {
+          publishPlayers(rows.map((r, idx) => {
             const name = r['Họ và tên'] || r['Họ tên'] || r['Name'] || `VĐV ${idx + 1}`;
             const gender = r['Giới tính'] || 'Nam';
             let tier = String(r['Hạng kỹ năng'] || r['Hạng'] || 'B').toUpperCase().trim();
@@ -4678,24 +3654,15 @@
 
             const score = parseFloat(r['Điểm'] || 2.5).toFixed(2);
             return { id: idx + 1, name, gender, rank: tier, score, email: r['Email'] || '' };
-          });
-
-          document.getElementById('loadingSpinner').style.display = 'none';
-          document.getElementById('statTotal').innerText = currentPlayers.length;
-          document.getElementById('statMale').innerText = currentPlayers.filter(p => p.gender === 'Nam').length;
-          document.getElementById('statFemale').innerText = currentPlayers.filter(p => p.gender === 'Nữ').length;
-          document.getElementById('statTierS').innerText = currentPlayers.filter(p => p.rank === 'S').length;
-          document.getElementById('statTierAplus').innerText = currentPlayers.filter(p => p.rank === 'A+').length;
-          document.getElementById('statTierA').innerText = currentPlayers.filter(p => p.rank === 'A').length;
-          document.getElementById('statTierB').innerText = currentPlayers.filter(p => p.rank === 'B').length;
-          document.getElementById('statTierC').innerText = currentPlayers.filter(p => p.rank === 'C').length;
-          document.getElementById('statTierD').innerText = currentPlayers.filter(p => p.rank === 'D').length;
-
-          applyFilters();
+          }));
         })
         .catch(() => {
-          document.getElementById('loadingSpinner').style.display = 'none';
-        });
+          loadLocalPlayers();
+          spinner.style.display = '';
+          spinner.querySelector('.spinner').style.display = 'none';
+          spinnerText.textContent = 'Không tải được Google Sheet. Đang hiện danh sách có sẵn trong file.';
+        })
+        .finally(() => clearTimeout(timer));
     }
 
     function applyFilters() {
@@ -4747,14 +3714,531 @@
     }
 
     // =========================================================
+    // ĐIỂM TRẬN TỪ GOOGLE SHEET THỨ TỰ TRẬN
+    // =========================================================
+    const SHEET_EVENT_IDS = {
+      nam_cc1: 'md-s',
+      nam_cc2: 'md-ap',
+      nam_tc1: 'md-a1',
+      nam_tc2: 'md-a2',
+      nam_sc1: 'md-b1',
+      nam_sc2: 'md-b2',
+      mix_cc: 'xd-open',
+      mix_tc: 'xd-b',
+      nu: 'wd',
+    };
+    const HTML_SCORE_CACHE_KEY = 'nab-hbc-html-scores-v1';
+    const HTML_SHEET_LINK_KEY = 'nab-hbc-html-score-sheet';
+    const HTML_SCRIPT_URL_KEY = 'nab-hbc-html-score-script';
+    const SHEET_APPS_SCRIPT = [
+      'function doPost(e) {',
+      '  var raw = (e.parameter && e.parameter.payload) || (e.postData && e.postData.contents) || "{}";',
+      '  var body = JSON.parse(raw);',
+      '  var book = SpreadsheetApp.getActiveSpreadsheet();',
+      '  var sheet = book.getSheetByName("Thu tu tran") || book.getSheets()[0];',
+      '  var values = sheet.getDataRange().getValues();',
+      '  var header = values[0].map(function (cell) { return String(cell).trim(); });',
+      '  function col(name) { return header.indexOf(name); }',
+      '  var idCol = col("Mã trận");',
+      '  if (idCol < 0) idCol = col("id");',
+      '  var n1 = col("Nhà 1"), k1 = col("Khách 1");',
+      '  var n2 = col("Nhà 2"), k2 = col("Khách 2");',
+      '  var n3 = col("Nhà 3"), k3 = col("Khách 3");',
+      '  var rows = {};',
+      '  for (var i = 1; i < values.length; i++) {',
+      '    var id = String(values[i][idCol] || "").trim();',
+      '    if (id) rows[id] = i + 1;',
+      '  }',
+      '  var updated = 0;',
+      '  (body.matches || []).forEach(function (match) {',
+      '    var row = rows[match.id];',
+      '    if (!row) return;',
+      '    function put(index, value) {',
+      '      if (index < 0) return;',
+      '      sheet.getRange(row, index + 1).setValue(value === "" || value == null ? "" : value);',
+      '    }',
+      '    var sets = match.sets || [];',
+      '    put(n1, sets[0] ? sets[0][0] : "");',
+      '    put(k1, sets[0] ? sets[0][1] : "");',
+      '    put(n2, sets[1] ? sets[1][0] : (match.rr ? "—" : ""));',
+      '    put(k2, sets[1] ? sets[1][1] : (match.rr ? "—" : ""));',
+      '    put(n3, sets[2] ? sets[2][0] : (match.rr ? "—" : ""));',
+      '    put(k3, sets[2] ? sets[2][1] : (match.rr ? "—" : ""));',
+      '    updated++;',
+      '  });',
+      '  return ContentService.createTextOutput(JSON.stringify({ ok: true, updated: updated }))',
+      '    .setMimeType(ContentService.MimeType.JSON);',
+      '}',
+      '',
+      'function doGet() {',
+      '  return ContentService.createTextOutput("nab-hbc-ok");',
+      '}',
+    ].join('\n');
+
+    const SHEET_MATCH_IDS = {
+      'nam_cc1|1|1|2': 'md-s-rr1-c1',
+      'nam_cc1|1|3|4': 'md-s-rr1-c2',
+      'nam_tc1|1|1|2': 'md-a1-rr1-c5',
+      'nam_tc1|1|3|4': 'md-a1-rr1-c6',
+      'nam_sc1|1|1|2': 'md-b1-rr1-c7',
+      'nam_sc1|1|3|4': 'md-b1-rr1-c8',
+      'nu|1|3|4': 'wd-rr1-c10',
+      'nu|1|1|2': 'wd-rr1-c9',
+      'nam_sc2|1|1|2': 'md-b2-rr1-c3',
+      'nam_sc2|1|3|4': 'md-b2-rr1-c4',
+      'nam_cc1|2|1|3': 'md-s-rr2-c1',
+      'nam_cc1|2|2|4': 'md-s-rr2-c2',
+      'nam_tc1|2|1|3': 'md-a1-rr2-c5',
+      'nam_tc1|2|2|4': 'md-a1-rr2-c6',
+      'nam_sc1|2|1|3': 'md-b1-rr2-c7',
+      'nam_sc1|2|2|4': 'md-b1-rr2-c8',
+      'nu|2|2|4': 'wd-rr2-c10',
+      'nu|2|1|3': 'wd-rr2-c9',
+      'nam_sc2|2|1|3': 'md-b2-rr2-c3',
+      'nam_sc2|2|2|4': 'md-b2-rr2-c4',
+      'nam_cc1|3|1|4': 'md-s-rr3-c1',
+      'nam_cc1|3|2|3': 'md-s-rr3-c2',
+      'nam_tc1|3|1|4': 'md-a1-rr3-c5',
+      'nam_tc1|3|2|3': 'md-a1-rr3-c6',
+      'nam_sc1|3|1|4': 'md-b1-rr3-c7',
+      'nam_sc1|3|2|3': 'md-b1-rr3-c8',
+      'nu|3|2|3': 'wd-rr3-c10',
+      'nu|3|1|4': 'wd-rr3-c9',
+      'nam_sc2|3|1|4': 'md-b2-rr3-c3',
+      'nam_sc2|3|2|3': 'md-b2-rr3-c4',
+      'nam_cc2|1|1|2': 'md-ap-rr1-c3',
+      'nam_cc2|1|3|4': 'md-ap-rr1-c4',
+      'nam_tc2|1|1|2': 'md-a2-rr1-c1',
+      'nam_tc2|1|3|4': 'md-a2-rr1-c2',
+      'mix_cc|1|1|2': 'xd-open-rr1-c5',
+      'mix_cc|1|3|4': 'xd-open-rr1-c6',
+      'mix_tc|1|1|2': 'xd-b-rr1-c7',
+      'mix_tc|1|3|4': 'xd-b-rr1-c8',
+      'nam_cc2|2|1|3': 'md-ap-rr2-c3',
+      'nam_cc2|2|2|4': 'md-ap-rr2-c4',
+      'nam_tc2|2|1|3': 'md-a2-rr2-c1',
+      'nam_tc2|2|2|4': 'md-a2-rr2-c2',
+      'mix_cc|2|1|3': 'xd-open-rr2-c5',
+      'mix_cc|2|2|4': 'xd-open-rr2-c6',
+      'mix_tc|2|1|3': 'xd-b-rr2-c7',
+      'mix_tc|2|2|4': 'xd-b-rr2-c8',
+      'nam_cc2|3|1|4': 'md-ap-rr3-c3',
+      'nam_cc2|3|2|3': 'md-ap-rr3-c4',
+      'nam_tc2|3|1|4': 'md-a2-rr3-c1',
+      'nam_tc2|3|2|3': 'md-a2-rr3-c2',
+      'mix_cc|3|1|4': 'xd-open-rr3-c5',
+      'mix_cc|3|2|3': 'xd-open-rr3-c6',
+      'mix_tc|3|1|4': 'xd-b-rr3-c7',
+      'mix_tc|3|2|3': 'xd-b-rr3-c8',
+      'nam_tc2|g|1|2': 'md-a2-gold',
+      'nam_tc2|b|3|4': 'md-a2-bronze',
+      'mix_tc|g|1|2': 'xd-b-gold',
+      'mix_tc|b|3|4': 'xd-b-bronze',
+      'mix_cc|g|1|2': 'xd-open-gold',
+      'mix_cc|b|3|4': 'xd-open-bronze',
+      'nam_cc2|g|1|2': 'md-ap-gold',
+      'nam_cc2|b|3|4': 'md-ap-bronze',
+      'nam_sc1|g|1|2': 'md-b1-gold',
+      'nam_sc1|b|3|4': 'md-b1-bronze',
+      'nam_sc2|g|1|2': 'md-b2-gold',
+      'nam_sc2|b|3|4': 'md-b2-bronze',
+      'nam_tc1|g|1|2': 'md-a1-gold',
+      'nam_tc1|b|3|4': 'md-a1-bronze',
+      'nu|g|1|2': 'wd-gold',
+      'nu|b|3|4': 'wd-bronze',
+      'nam_cc1|g|1|2': 'md-s-gold',
+      'nam_cc1|b|3|4': 'md-s-bronze',
+    };
+
+    function sheetKeyFor(kind, eventId, teamA, teamB) {
+      return SHEET_MATCH_IDS[eventId + '|' + kind + '|' + teamA + '|' + teamB] || '';
+    }
+
+    function setSheetStatus(message, withChangeLink) {
+      const el = document.getElementById('sheetScoreStatus');
+      if (!el) return;
+      el.textContent = message || '';
+      if (withChangeLink) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = 'Đổi link Sheet';
+        button.onclick = () => loadScoresFromSheet(true);
+        el.appendChild(button);
+      }
+    }
+
+    function readStoredSheetLink() {
+      try {
+        return JSON.parse(localStorage.getItem(HTML_SHEET_LINK_KEY) || '{}');
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function parseSheetLink(value) {
+      const text = String(value || '').trim();
+      const id = text.match(/spreadsheets\/d\/([a-zA-Z0-9-_]+)/)?.[1] || (/^[a-zA-Z0-9-_]{20,}$/.test(text) ? text : '');
+      const gid = text.match(/[?&#]gid=(\d+)/)?.[1] || '';
+      return { id, gid };
+    }
+
+    function askSheetLink() {
+      const current = readStoredSheetLink();
+      const seed = current.id ? 'https://docs.google.com/spreadsheets/d/' + current.id + '/edit' + (current.gid ? '?gid=' + current.gid : '') : '';
+      const pasted = prompt('Dán link Google Sheet của file Thứ tự trận. File cần chia sẻ: Bất kỳ ai có đường liên kết.', seed);
+      if (pasted == null) return null;
+      const link = parseSheetLink(pasted);
+      if (!link.id) {
+        setSheetStatus('Link Google Sheet chưa đúng.');
+        return null;
+      }
+      localStorage.setItem(HTML_SHEET_LINK_KEY, JSON.stringify(link));
+      return link;
+    }
+
+    function sheetCellBlank(value) {
+      const text = String(value ?? '').trim();
+      return text === '' || text === '—' || text === '–' || text === '-' || text === 'null';
+    }
+
+    function sheetPoint(value) {
+      if (sheetCellBlank(value)) return null;
+      const number = Number(value);
+      return Number.isInteger(number) && number >= 0 ? number : null;
+    }
+
+    function readSheetSet(row, setNumber) {
+      const home = sheetPoint(row['Nhà ' + setNumber]);
+      const away = sheetPoint(row['Khách ' + setNumber]);
+      if (home == null && away == null) return null;
+      if (home == null || away == null) return null;
+      if (home === 0 && away === 0) return null;
+      return { scoreA: home, scoreB: away };
+    }
+
+    function clearMatchScore(match) {
+      match.scoreA = 0;
+      match.scoreB = 0;
+      match.played = false;
+      if (match.round === 'Chung kết') {
+        match.sets = [{ scoreA: 0, scoreB: 0 }, { scoreA: 0, scoreB: 0 }, { scoreA: 0, scoreB: 0 }];
+        match.setsWonA = 0;
+        match.setsWonB = 0;
+      }
+    }
+
+    function applyWalkover(match, homeWins) {
+      if (match.round === 'Chung kết') {
+        match.sets = homeWins
+          ? [{ scoreA: 17, scoreB: 0 }, { scoreA: 17, scoreB: 0 }, { scoreA: 0, scoreB: 0 }]
+          : [{ scoreA: 0, scoreB: 17 }, { scoreA: 0, scoreB: 17 }, { scoreA: 0, scoreB: 0 }];
+        match.setsWonA = homeWins ? 2 : 0;
+        match.setsWonB = homeWins ? 0 : 2;
+        match.scoreA = homeWins ? 34 : 0;
+        match.scoreB = homeWins ? 0 : 34;
+      } else {
+        match.scoreA = homeWins ? 25 : 0;
+        match.scoreB = homeWins ? 0 : 25;
+      }
+      match.played = true;
+    }
+
+    function sheetRowKey(row) {
+      const direct = String(row['Mã trận'] || row.id || row.ID || '').trim();
+      if (direct) return direct;
+      const event = TOURNAMENT_EVENTS.find((item) => foldName(item.name) === foldName(row['Nội dung']));
+      const webId = event ? SHEET_EVENT_IDS[event.id] : '';
+      const stage = String(row['Giai đoạn'] || '').toLowerCase();
+      if (!webId || !stage) return '';
+      if (stage.includes('vàng') || stage.includes('vang')) return webId + '-gold';
+      if (stage.includes('đồng') || stage.includes('dong')) return webId + '-bronze';
+      const round = Number(stage.match(/v[oò]ng tr[oò]n\s*(\d+)/)?.[1]);
+      const court = Number(row['Sân']);
+      if (!round || !court) return '';
+      return webId + '-rr' + round + '-c' + court;
+    }
+
+    function applySheetScoreRow(row) {
+      const key = sheetRowKey(row);
+      const match = MATCHES.find((item) => item.sheetKey === key);
+      if (!match) return 'skip';
+      const walkover = String(row['Walk-over'] || row.walkover || '').trim().toLowerCase();
+      const set1 = readSheetSet(row, 1);
+      if (!set1 && (walkover.includes('nhà') || walkover.includes('khách') || walkover === 'home' || walkover === 'away')) {
+        applyWalkover(match, walkover.includes('nhà') || walkover === 'home');
+        return 'filled';
+      }
+      if (match.round === 'Chung kết') {
+        const sets = [1, 2, 3].map((setNumber) => readSheetSet(row, setNumber));
+        if (!sets.some(Boolean)) {
+          clearMatchScore(match);
+          return 'empty';
+        }
+        match.sets = sets.map((set) => set || { scoreA: 0, scoreB: 0 });
+        let wonA = 0;
+        let wonB = 0;
+        let totalA = 0;
+        let totalB = 0;
+        match.sets.forEach((set) => {
+          if (!set.scoreA && !set.scoreB) return;
+          if (set.scoreA > set.scoreB) wonA += 1;
+          else if (set.scoreB > set.scoreA) wonB += 1;
+          totalA += set.scoreA;
+          totalB += set.scoreB;
+        });
+        match.setsWonA = wonA;
+        match.setsWonB = wonB;
+        match.scoreA = totalA;
+        match.scoreB = totalB;
+        match.played = wonA > 0 || wonB > 0;
+        return match.played ? 'filled' : 'empty';
+      }
+      if (!set1) {
+        clearMatchScore(match);
+        return 'empty';
+      }
+      match.scoreA = set1.scoreA;
+      match.scoreB = set1.scoreB;
+      match.played = true;
+      return 'filled';
+    }
+
+    function gvizTable(text) {
+      const matched = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/);
+      if (!matched) {
+        throw new Error('Sheet không mở được. Hãy chia sẻ: Bất kỳ ai có đường liên kết, quyền Người xem.');
+      }
+      const json = JSON.parse(matched[1]);
+      if (json.status === 'error') {
+        const detail = json.errors && json.errors[0] && (json.errors[0].detailed_message || json.errors[0].message);
+        throw new Error(detail || 'Không đọc được Sheet');
+      }
+      const columns = json.table.cols.map((column) => String((column && column.label) || '').trim());
+      return json.table.rows.map((row) => {
+        const record = {};
+        (row.c || []).forEach((cell, index) => {
+          record[columns[index]] = cell ? (cell.v !== null && cell.v !== undefined ? cell.v : (cell.f || '')) : '';
+        });
+        return record;
+      });
+    }
+
+    async function fetchSheetRows(link) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 12000);
+      const base = 'https://docs.google.com/spreadsheets/d/' + link.id + '/gviz/tq?tqx=out:json&timestamp=' + Date.now();
+      const urls = link.gid
+        ? [base + '&gid=' + link.gid]
+        : [base + '&sheet=' + encodeURIComponent('Thu tu tran'), base];
+      try {
+        let lastError = null;
+        for (const url of urls) {
+          try {
+            const response = await fetch(url, { signal: controller.signal });
+            const rows = gvizTable(await response.text());
+            const usable = rows.some((row) => row['Mã trận'] || row['Nhà 1'] || row['Nội dung']);
+            if (usable || urls.length === 1) return rows;
+          } catch (error) {
+            lastError = error;
+          }
+        }
+        throw lastError || new Error('Không đọc được Sheet');
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    function persistHtmlScores() {
+      const data = {};
+      MATCHES.forEach((match) => {
+        if (!match.played || !match.sheetKey) return;
+        data[match.sheetKey] = {
+          scoreA: match.scoreA,
+          scoreB: match.scoreB,
+          played: true,
+          sets: match.sets,
+          setsWonA: match.setsWonA,
+          setsWonB: match.setsWonB,
+        };
+      });
+      localStorage.setItem(HTML_SCORE_CACHE_KEY, JSON.stringify(data));
+    }
+
+    function restoreHtmlScores() {
+      try {
+        const data = JSON.parse(localStorage.getItem(HTML_SCORE_CACHE_KEY) || '{}');
+        MATCHES.forEach((match) => {
+          const saved = data[match.sheetKey];
+          if (!saved) return;
+          match.scoreA = saved.scoreA;
+          match.scoreB = saved.scoreB;
+          match.played = !!saved.played;
+          if (match.round === 'Chung kết' && saved.sets) {
+            match.sets = saved.sets;
+            match.setsWonA = saved.setsWonA || 0;
+            match.setsWonB = saved.setsWonB || 0;
+          }
+        });
+      } catch (error) {
+        localStorage.removeItem(HTML_SCORE_CACHE_KEY);
+      }
+    }
+
+    async function loadScoresFromSheet(forcePrompt) {
+      const link = forcePrompt || !readStoredSheetLink().id ? askSheetLink() : readStoredSheetLink();
+      if (!link || !link.id) return;
+      setSheetStatus('Đang tải điểm từ Google Sheet…');
+      try {
+        const rows = await fetchSheetRows(link);
+        let filled = 0;
+        let known = 0;
+        rows.forEach((row) => {
+          const result = applySheetScoreRow(row);
+          if (result === 'skip') return;
+          known += 1;
+          if (result === 'filled') filled += 1;
+        });
+        if (!known) {
+          setSheetStatus('File này không có cột Mã trận hoặc Nhà 1. Hãy dùng file Xuất Excel thứ tự trận.', true);
+          return;
+        }
+        persistHtmlScores();
+        renderMatchesBoard();
+        setSheetStatus('Đã tải ' + filled + ' trận có điểm từ Google Sheet. ' + (known - filled) + ' trận chưa có điểm.', true);
+      } catch (error) {
+        const message = error && error.name === 'AbortError'
+          ? 'Google Sheet không phản hồi. Kiểm tra mạng hoặc quyền chia sẻ công khai.'
+          : (error && error.message) || 'Không tải được Google Sheet.';
+        setSheetStatus(message, true);
+      }
+    }
+
+    function scorePayload() {
+      return {
+        matches: MATCHES.filter((match) => match.sheetKey).map((match) => {
+          const rr = match.round !== 'Chung kết';
+          const sets = !match.played
+            ? []
+            : rr
+              ? [[match.scoreA, match.scoreB]]
+              : (match.sets || [])
+                .filter((set) => set.scoreA || set.scoreB)
+                .map((set) => [set.scoreA, set.scoreB]);
+          return { id: match.sheetKey, rr, sets };
+        }),
+      };
+    }
+
+    function postScoresToScript(url, payload) {
+      const iframe = document.createElement('iframe');
+      iframe.name = 'nabSheetSink';
+      iframe.style.display = 'none';
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = url;
+      form.target = iframe.name;
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'payload';
+      input.value = JSON.stringify(payload);
+      form.appendChild(input);
+      document.body.appendChild(iframe);
+      document.body.appendChild(form);
+      form.submit();
+      setTimeout(() => {
+        form.remove();
+        iframe.remove();
+      }, 4000);
+    }
+
+    function openSheetScriptModal() {
+      document.getElementById('sheetScriptSource').value = SHEET_APPS_SCRIPT;
+      document.getElementById('sheetScriptUrl').value = localStorage.getItem(HTML_SCRIPT_URL_KEY) || '';
+      document.getElementById('sheetScriptModal').classList.add('open');
+    }
+
+    function closeSheetScriptModal() {
+      document.getElementById('sheetScriptModal').classList.remove('open');
+    }
+
+    function copySheetScript() {
+      const box = document.getElementById('sheetScriptSource');
+      box.focus();
+      box.select();
+      const copied = document.execCommand('copy');
+      setSheetStatus(copied ? 'Đã chép Apps Script. Dán vào Google Sheet → Tiện ích → Apps Script.' : 'Bôi đen ô script rồi sao chép thủ công.');
+    }
+
+    async function writeScores(url) {
+      const played = MATCHES.filter((match) => match.played).length;
+      const confirmed = window.confirm(
+        played
+          ? 'Ghi ' + played + ' trận có điểm lên Google Sheet? Trận chưa có điểm sẽ bị xóa ô điểm trên Sheet.'
+          : 'Trang chưa có điểm. Ghi lên Sheet sẽ xóa hết ô điểm. Tiếp tục?',
+      );
+      if (!confirmed) return;
+      setSheetStatus('Đang ghi điểm lên Google Sheet…');
+      const before = MATCHES.find((match) => match.played && match.sheetKey);
+      postScoresToScript(url, scorePayload());
+      await new Promise((resolve) => setTimeout(resolve, 3500));
+      try {
+        const rows = await fetchSheetRows(readStoredSheetLink());
+        if (before) {
+          const row = rows.find((item) => sheetRowKey(item) === before.sheetKey);
+          const set = row ? readSheetSet(row, 1) : null;
+          const expectedAway = before.round === 'Chung kết' ? (before.sets && before.sets[0] ? before.sets[0].scoreB : null) : before.scoreB;
+          const expectedHome = before.round === 'Chung kết' ? (before.sets && before.sets[0] ? before.sets[0].scoreA : null) : before.scoreA;
+          if (!set || set.scoreA !== expectedHome || set.scoreB !== expectedAway) {
+            setSheetStatus('Đã gửi nhưng Sheet chưa đổi. Kiểm tra URL /exec, quyền Bất kỳ ai, và tab Thu tu tran.', true);
+            return;
+          }
+        }
+        setSheetStatus('Đã ghi điểm lên Google Sheet. ' + played + ' trận có tỉ số.', true);
+      } catch (error) {
+        setSheetStatus('Đã gửi lên Apps Script. Mở Sheet để kiểm tra ô Nhà 1 / Khách 1.', true);
+      }
+    }
+
+    async function saveSheetScriptUrl() {
+      const url = document.getElementById('sheetScriptUrl').value.trim();
+      if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url)) {
+        setSheetStatus('Cần URL ứng dụng web kết thúc bằng /exec.');
+        return;
+      }
+      if (!readStoredSheetLink().id) {
+        setSheetStatus('Hãy bấm Tải điểm từ Sheet và dán link file trước.');
+        return;
+      }
+      localStorage.setItem(HTML_SCRIPT_URL_KEY, url);
+      closeSheetScriptModal();
+      await writeScores(url);
+    }
+
+    function pushScoresToSheet() {
+      const url = localStorage.getItem(HTML_SCRIPT_URL_KEY) || '';
+      if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url)) {
+        openSheetScriptModal();
+        return;
+      }
+      if (!readStoredSheetLink().id) {
+        setSheetStatus('Hãy bấm Tải điểm từ Sheet và dán link file trước.', true);
+        return;
+      }
+      writeScores(url);
+    }
+
+    // =========================================================
     // KHỞI CHẠY KHI TẢI TRANG
     // =========================================================
     window.addEventListener('DOMContentLoaded', () => {
       initTheme();
       init72Matches();
+      restoreHtmlScores();
+      fillPlayerNames();
       renderMatchesBoard();
+      if (readStoredSheetLink().id) loadScoresFromSheet(false);
       renderTeamsView();
-      syncFromGoogleSheet();
+      loadLocalPlayers();
 
       if (window.location.hash === '#thu-tu-tran' || window.location.hash === '#tran-dau') {
         switchView('matches');
