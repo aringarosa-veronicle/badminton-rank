@@ -2967,7 +2967,11 @@
     }
 
     function foldName(value) {
-      return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase();
+      return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+
+    function pairHasPlayer(text, needle) {
+      return String(text || '').split(' & ').some((name) => foldName(name) === needle);
     }
 
     function escapeHtml(value) {
@@ -2980,7 +2984,7 @@
       const needle = foldName(query);
       return String(text).split(' & ').map((name) => {
         const safe = escapeHtml(name);
-        return needle && foldName(name).includes(needle) ? `<mark>${safe}</mark>` : safe;
+        return needle && foldName(name) === needle ? `<mark>${safe}</mark>` : safe;
       }).join(' & ');
     }
 
@@ -2995,9 +2999,9 @@
       if (match.round !== 'Chung kết' || eventHasResults(match.eventId)) {
         const pairA = pairs['t' + match.teamA] || '';
         const pairB = pairs['t' + match.teamB] || '';
-        return foldName(pairA).includes(needle) || foldName(pairB).includes(needle);
+        return pairHasPlayer(pairA, needle) || pairHasPlayer(pairB, needle);
       }
-      return Object.values(pairs).some((text) => foldName(text).includes(needle));
+      return Object.values(pairs).some((text) => pairHasPlayer(text, needle));
     }
 
     function fillPlayerNames() {
@@ -4161,21 +4165,35 @@
     }
 
     function sendScoresToScript(url, payload) {
-      const target = url + (url.includes('?') ? '&' : '?') + 'payload=' + encodeURIComponent(JSON.stringify(payload));
+      const json = JSON.stringify(payload);
+      fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: json,
+      }).catch(() => {});
+      const iframe = document.createElement('iframe');
+      iframe.name = 'nabSheetSink';
+      iframe.style.display = 'none';
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = url;
+      form.target = iframe.name;
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'payload';
+      input.value = json;
+      form.appendChild(input);
+      document.body.appendChild(iframe);
+      document.body.appendChild(form);
+      form.submit();
       return new Promise((resolve) => {
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        let done = false;
-        const finish = () => {
-          if (done) return;
-          done = true;
+        setTimeout(resolve, 8000);
+        setTimeout(() => {
+          form.remove();
           iframe.remove();
-          resolve();
-        };
-        iframe.onload = () => setTimeout(finish, 400);
-        iframe.src = target;
-        document.body.appendChild(iframe);
-        setTimeout(finish, 20000);
+        }, 25000);
       });
     }
 
@@ -4210,8 +4228,8 @@
       await sendScoresToScript(url, scorePayload());
       try {
         let filled = null;
-        for (let attempt = 0; attempt < 5; attempt += 1) {
-          await new Promise((resolve) => setTimeout(resolve, attempt === 0 ? 1000 : 2000));
+        for (let attempt = 0; attempt < 12; attempt += 1) {
+          await new Promise((resolve) => setTimeout(resolve, attempt === 0 ? 2000 : 3000));
           filled = countSheetScores(await fetchSheetRows(readStoredSheetLink()));
           if (filled === expected) break;
         }
