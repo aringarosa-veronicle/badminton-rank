@@ -2467,7 +2467,7 @@
       <ol style="margin:0 0 8px 18px; font-size:13px; line-height:1.5;">
         <li>Mở Google Sheet → Tiện ích → Apps Script.</li>
         <li>Xóa code cũ, dán đoạn bên dưới, rồi lưu.</li>
-        <li>Triển khai → Triển khai mới → loại Ứng dụng web.</li>
+        <li>Triển khai → Triển khai mới → loại Ứng dụng web. Nếu đã triển khai rồi: Quản lý các bản triển khai → bút chì → Phiên bản: Bản mới → Triển khai. URL /exec giữ nguyên.</li>
         <li>Thực thi với tư cách: Tôi. Quyền truy cập: Bất kỳ ai.</li>
         <li>Dán URL kết thúc bằng <strong>/exec</strong> vào ô dưới.</li>
       </ol>
@@ -3731,47 +3731,53 @@
     const HTML_SHEET_LINK_KEY = 'nab-hbc-html-score-sheet';
     const HTML_SCRIPT_URL_KEY = 'nab-hbc-html-score-script';
     const SHEET_APPS_SCRIPT = [
+      'function doGet(e) {',
+      '  if (e && e.parameter && e.parameter.payload) return writeMatchScores_(e);',
+      '  return ContentService.createTextOutput("nab-hbc-ok");',
+      '}',
+      '',
       'function doPost(e) {',
+      '  return writeMatchScores_(e);',
+      '}',
+      '',
+      'function writeMatchScores_(e) {',
       '  var raw = (e.parameter && e.parameter.payload) || (e.postData && e.postData.contents) || "{}";',
       '  var body = JSON.parse(raw);',
       '  var book = SpreadsheetApp.getActiveSpreadsheet();',
       '  var sheet = book.getSheetByName("Thu tu tran") || book.getSheets()[0];',
-      '  var values = sheet.getDataRange().getValues();',
+      '  var range = sheet.getDataRange();',
+      '  var values = range.getValues();',
       '  var header = values[0].map(function (cell) { return String(cell).trim(); });',
       '  function col(name) { return header.indexOf(name); }',
       '  var idCol = col("Mã trận");',
       '  if (idCol < 0) idCol = col("id");',
-      '  var n1 = col("Nhà 1"), k1 = col("Khách 1");',
-      '  var n2 = col("Nhà 2"), k2 = col("Khách 2");',
-      '  var n3 = col("Nhà 3"), k3 = col("Khách 3");',
-      '  var rows = {};',
+      '  var scoreCols = ["Nhà 1", "Khách 1", "Nhà 2", "Khách 2", "Nhà 3", "Khách 3"].map(col);',
+      '  var byId = {};',
       '  for (var i = 1; i < values.length; i++) {',
       '    var id = String(values[i][idCol] || "").trim();',
-      '    if (id) rows[id] = i + 1;',
+      '    if (id) byId[id] = i;',
       '  }',
       '  var updated = 0;',
       '  (body.matches || []).forEach(function (match) {',
-      '    var row = rows[match.id];',
-      '    if (!row) return;',
-      '    function put(index, value) {',
-      '      if (index < 0) return;',
-      '      sheet.getRange(row, index + 1).setValue(value === "" || value == null ? "" : value);',
-      '    }',
+      '    var index = byId[match.id];',
+      '    if (index == null) return;',
       '    var sets = match.sets || [];',
-      '    put(n1, sets[0] ? sets[0][0] : "");',
-      '    put(k1, sets[0] ? sets[0][1] : "");',
-      '    put(n2, sets[1] ? sets[1][0] : (match.rr ? "—" : ""));',
-      '    put(k2, sets[1] ? sets[1][1] : (match.rr ? "—" : ""));',
-      '    put(n3, sets[2] ? sets[2][0] : (match.rr ? "—" : ""));',
-      '    put(k3, sets[2] ? sets[2][1] : (match.rr ? "—" : ""));',
+      '    var cells = [',
+      '      sets[0] ? sets[0][0] : "",',
+      '      sets[0] ? sets[0][1] : "",',
+      '      sets[1] ? sets[1][0] : (match.rr ? "—" : ""),',
+      '      sets[1] ? sets[1][1] : (match.rr ? "—" : ""),',
+      '      sets[2] ? sets[2][0] : (match.rr ? "—" : ""),',
+      '      sets[2] ? sets[2][1] : (match.rr ? "—" : "")',
+      '    ];',
+      '    cells.forEach(function (value, n) {',
+      '      if (scoreCols[n] >= 0) values[index][scoreCols[n]] = value;',
+      '    });',
       '    updated++;',
       '  });',
+      '  range.setValues(values);',
       '  return ContentService.createTextOutput(JSON.stringify({ ok: true, updated: updated }))',
       '    .setMimeType(ContentService.MimeType.JSON);',
-      '}',
-      '',
-      'function doGet() {',
-      '  return ContentService.createTextOutput("nab-hbc-ok");',
       '}',
     ].join('\n');
 
@@ -3854,7 +3860,7 @@
       return SHEET_MATCH_IDS[eventId + '|' + kind + '|' + teamA + '|' + teamB] || '';
     }
 
-    function setSheetStatus(message, withChangeLink) {
+    function setSheetStatus(message, withChangeLink, withScriptLink) {
       const el = document.getElementById('sheetScoreStatus');
       if (!el) return;
       el.textContent = message || '';
@@ -3863,6 +3869,13 @@
         button.type = 'button';
         button.textContent = 'Đổi link Sheet';
         button.onclick = () => loadScoresFromSheet(true);
+        el.appendChild(button);
+      }
+      if (withScriptLink) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = 'Cập nhật script';
+        button.onclick = () => openSheetScriptModal();
         el.appendChild(button);
       }
     }
@@ -4129,26 +4142,41 @@
       };
     }
 
-    function postScoresToScript(url, payload) {
-      const iframe = document.createElement('iframe');
-      iframe.name = 'nabSheetSink';
-      iframe.style.display = 'none';
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = url;
-      form.target = iframe.name;
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'payload';
-      input.value = JSON.stringify(payload);
-      form.appendChild(input);
-      document.body.appendChild(iframe);
-      document.body.appendChild(form);
-      form.submit();
-      setTimeout(() => {
-        form.remove();
-        iframe.remove();
-      }, 4000);
+    function countSheetScores(rows) {
+      let filled = 0;
+      rows.forEach((row) => {
+        const key = sheetRowKey(row);
+        if (!MATCHES.some((match) => match.sheetKey === key)) return;
+        if (readSheetSet(row, 1) || readSheetSet(row, 2) || readSheetSet(row, 3)) filled += 1;
+      });
+      return filled;
+    }
+
+    function expectedSheetScores() {
+      return MATCHES.filter((match) => {
+        if (!match.played || !match.sheetKey) return false;
+        if (match.round !== 'Chung kết') return true;
+        return (match.sets || []).some((set) => set.scoreA || set.scoreB);
+      }).length;
+    }
+
+    function sendScoresToScript(url, payload) {
+      const target = url + (url.includes('?') ? '&' : '?') + 'payload=' + encodeURIComponent(JSON.stringify(payload));
+      return new Promise((resolve) => {
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        let done = false;
+        const finish = () => {
+          if (done) return;
+          done = true;
+          iframe.remove();
+          resolve();
+        };
+        iframe.onload = () => setTimeout(finish, 400);
+        iframe.src = target;
+        document.body.appendChild(iframe);
+        setTimeout(finish, 20000);
+      });
     }
 
     function openSheetScriptModal() {
@@ -4178,24 +4206,30 @@
       );
       if (!confirmed) return;
       setSheetStatus('Đang ghi điểm lên Google Sheet…');
-      const before = MATCHES.find((match) => match.played && match.sheetKey);
-      postScoresToScript(url, scorePayload());
-      await new Promise((resolve) => setTimeout(resolve, 3500));
+      const expected = expectedSheetScores();
+      await sendScoresToScript(url, scorePayload());
       try {
-        const rows = await fetchSheetRows(readStoredSheetLink());
-        if (before) {
-          const row = rows.find((item) => sheetRowKey(item) === before.sheetKey);
-          const set = row ? readSheetSet(row, 1) : null;
-          const expectedAway = before.round === 'Chung kết' ? (before.sets && before.sets[0] ? before.sets[0].scoreB : null) : before.scoreB;
-          const expectedHome = before.round === 'Chung kết' ? (before.sets && before.sets[0] ? before.sets[0].scoreA : null) : before.scoreA;
-          if (!set || set.scoreA !== expectedHome || set.scoreB !== expectedAway) {
-            setSheetStatus('Đã gửi nhưng Sheet chưa đổi. Kiểm tra URL /exec, quyền Bất kỳ ai, và tab Thu tu tran.', true);
-            return;
-          }
+        let filled = null;
+        for (let attempt = 0; attempt < 5; attempt += 1) {
+          await new Promise((resolve) => setTimeout(resolve, attempt === 0 ? 1000 : 2000));
+          filled = countSheetScores(await fetchSheetRows(readStoredSheetLink()));
+          if (filled === expected) break;
         }
-        setSheetStatus('Đã ghi điểm lên Google Sheet. ' + played + ' trận có tỉ số.', true);
+        if (filled !== expected) {
+          const detail = expected === 0
+            ? 'Sheet vẫn còn ' + filled + ' trận có điểm, chưa xóa được.'
+            : 'Sheet đang có ' + filled + ' trận có điểm, trang đang có ' + expected + '.';
+          setSheetStatus(detail + ' Hãy dán script mới và triển khai lại Bản mới. URL /exec giữ nguyên.', true, true);
+          return;
+        }
+        setSheetStatus(
+          expected
+            ? 'Đã ghi điểm lên Google Sheet. ' + expected + ' trận có tỉ số.'
+            : 'Đã xóa hết điểm trên Google Sheet.',
+          true,
+        );
       } catch (error) {
-        setSheetStatus('Đã gửi lên Apps Script. Mở Sheet để kiểm tra ô Nhà 1 / Khách 1.', true);
+        setSheetStatus('Không kiểm tra lại được Sheet sau khi ghi. ' + ((error && error.message) || ''), true, true);
       }
     }
 
