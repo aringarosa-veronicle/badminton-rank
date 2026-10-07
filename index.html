@@ -1948,7 +1948,7 @@
           </div>
           <div class="timeline-card">
             <span class="timeline-card-time"><i class="fa-solid fa-bolt"></i> 08:30 - 09:38</span>
-            <span class="timeline-card-desc">Vòng tròn đợt 1 · 10 sân · cao cấp 1, trung cấp 1, sơ cấp 1, sơ cấp 2, đôi nữ</span>
+            <span class="timeline-card-desc">Vòng tròn đợt 1 · sân 21–30 · cao cấp 1, trung cấp 1, sơ cấp 1, sơ cấp 2, đôi nữ</span>
           </div>
           <div class="timeline-card">
             <span class="timeline-card-time"><i class="fa-regular fa-hourglass-half"></i> 09:38 - 09:53</span>
@@ -1956,7 +1956,7 @@
           </div>
           <div class="timeline-card">
             <span class="timeline-card-time"><i class="fa-solid fa-bolt"></i> 09:53 - 11:01</span>
-            <span class="timeline-card-desc">Vòng tròn đợt 2 · 8 sân · cao cấp 2, trung cấp 2, mix cao, mix trung</span>
+            <span class="timeline-card-desc">Vòng tròn đợt 2 · sân 21–28 · cao cấp 2, trung cấp 2, mix cao, mix trung</span>
           </div>
           <div class="timeline-card">
             <span class="timeline-card-time"><i class="fa-regular fa-hourglass-half"></i> 11:01 - 11:46</span>
@@ -1964,7 +1964,7 @@
           </div>
           <div class="timeline-card">
             <span class="timeline-card-time"><i class="fa-solid fa-medal"></i> 11:46 - 14:46</span>
-            <span class="timeline-card-desc">Tranh huy chương · Mix CC và Nam CC2 mỗi nội dung một khung · Nam CC1 cuối</span>
+            <span class="timeline-card-desc">Tranh huy chương · sân 27–30 · Mix CC và Nam CC2 mỗi nội dung một khung · Nam CC1 cuối</span>
           </div>
         </div>
       </div>
@@ -2016,17 +2016,30 @@
 
         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
           <select class="matches-select-filter" id="courtFilter" onchange="renderMatchesList()">
-            <option value="all">Tất cả các sân (1 - 10)</option>
-            <option value="Sân 1">Sân 1</option>
-            <option value="Sân 2">Sân 2</option>
-            <option value="Sân 3">Sân 3</option>
-            <option value="Sân 4">Sân 4</option>
-            <option value="Sân 5">Sân 5</option>
-            <option value="Sân 6">Sân 6</option>
-            <option value="Sân 7">Sân 7</option>
-            <option value="Sân 8">Sân 8</option>
-            <option value="Sân 9">Sân 9</option>
-            <option value="Sân 10">Sân 10</option>
+            <option value="all">Tất cả các sân (21 - 30)</option>
+            <option value="Sân 21">Sân 21</option>
+            <option value="Sân 22">Sân 22</option>
+            <option value="Sân 23">Sân 23</option>
+            <option value="Sân 24">Sân 24</option>
+            <option value="Sân 25">Sân 25</option>
+            <option value="Sân 26">Sân 26</option>
+            <option value="Sân 27">Sân 27</option>
+            <option value="Sân 28">Sân 28</option>
+            <option value="Sân 29">Sân 29</option>
+            <option value="Sân 30">Sân 30</option>
+          </select>
+
+          <select class="matches-select-filter" id="eventFilter" onchange="renderMatchesList()">
+            <option value="all">Tất cả nội dung</option>
+            <option value="nam_cc1">Đôi nam cao cấp 1</option>
+            <option value="nam_cc2">Đôi nam cao cấp 2</option>
+            <option value="nam_tc1">Đôi nam trung cấp 1</option>
+            <option value="nam_tc2">Đôi nam trung cấp 2</option>
+            <option value="nam_sc1">Đôi nam sơ cấp 1</option>
+            <option value="nam_sc2">Đôi nam sơ cấp 2</option>
+            <option value="mix_cc">Đôi nam nữ cao cấp</option>
+            <option value="mix_tc">Đôi nam nữ trung cấp</option>
+            <option value="nu">Đôi nữ</option>
           </select>
 
           <select class="matches-select-filter" id="teamFilter" onchange="renderMatchesList()">
@@ -2460,18 +2473,14 @@
     <!-- ================================================= -->
     <div id="viewLocation" class="tab-view">
       <div class="rules-hero" style="border-left-color: #2563EB;">
-        <h2>ĐỊA ĐIỂM THI ĐẤU: SÂN PHẠM TU BADMINTON</h2>
-        <p><strong>Thời gian:</strong> 7h00 ngày 17/10/2026 · <strong>Địa chỉ:</strong> Phạm Tu, Thanh Liệt, Hà Nội</p>
+        <h2>ĐỊA ĐIỂM THI ĐẤU: SÂN CẦU LÔNG MAXPING</h2>
+        <p><strong>Địa chỉ:</strong> Cuối ngõ 120 Định Công</p>
+        <p style="margin-top:8px;"><strong>Thời gian bắt đầu:</strong> 8h00 ngày 17/10/2026 · <strong>Lượt trận đầu tiên:</strong> 8h30</p>
+        <p style="margin-top:8px;"><strong>Số sân thi đấu:</strong> Từ sân 21 đến sân 30. Tranh huy chương trên sân 27, 28, 29 và 30.</p>
         <div style="margin-top:14px;">
-          <a href="https://maps.app.goo.gl/zga2NTGspYErhftN7" target="_blank" class="btn-map-primary">
+          <a href="https://maps.app.goo.gl/Cg8xPwsi3Z8P3j6s6" target="_blank" class="btn-map-primary">
             <i class="fa-solid fa-diamond-turn-right"></i> Chỉ đường Google Maps
           </a>
-        </div>
-      </div>
-      <div class="rules-section">
-        <div class="section-title"><i class="fa-solid fa-route" style="color:#2563EB;"></i> Sơ đồ vào sân</div>
-        <div style="text-align: center;">
-          <img src="https://lh3.googleusercontent.com/d/10f9jLfjcqjZdyOu1m-FRIes5QHzbo8cL" onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=10f9jLfjcqjZdyOu1m-FRIes5QHzbo8cL&sz=w2000';" alt="Bản đồ sân" style="max-width:100%; border-radius:8px; border:1px solid var(--border-color);" />
         </div>
       </div>
     </div>
@@ -2498,7 +2507,7 @@
 
       <div class="modal-actions">
         <button class="btn-dark-tool" onclick="closeScoreModal()">Hủy</button>
-        <button class="btn-dark-export" onclick="saveScoreModal()">Lưu trên trang</button>
+        <button class="btn-dark-export" onclick="saveScoreModal()" title="Lưu điểm trên trang và ghi lên Google Sheet">Lưu</button>
       </div>
     </div>
   </div>
@@ -2650,78 +2659,78 @@
     // Tập hợp 08:00, khai mạc 08:25, vòng tròn 08:30–11:01, nghỉ 45' sau vòng tròn, huy chương 11:46–14:46
     // Mỗi dòng: bắt đầu, kết thúc, vòng (1/2/3 hoặc g/b), nội dung, sân, đội A, đội B
     const MATCH_ROWS = [
-      ['08:30','08:46','1','nam_cc1',1,1,2],
-      ['08:30','08:46','1','nam_cc1',2,3,4],
-      ['08:30','08:46','1','nam_tc1',3,1,2],
-      ['08:30','08:46','1','nam_tc1',4,3,4],
-      ['08:30','08:46','1','nam_sc1',5,1,2],
-      ['08:30','08:46','1','nam_sc1',6,3,4],
-      ['08:30','08:46','1','nu',7,3,4],
-      ['08:30','08:46','1','nu',8,1,2],
-      ['08:30','08:46','1','nam_sc2',9,1,2],
-      ['08:30','08:46','1','nam_sc2',10,3,4],
-      ['08:56','09:12','2','nam_cc1',1,1,3],
-      ['08:56','09:12','2','nam_cc1',2,2,4],
-      ['08:56','09:12','2','nam_tc1',3,1,3],
-      ['08:56','09:12','2','nam_tc1',4,2,4],
-      ['08:56','09:12','2','nam_sc1',5,1,3],
-      ['08:56','09:12','2','nam_sc1',6,2,4],
-      ['08:56','09:12','2','nu',7,2,4],
-      ['08:56','09:12','2','nu',8,1,3],
-      ['08:56','09:12','2','nam_sc2',9,1,3],
-      ['08:56','09:12','2','nam_sc2',10,2,4],
-      ['09:22','09:38','3','nam_cc1',1,1,4],
-      ['09:22','09:38','3','nam_cc1',2,2,3],
-      ['09:22','09:38','3','nam_tc1',3,1,4],
-      ['09:22','09:38','3','nam_tc1',4,2,3],
-      ['09:22','09:38','3','nam_sc1',5,1,4],
-      ['09:22','09:38','3','nam_sc1',6,2,3],
-      ['09:22','09:38','3','nu',7,2,3],
-      ['09:22','09:38','3','nu',8,1,4],
-      ['09:22','09:38','3','nam_sc2',9,1,4],
-      ['09:22','09:38','3','nam_sc2',10,2,3],
-      ['09:53','10:09','1','nam_cc2',1,1,2],
-      ['09:53','10:09','1','nam_cc2',2,3,4],
-      ['09:53','10:09','1','nam_tc2',3,1,2],
-      ['09:53','10:09','1','nam_tc2',4,3,4],
-      ['09:53','10:09','1','mix_cc',5,1,2],
-      ['09:53','10:09','1','mix_cc',6,3,4],
-      ['09:53','10:09','1','mix_tc',7,1,2],
-      ['09:53','10:09','1','mix_tc',8,3,4],
-      ['10:19','10:35','2','nam_cc2',1,1,3],
-      ['10:19','10:35','2','nam_cc2',2,2,4],
-      ['10:19','10:35','2','nam_tc2',3,1,3],
-      ['10:19','10:35','2','nam_tc2',4,2,4],
-      ['10:19','10:35','2','mix_cc',5,1,3],
-      ['10:19','10:35','2','mix_cc',6,2,4],
-      ['10:19','10:35','2','mix_tc',7,1,3],
-      ['10:19','10:35','2','mix_tc',8,2,4],
-      ['10:45','11:01','3','nam_cc2',1,1,4],
-      ['10:45','11:01','3','nam_cc2',2,2,3],
-      ['10:45','11:01','3','nam_tc2',3,1,4],
-      ['10:45','11:01','3','nam_tc2',4,2,3],
-      ['10:45','11:01','3','mix_cc',5,1,4],
-      ['10:45','11:01','3','mix_cc',6,2,3],
-      ['10:45','11:01','3','mix_tc',7,1,4],
-      ['10:45','11:01','3','mix_tc',8,2,3],
-      ['11:46','12:16','g','nam_tc2',1,1,2],
-      ['11:46','12:16','b','nam_tc2',2,3,4],
-      ['11:46','12:16','g','mix_tc',3,1,2],
-      ['11:46','12:16','b','mix_tc',4,3,4],
-      ['12:16','12:46','g','mix_cc',1,1,2],
-      ['12:16','12:46','b','mix_cc',2,3,4],
-      ['12:46','13:16','g','nam_cc2',1,1,2],
-      ['12:46','13:16','b','nam_cc2',2,3,4],
-      ['13:16','13:46','g','nam_sc1',1,1,2],
-      ['13:16','13:46','b','nam_sc1',2,3,4],
-      ['13:16','13:46','g','nam_sc2',3,1,2],
-      ['13:16','13:46','b','nam_sc2',4,3,4],
-      ['13:46','14:16','g','nam_tc1',1,1,2],
-      ['13:46','14:16','b','nam_tc1',2,3,4],
-      ['13:46','14:16','g','nu',3,1,2],
-      ['13:46','14:16','b','nu',4,3,4],
-      ['14:16','14:46','g','nam_cc1',1,1,2],
-      ['14:16','14:46','b','nam_cc1',2,3,4]
+      ['08:30','08:46','1','nam_cc1',21,1,2],
+      ['08:30','08:46','1','nam_cc1',22,3,4],
+      ['08:30','08:46','1','nam_tc1',23,1,2],
+      ['08:30','08:46','1','nam_tc1',24,3,4],
+      ['08:30','08:46','1','nam_sc1',25,1,2],
+      ['08:30','08:46','1','nam_sc1',26,3,4],
+      ['08:30','08:46','1','nu',27,3,4],
+      ['08:30','08:46','1','nu',28,1,2],
+      ['08:30','08:46','1','nam_sc2',29,1,2],
+      ['08:30','08:46','1','nam_sc2',30,3,4],
+      ['08:56','09:12','2','nam_cc1',21,1,3],
+      ['08:56','09:12','2','nam_cc1',22,2,4],
+      ['08:56','09:12','2','nam_tc1',23,1,3],
+      ['08:56','09:12','2','nam_tc1',24,2,4],
+      ['08:56','09:12','2','nam_sc1',25,1,3],
+      ['08:56','09:12','2','nam_sc1',26,2,4],
+      ['08:56','09:12','2','nu',27,2,4],
+      ['08:56','09:12','2','nu',28,1,3],
+      ['08:56','09:12','2','nam_sc2',29,1,3],
+      ['08:56','09:12','2','nam_sc2',30,2,4],
+      ['09:22','09:38','3','nam_cc1',21,1,4],
+      ['09:22','09:38','3','nam_cc1',22,2,3],
+      ['09:22','09:38','3','nam_tc1',23,1,4],
+      ['09:22','09:38','3','nam_tc1',24,2,3],
+      ['09:22','09:38','3','nam_sc1',25,1,4],
+      ['09:22','09:38','3','nam_sc1',26,2,3],
+      ['09:22','09:38','3','nu',27,2,3],
+      ['09:22','09:38','3','nu',28,1,4],
+      ['09:22','09:38','3','nam_sc2',29,1,4],
+      ['09:22','09:38','3','nam_sc2',30,2,3],
+      ['09:53','10:09','1','nam_cc2',21,1,2],
+      ['09:53','10:09','1','nam_cc2',22,3,4],
+      ['09:53','10:09','1','nam_tc2',23,1,2],
+      ['09:53','10:09','1','nam_tc2',24,3,4],
+      ['09:53','10:09','1','mix_cc',25,1,2],
+      ['09:53','10:09','1','mix_cc',26,3,4],
+      ['09:53','10:09','1','mix_tc',27,1,2],
+      ['09:53','10:09','1','mix_tc',28,3,4],
+      ['10:19','10:35','2','nam_cc2',21,1,3],
+      ['10:19','10:35','2','nam_cc2',22,2,4],
+      ['10:19','10:35','2','nam_tc2',23,1,3],
+      ['10:19','10:35','2','nam_tc2',24,2,4],
+      ['10:19','10:35','2','mix_cc',25,1,3],
+      ['10:19','10:35','2','mix_cc',26,2,4],
+      ['10:19','10:35','2','mix_tc',27,1,3],
+      ['10:19','10:35','2','mix_tc',28,2,4],
+      ['10:45','11:01','3','nam_cc2',21,1,4],
+      ['10:45','11:01','3','nam_cc2',22,2,3],
+      ['10:45','11:01','3','nam_tc2',23,1,4],
+      ['10:45','11:01','3','nam_tc2',24,2,3],
+      ['10:45','11:01','3','mix_cc',25,1,4],
+      ['10:45','11:01','3','mix_cc',26,2,3],
+      ['10:45','11:01','3','mix_tc',27,1,4],
+      ['10:45','11:01','3','mix_tc',28,2,3],
+      ['11:46','12:16','g','nam_tc2',27,1,2],
+      ['11:46','12:16','b','nam_tc2',28,3,4],
+      ['11:46','12:16','g','mix_tc',29,1,2],
+      ['11:46','12:16','b','mix_tc',30,3,4],
+      ['12:16','12:46','g','mix_cc',27,1,2],
+      ['12:16','12:46','b','mix_cc',28,3,4],
+      ['12:46','13:16','g','nam_cc2',27,1,2],
+      ['12:46','13:16','b','nam_cc2',28,3,4],
+      ['13:16','13:46','g','nam_sc1',27,1,2],
+      ['13:16','13:46','b','nam_sc1',28,3,4],
+      ['13:16','13:46','g','nam_sc2',29,1,2],
+      ['13:16','13:46','b','nam_sc2',30,3,4],
+      ['13:46','14:16','g','nam_tc1',27,1,2],
+      ['13:46','14:16','b','nam_tc1',28,3,4],
+      ['13:46','14:16','g','nu',29,1,2],
+      ['13:46','14:16','b','nu',30,3,4],
+      ['14:16','14:46','g','nam_cc1',27,1,2],
+      ['14:16','14:46','b','nam_cc1',28,3,4]
     ];
 
     let MATCHES = [];
@@ -3062,6 +3071,7 @@
 
     function renderMatchesList() {
       const courtFilter = document.getElementById('courtFilter').value;
+      const eventFilter = document.getElementById('eventFilter').value;
       const teamFilter = document.getElementById('teamFilter').value;
       const playerQuery = (document.getElementById('playerFilter')?.value || '').trim();
       const container = document.getElementById('matchesListContainer');
@@ -3069,8 +3079,9 @@
       let filtered = MATCHES.filter(m => {
         const matchRound = (currentRoundFilter === 'all') || (m.round === currentRoundFilter);
         const matchCourt = (courtFilter === 'all') || (m.court === courtFilter);
+        const matchEvent = (eventFilter === 'all') || (m.eventId === eventFilter);
         const matchTeam = (teamFilter === 'all') || (m.teamA == teamFilter || m.teamB == teamFilter);
-        return matchRound && matchCourt && matchTeam && matchIncludesPlayer(m, playerQuery);
+        return matchRound && matchCourt && matchEvent && matchTeam && matchIncludesPlayer(m, playerQuery);
       });
 
       // Nhóm theo khung giờ / vòng đấu, sắp xếp theo thời gian
@@ -3377,6 +3388,7 @@
       closeScoreModal();
       persistHtmlScores();
       renderMatchesBoard();
+      queueSheetWrite();
     }
 
     function populateSampleScores() {
@@ -4298,15 +4310,18 @@
       setSheetStatus(copied ? 'Đã chép Apps Script. Dán vào Google Sheet → Tiện ích → Apps Script.' : 'Bôi đen ô script rồi sao chép thủ công.');
     }
 
-    async function writeScores(url) {
+    async function writeScores(url, options) {
+      const quiet = !!(options && options.quiet);
       const played = MATCHES.filter((match) => match.played).length;
-      const confirmed = window.confirm(
-        played
-          ? 'Ghi ' + played + ' trận có điểm lên Google Sheet? Trận chưa có điểm sẽ bị xóa ô điểm trên Sheet.'
-          : 'Trang chưa có điểm. Ghi lên Sheet sẽ xóa hết ô điểm. Tiếp tục?',
-      );
-      if (!confirmed) return;
-      setSheetStatus('Đang ghi điểm lên Google Sheet…');
+      if (!quiet) {
+        const confirmed = window.confirm(
+          played
+            ? 'Ghi ' + played + ' trận có điểm lên Google Sheet? Trận chưa có điểm sẽ bị xóa ô điểm trên Sheet.'
+            : 'Trang chưa có điểm. Ghi lên Sheet sẽ xóa hết ô điểm. Tiếp tục?',
+        );
+        if (!confirmed) return;
+      }
+      setSheetStatus(quiet ? 'Đã lưu trên trang. Đang ghi lên Google Sheet…' : 'Đang ghi điểm lên Google Sheet…');
       const expected = expectedSheetScores();
       await sendScoresToScript(url, scorePayload());
       try {
@@ -4325,7 +4340,7 @@
         }
         setSheetStatus(
           expected
-            ? 'Đã ghi điểm lên Google Sheet. ' + expected + ' trận có tỉ số.'
+            ? (quiet ? 'Đã lưu trên trang và ghi lên Google Sheet. ' : 'Đã ghi điểm lên Google Sheet. ') + expected + ' trận có tỉ số.'
             : 'Đã xóa hết điểm trên Google Sheet.',
           true,
         );
@@ -4349,17 +4364,47 @@
       await writeScores(url);
     }
 
-    function pushScoresToSheet() {
+    let sheetWriteRunning = false;
+    let sheetWritePending = false;
+
+    function queueSheetWrite() {
+      sheetWritePending = true;
+      if (sheetWriteRunning) return;
+      sheetWriteRunning = true;
+      (async () => {
+        try {
+          while (sheetWritePending) {
+            sheetWritePending = false;
+            await pushScoresToSheet({ quiet: true });
+          }
+        } finally {
+          sheetWriteRunning = false;
+          if (sheetWritePending) queueSheetWrite();
+        }
+      })();
+    }
+
+    function pushScoresToSheet(options) {
+      const quiet = !!(options && options.quiet);
       const url = localStorage.getItem(HTML_SCRIPT_URL_KEY) || '';
       if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url)) {
+        if (quiet) {
+          setSheetStatus('Đã lưu trên trang. Chưa ghi được lên Google Sheet. Bấm Ghi điểm lên Sheet để dán URL Apps Script một lần.', true, true);
+          return;
+        }
         openSheetScriptModal();
         return;
       }
       if (!readStoredSheetLink().id) {
-        setSheetStatus('Hãy bấm Tải điểm từ Sheet và dán link file trước.', true);
+        setSheetStatus(
+          quiet
+            ? 'Đã lưu trên trang. Hãy bấm Tải điểm từ Sheet và dán link file trước khi ghi lên Sheet.'
+            : 'Hãy bấm Tải điểm từ Sheet và dán link file trước.',
+          true,
+        );
         return;
       }
-      writeScores(url);
+      return writeScores(url, options);
     }
 
     // =========================================================
