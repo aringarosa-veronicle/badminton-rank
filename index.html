@@ -4599,8 +4599,8 @@ function sendScoresToScript(url, payload) {
 
     function queueSheetWrite(matchKey) {
       if (matchKey) pendingSheetKeys.push(matchKey);
-      if (sheetWriterRunning) return;
-      sheetWriterRunning = true;
+      if (sheetWriteRunning) return;
+      sheetWriteRunning = true;
       (async () => {
         try {
           while (pendingSheetKeys.length) {
@@ -4609,7 +4609,7 @@ function sendScoresToScript(url, payload) {
             await pushScoresToSheet({ quiet: true, matchKeys: keys });
           }
         } finally {
-          sheetWriterRunning = false;
+          sheetWriteRunning = false;
           if (pendingSheetKeys.length) queueSheetWrite();
         }
       })();
