@@ -4481,29 +4481,29 @@ function sheetMatchesPayload(rows, payload) {
 }
 
 function sendScoresToScript(url, payload) {
-  const targets = [];
-  let batch = [];
-  const pack = () => url + (url.includes('?') ? '&' : '?') + 'payload=' + encodeURIComponent(JSON.stringify({ matches: batch }));
-  payload.matches.forEach((match) => {
-    batch.push(match);
-    if (pack().length > 1500 && batch.length > 1) {
-      const last = batch.pop();
-      targets.push(pack());
-      batch = [last];
+  const body = JSON.stringify(payload);
+  const hash = '#scores=' + encodeURIComponent(body);
+  let target = url;
+  if (body.length < 1500) {
+    const params = new URLSearchParams();
+    params.set('payload', body);
+    if (payload.matches.length === 1) {
+      const match = payload.matches[0];
+      params.set('id', match.id);
+      params.set('rr', match.rr ? '1' : '0');
+      (match.sets || []).forEach((set, index) => {
+        params.set('a' + (index + 1), String(set[0]));
+        params.set('b' + (index + 1), String(set[1]));
+      });
     }
-  });
-  if (batch.length) targets.push(pack());
-  if (!targets.length) return Promise.resolve();
-  const opened = window.open(targets[0], 'nabScoreWrite');
+    target += '?' + params.toString();
+  }
+  target += hash;
+  const opened = window.open(target, 'nabScoreWrite');
   if (!opened) {
     return Promise.reject(new Error('Trình duyệt đã chặn cửa sổ Google. Hãy cho phép popup rồi bấm lại.'));
   }
-  return (async () => {
-    for (let index = 1; index < targets.length; index += 1) {
-      await new Promise((resolve) => setTimeout(resolve, 12000));
-      opened.location.href = targets[index];
-    }
-  })();
+  return Promise.resolve();
 }
 
     function openSheetScriptModal() {
@@ -4538,8 +4538,8 @@ function sendScoresToScript(url, payload) {
       const matchKeys = options && options.matchKeys;
       const payload = scorePayload(matchKeys);
       setSheetStatus(quiet
-        ? 'Đã lưu trên trang. Cửa sổ Google đang mở: hãy đăng nhập nếu được hỏi.'
-        : 'Cửa sổ Google đang mở. Hãy đăng nhập nếu được hỏi. Tài khoản phải có quyền sửa file điểm.');
+        ? 'Đã lưu trên trang. Cửa sổ Google đang mở. Nếu cửa sổ báo bấm lại, bấm Lưu thêm một lần.'
+        : 'Cửa sổ Google đang mở. Nếu cửa sổ báo bấm lại, bấm Ghi điểm lên Sheet thêm một lần.');
       const expected = expectedSheetScores();
       try {
         await sendScoresToScript(url, payload);
