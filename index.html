@@ -1612,13 +1612,91 @@
       padding: 14px;
     }
 
-    .team-header-title {
+.team-header-title {
       display: flex;
       align-items: center;
       gap: 8px;
       font-size: 15px;
       font-weight: 800;
       color: var(--text-primary);
+    }
+
+    .team-avatar {
+      flex: none;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background: var(--bg-card);
+      cursor: zoom-in;
+    }
+
+    .team-avatar img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .balance-table .team-avatar {
+      display: block;
+      width: 36px;
+      height: 36px;
+      margin: 0 auto 6px;
+      border-color: rgba(255, 255, 255, 0.35);
+      background: #111;
+    }
+
+    .avatar-zoom {
+      position: fixed;
+      z-index: 1200;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 28px 20px;
+      background: rgba(0, 0, 0, 0.84);
+    }
+
+    .avatar-zoom[hidden] {
+      display: none;
+    }
+
+    .avatar-zoom figure {
+      margin: 0;
+      max-width: min(920px, 92vw);
+      text-align: center;
+    }
+
+    .avatar-zoom img {
+      display: block;
+      max-width: min(920px, 92vw);
+      max-height: 78vh;
+      object-fit: contain;
+      border-radius: 12px;
+      background: #111;
+    }
+
+    .avatar-zoom figcaption {
+      margin-top: 12px;
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .avatar-zoom-close {
+      position: absolute;
+      top: 16px;
+      right: 18px;
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
+      font-size: 26px;
+      line-height: 1;
+      cursor: pointer;
     }
 
     .team-num-badge {
@@ -2057,7 +2135,7 @@
           <button class="btn-dark-tool" onclick="toggleAllRounds(true)" title="Thu gọn tất cả lượt trận"><i class="fa-solid fa-angles-up"></i> Thu gọn</button>
           <button class="btn-dark-tool" onclick="populateSampleScores()" title="Tự động điền điểm mẫu mô phỏng"><i class="fa-solid fa-wand-magic-sparkles"></i> Điểm mẫu</button>
           <button class="btn-dark-tool" onclick="resetAllScores()" title="Đặt lại điểm số về 0-0"><i class="fa-solid fa-arrows-rotate"></i> Reset</button>
-          <button class="btn-dark-tool" onclick="loadScoresFromSheet(false)" title="Tải điểm từ Google Sheet Thứ tự trận"><i class="fa-solid fa-cloud-arrow-down"></i> Tải điểm từ Sheet</button>
+          <button class="btn-dark-tool" onclick="loadScoresFromSheet()" title="Tải lại điểm từ Google Sheet Thứ tự trận"><i class="fa-solid fa-cloud-arrow-down"></i> Tải điểm từ Sheet</button>
           <button class="btn-dark-export" onclick="pushScoresToSheet()" title="Ghi điểm đang có trên trang vào Google Sheet"><i class="fa-solid fa-cloud-arrow-up"></i> Ghi điểm lên Sheet</button>
         </div>
       </div>
@@ -2092,12 +2170,10 @@
           <table class="balance-table">
             <thead>
               <tr>
-                <th>Tiêu chí</th>
-                <th>Team Wårriœrs</th>
-                <th>Team Tiền</th>
-                <th>Team Larvengers</th>
-                <th>Team Mattari</th>
-                <th>Cân bằng</th>
+                <th><button type="button" class="team-avatar" onclick="openAvatarZoom('team1')" title="Xem avatar Team Wårriœrs"><img src="https://lh3.googleusercontent.com/d/1XAP46tGcRmpY2K21Eu7jBIAPgMTZVNBR" alt="" referrerpolicy="no-referrer"></button>Team Wårriœrs</th>
+                <th><button type="button" class="team-avatar" onclick="openAvatarZoom('team2')" title="Xem avatar Team Tiền"><img src="https://lh3.googleusercontent.com/d/1eRNO-6INX0CnOwLkU2AN-sDZp46yOU0K" alt="" referrerpolicy="no-referrer"></button>Team Tiền</th>
+                <th><button type="button" class="team-avatar" onclick="openAvatarZoom('team3')" title="Xem avatar Team Larvengers"><img src="https://lh3.googleusercontent.com/d/1M8C2LTXhevcRLWL_8Hoa9qP3osJjpJSs" alt="" referrerpolicy="no-referrer"></button>Team Larvengers</th>
+                <th><button type="button" class="team-avatar" onclick="openAvatarZoom('team4')" title="Xem avatar Team Mattari"><img src="https://lh3.googleusercontent.com/d/1K7c691tTx0DK8PzjKpeDQggs7uJWnb5d" alt="" referrerpolicy="no-referrer"></button>Team Mattari</th>
               </tr>
             </thead>
             <tbody id="balanceTableBody"></tbody>
@@ -2183,10 +2259,14 @@
             <option value="default">Hạng & điểm (mặc định)</option>
             <option value="score-desc">Điểm: Cao đến thấp</option>
             <option value="score-asc">Điểm: Thấp đến cao</option>
+            <option value="rank-desc">Hạng: S đến D</option>
+            <option value="rank-asc">Hạng: D đến S</option>
             <option value="name-asc">Tên: A - Z</option>
           </select>
+          <button class="btn-dark-export" id="playerSyncBtn" type="button" onclick="syncFromGoogleSheet()" title="Đồng bộ danh sách người chơi từ Google Sheet đã gắn trong file"><i class="fa-solid fa-rotate"></i> Đồng bộ Sheet</button>
         </div>
-        <div id="playerCounter" style="margin-top:10px; font-size:12.5px; color:var(--text-muted);">Đang hiển thị: 0 người</div>
+        <div id="playerCounter" style="margin-top: 10px; font-size: 12.5px; color: var(--text-muted);">Đang hiển thị: 0 người</div>
+        <div id="playerSyncStatus" style="margin-top: 6px; font-size: 12.5px; color: var(--text-muted);"></div>
       </div>
 
       <div id="loadingSpinner">
@@ -2486,7 +2566,13 @@
     </div>
 
   </div>
-
+    <div id="avatarZoom" class="avatar-zoom" hidden onclick="if (event.target === this) closeAvatarZoom()">
+    <button type="button" class="avatar-zoom-close" onclick="closeAvatarZoom()" aria-label="Đóng">&times;</button>
+    <figure onclick="event.stopPropagation()">
+      <img id="avatarZoomImg" alt="" referrerpolicy="no-referrer" />
+      <figcaption id="avatarZoomName"></figcaption>
+    </figure>
+  </div>
   <!-- Score Modal (Hỗ trợ 1 set vòng tròn & 3 set tranh huy chương) -->
   <div class="modal-backdrop" id="scoreModal">
     <div class="modal-box">
@@ -3563,6 +3649,34 @@
       return { total, nam, nu, s, ap, a, b, c, d, sumScore, avgScore, femaleSumScore };
     }
 
+    const TEAM_AVATARS = {
+      team1: { name: 'Team Wårriœrs', src: 'https://lh3.googleusercontent.com/d/1XAP46tGcRmpY2K21Eu7jBIAPgMTZVNBR' },
+      team2: { name: 'Team Tiền', src: 'https://lh3.googleusercontent.com/d/1eRNO-6INX0CnOwLkU2AN-sDZp46yOU0K' },
+      team3: { name: 'Team Larvengers', src: 'https://lh3.googleusercontent.com/d/1M8C2LTXhevcRLWL_8Hoa9qP3osJjpJSs' },
+      team4: { name: 'Team Mattari', src: 'https://lh3.googleusercontent.com/d/1K7c691tTx0DK8PzjKpeDQggs7uJWnb5d' },
+    };
+
+    function openAvatarZoom(teamId) {
+      const team = TEAM_AVATARS[teamId];
+      if (!team) return;
+      const box = document.getElementById('avatarZoom');
+      const img = document.getElementById('avatarZoomImg');
+      img.src = team.src;
+      img.alt = team.name;
+      document.getElementById('avatarZoomName').textContent = team.name;
+      box.hidden = false;
+    }
+
+    function closeAvatarZoom() {
+      const box = document.getElementById('avatarZoom');
+      if (!box || box.hidden) return;
+      box.hidden = true;
+    }
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeAvatarZoom();
+    });
+
     function renderTeamsView() {
       const t1 = calcTeamStats(teamsState.team1.players);
       const t2 = calcTeamStats(teamsState.team2.players);
@@ -3623,7 +3737,7 @@
         return `
           <div class="team-col" ondragover="event.preventDefault()" ondrop="handleDrop(event, '${t.id}')">
             <div class="team-col-header">
-              <div class="team-header-title"><span class="team-num-badge">${t.badge}</span> ${t.name}</div>
+              <div class="team-header-title"><button type="button" class="team-avatar" onclick="openAvatarZoom('${t.id}')" title="Xem avatar ${t.name}"><img src="${TEAM_AVATARS[t.id].src}" alt="" referrerpolicy="no-referrer"></button><span class="team-num-badge">${t.badge}</span>${t.name}</div>
               <div class="team-header-subtitle">${stats.total} người · ${stats.nam} nam / ${stats.nu} nữ</div>
               <div class="team-header-scores">
                 <div><strong>Điểm ${stats.sumScore.toFixed(2)}</strong></div>
@@ -3689,8 +3803,8 @@
     // =========================================================
     // GOOGLE SHEETS & DANH SÁCH NGƯỜI CHƠI (TAB 2)
     // =========================================================
-    const SPREADSHEET_ID = "18NLI0v073EIZezHwbwKx5zfrHNTarPx899hNCJBqSBg";
-    let currentPlayers = [];
+    const PLAYER_SHEET_URL =
+      'https://docs.google.com/spreadsheets/d/18NLI0v073ElZezHwbwkX5zfrHNTarPx899hNCJBqSBg/edit?usp=sharing';    let currentPlayers = [];
 
     function publishPlayers(players) {
       currentPlayers = players;
@@ -3718,52 +3832,169 @@
       }))));
     }
 
+   const RANK_ORDER = ['S', 'A+', 'A', 'B', 'C', 'D'];
+
+    function setPlayerSyncStatus(message, isError) {
+      const el = document.getElementById('playerSyncStatus');
+      if (!el) return;
+      el.textContent = message || '';
+      el.style.color = isError ? '#DC2626' : 'var(--text-muted)';
+    }
+
+    function playerColumn(headers, aliases) {
+      const folded = headers.map(h => foldName(h));
+      for (const alias of aliases) {
+        const index = folded.findIndex(h => h === alias);
+        if (index >= 0) return index;
+      }
+      for (const alias of aliases) {
+        const index = folded.findIndex(h => h.includes(alias));
+        if (index >= 0) return index;
+      }
+      return -1;
+    }
+
+    function parseRank(value) {
+      const text = String(value || '').toUpperCase().trim();
+      const lead = text.match(/^(A\+|[SABCD])(?![A-Z])/);
+      if (lead) return lead[1];
+      const named = text.match(/(?:HẠNG|HANG|TRÌNH ĐỘ|TRINH DO)\s*:?\s*(A\+|[SABCD])(?![A-Z])/);
+      if (named) return named[1];
+      return '';
+    }
+
+    function parseGender(value) {
+      const text = foldName(value);
+      if (text.startsWith('nu') || text === 'female' || text === 'f') return 'Nữ';
+      if (text.startsWith('nam') || text === 'male' || text === 'm') return 'Nam';
+      return '';
+    }
+
+    function cellValue(cell) {
+      if (!cell) return '';
+      if (cell.f != null && typeof cell.v !== 'number') return String(cell.f);
+      return cell.v == null ? '' : cell.v;
+    }
+
     function syncFromGoogleSheet() {
-      const spinner = document.getElementById('loadingSpinner');
-      const spinnerText = spinner.querySelector('div:last-child');
-      spinner.style.display = '';
-      spinner.querySelector('.spinner').style.display = '';
-      spinnerText.textContent = 'Đang đồng bộ dữ liệu người chơi...';
+      const button = document.getElementById('playerSyncBtn');
+      if (button) button.disabled = true;
+      setPlayerSyncStatus('Đang đồng bộ danh sách người chơi từ Google Sheet...');
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 8000);
-      const gvizUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&tq=&timestamp=${Date.now()}`;
-      fetch(gvizUrl, { signal: controller.signal })
+      const timer = setTimeout(() => controller.abort(), 12000);
+      const sheetId = parseSheetLink(PLAYER_SHEET_URL).id;
+      const gvizUrl =
+        `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&headers=1&tq=&timestamp=${Date.now()}`;
+      fetch(gvizUrl, { signal: controller.signal, cache: 'no-store' })
         .then(r => r.text())
         .then(t => {
           const m = t.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/);
-          if (!m) throw new Error('Sheet không trả dữ liệu');
+          if (!m) throw new Error('Google Sheet không trả dữ liệu. Kiểm tra file đã chia sẻ "Bất kỳ ai có đường liên kết"');
           const json = JSON.parse(m[1]);
-          const cols = json.table.cols.map(c => (c && c.label) || '');
-          const rows = json.table.rows.map(r => {
-            const obj = {};
-            r.c.forEach((cell, idx) => { obj[cols[idx]] = cell ? (cell.v !== null ? cell.v : cell.f) : ''; });
-            return obj;
+          if (json.status === 'error') throw new Error('Google Sheet báo lỗi: ' + ((json.errors && json.errors[0] && json.errors[0].detailed_message) || 'không đọc được'));
+          let headers = json.table.cols.map(c => (c && c.label) || '');
+          let rows = json.table.rows.map(r => (r.c || []).map(cellValue));
+          if (!headers.some(Boolean) && rows.length) {
+            headers = rows[0].map(String);
+            rows = rows.slice(1);
+          }
+          const nameCol = playerColumn(headers, ['ho va ten', 'ho ten', 'ten van dong vien', 'ten', 'name', 'full name']);
+          const genderCol = playerColumn(headers, ['gioi tinh', 'gender']);
+          const rankCol = playerColumn(headers, ['hang ky nang', 'hang', 'trinh do', 'level', 'tier']);
+          const scoreCol = playerColumn(headers, ['diem tu danh gia', 'diem', 'score']);
+          const emailCol = playerColumn(headers, ['email', 'e-mail', 'mail']);
+          if (nameCol < 0) throw new Error('Không thấy cột Họ và tên trong Google Sheet. Các cột đang có: ' + headers.filter(Boolean).join(', '));
+
+          const players = [];
+          rows.forEach((row) => {
+            const name = String(row[nameCol] || '').trim();
+            if (!name) return;
+            const scoreNumber = scoreCol >= 0 ? parseFloat(String(row[scoreCol]).replace(',', '.')) : NaN;
+            players.push({
+              id: players.length + 1,
+              name,
+              gender: (genderCol >= 0 && parseGender(row[genderCol])) || 'Nam',
+              rank: (rankCol >= 0 && parseRank(row[rankCol])) || 'B',
+              score: (Number.isFinite(scoreNumber) ? scoreNumber : 0).toFixed(2),
+              email: emailCol >= 0 ? String(row[emailCol] || '').trim() : '',
+            });
           });
-
-          publishPlayers(rows.map((r, idx) => {
-            const name = r['Họ và tên'] || r['Họ tên'] || r['Name'] || `VĐV ${idx + 1}`;
-            const gender = r['Giới tính'] || 'Nam';
-            let tier = String(r['Hạng kỹ năng'] || r['Hạng'] || 'B').toUpperCase().trim();
-            if (tier.includes('S')) tier = 'S';
-            else if (tier.includes('A+')) tier = 'A+';
-            else if (tier.includes('A')) tier = 'A';
-            else if (tier.includes('B')) tier = 'B';
-            else if (tier.includes('C')) tier = 'C';
-            else if (tier.includes('D')) tier = 'D';
-
-            const score = parseFloat(r['Điểm'] || 2.5).toFixed(2);
-            return { id: idx + 1, name, gender, rank: tier, score, email: r['Email'] || '' };
-          }));
+          if (!players.length) throw new Error('Google Sheet không có người chơi nào.');
+          publishPlayers(players);
+          const missing = [
+            genderCol < 0 ? 'Giới tính' : '',
+            rankCol < 0 ? 'Hạng' : '',
+            scoreCol < 0 ? 'Điểm' : '',
+          ].filter(Boolean);
+          const time = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+          setPlayerSyncStatus(
+            `Đã đồng bộ ${players.length} người chơi từ Google Sheet lúc ${time}.` +
+            (missing.length ? ` Không thấy cột ${missing.join(', ')}, đang dùng giá trị mặc định.` : ''),
+            missing.length > 0,
+          );
         })
-        .catch(() => {
-          loadLocalPlayers();
-          spinner.style.display = '';
-          spinner.querySelector('.spinner').style.display = 'none';
-          spinnerText.textContent = 'Không tải được Google Sheet. Đang hiện danh sách có sẵn trong file.';
+        .catch((error) => {
+          const message = error && error.name === 'AbortError'
+            ? 'Google Sheet không phản hồi. Kiểm tra mạng rồi thử lại.'
+            : (error && error.message) || 'Không tải được Google Sheet.';
+          setPlayerSyncStatus(message + ' Danh sách đang giữ nguyên như trước.', true);
         })
-        .finally(() => clearTimeout(timer));
+        .finally(() => {
+          clearTimeout(timer);
+          if (button) button.disabled = false;
+        });
     }
 
+    function comparePlayers(sort) {
+      const rankIndex = (p) => {
+        const index = RANK_ORDER.indexOf(p.rank);
+        return index < 0 ? RANK_ORDER.length : index;
+      };
+      const byName = (a, b) => a.name.localeCompare(b.name, 'vi');
+      const byScore = (a, b) => Number(b.score) - Number(a.score);
+      if (sort === 'score-desc') return (a, b) => byScore(a, b) || byName(a, b);
+      if (sort === 'score-asc') return (a, b) => -byScore(a, b) || byName(a, b);
+      if (sort === 'rank-asc') return (a, b) => rankIndex(b) - rankIndex(a) || -byScore(a, b) || byName(a, b);
+      if (sort === 'name-asc') return byName;
+      return (a, b) => rankIndex(a) - rankIndex(b) || byScore(a, b) || byName(a, b);
+    }
+
+    function showPlayerDetail(id) {
+      const p = currentPlayers.find(item => item.id === id);
+      if (p) alert(`${p.name} - Điểm: ${p.score} - Hạng: ${p.rank}`);
+    }
+
+    function applyFilters() {
+      const q = foldName(document.getElementById('searchInput').value);
+      const rank = document.getElementById('rankFilter').value;
+      const gender = document.getElementById('genderFilter').value;
+      const sort = document.getElementById('sortFilter').value;
+
+      const filtered = currentPlayers.filter(p => {
+        const mQ = !q || foldName(p.name).includes(q) || foldName(p.email).includes(q);
+        const mR = rank === 'all' || p.rank === rank;
+        const mG = gender === 'all' || p.gender === gender;
+        return mQ && mR && mG;
+      }).sort(comparePlayers(sort));
+
+      document.getElementById('playerCounter').innerText = `Đang hiển thị: ${filtered.length}/${currentPlayers.length} người`;
+      const container = document.getElementById('playerListContainer');
+      container.innerHTML = filtered.map((p, i) => `
+        <div class="player-card">
+          <div class="player-main-row">
+            <div>${i + 1}</div>
+            <div style="font-weight:700;">${escapeHtml(p.name)}</div>
+            <div><span class="badge-rank rank-${p.rank.replace('+', '_plus')}">${p.rank}</span></div>
+            <div style="font-weight:800;">${p.score}</div>
+            <div>${p.gender}</div>
+            <div><span style="font-size:11.5px; padding:2px 8px; border-radius:10px; background:#DCFCE7; color:#15803D;">Đã đăng ký</span></div>
+            <div style="font-size:12px; color:var(--text-muted);">${escapeHtml(p.email)}</div>
+            <div style="font-size:12px; color:var(--text-muted);">17/10/2026</div>
+            <div style="text-align:right;"><button class="btn-detail" onclick="showPlayerDetail(${p.id})">Xem</button></div>
+          </div>
+        </div>
+      `).join('');
+    }
     function applyFilters() {
       const q = document.getElementById('searchInput').value.toLowerCase().trim();
       const rank = document.getElementById('rankFilter').value;
@@ -3827,8 +4058,7 @@
       nu: 'wd',
     };
     const HTML_SCORE_CACHE_KEY = 'nab-hbc-html-scores-v1';
-    const HTML_SHEET_LINK_KEY = 'nab-hbc-html-score-sheet';
-    const HTML_SCRIPT_URL_KEY = 'nab-hbc-html-score-script';
+    const SCORE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1pfw6EYCp-25pLpjrm-NgDeSJGav26MUdaGFeAetPw4s/edit?usp=drive_link';    const HTML_SCRIPT_URL_KEY = 'nab-hbc-html-score-script';
     const SHEET_APPS_SCRIPT = [
       'function doGet(e) {',
       '  if (e && e.parameter && e.parameter.payload) return writeMatchScores_(e);',
@@ -3966,8 +4196,8 @@
       if (withChangeLink) {
         const button = document.createElement('button');
         button.type = 'button';
-        button.textContent = 'Đổi link Sheet';
-        button.onclick = () => loadScoresFromSheet(true);
+        button.textContent = 'Tải lại điểm';
+        button.onclick = () => loadScoresFromSheet();
         el.appendChild(button);
       }
       if (withScriptLink) {
@@ -3979,14 +4209,6 @@
       }
     }
 
-    function readStoredSheetLink() {
-      try {
-        return JSON.parse(localStorage.getItem(HTML_SHEET_LINK_KEY) || '{}');
-      } catch (error) {
-        return {};
-      }
-    }
-
     function parseSheetLink(value) {
       const text = String(value || '').trim();
       const id = text.match(/spreadsheets\/d\/([a-zA-Z0-9-_]+)/)?.[1] || (/^[a-zA-Z0-9-_]{20,}$/.test(text) ? text : '');
@@ -3994,18 +4216,8 @@
       return { id, gid };
     }
 
-    function askSheetLink() {
-      const current = readStoredSheetLink();
-      const seed = current.id ? 'https://docs.google.com/spreadsheets/d/' + current.id + '/edit' + (current.gid ? '?gid=' + current.gid : '') : '';
-      const pasted = prompt('Dán link Google Sheet của file Thứ tự trận. File cần chia sẻ: Bất kỳ ai có đường liên kết.', seed);
-      if (pasted == null) return null;
-      const link = parseSheetLink(pasted);
-      if (!link.id) {
-        setSheetStatus('Link Google Sheet chưa đúng.');
-        return null;
-      }
-      localStorage.setItem(HTML_SHEET_LINK_KEY, JSON.stringify(link));
-      return link;
+    function readStoredSheetLink() {
+      return parseSheetLink(SCORE_SHEET_URL);
     }
 
     function sheetCellBlank(value) {
@@ -4196,8 +4408,8 @@
       }
     }
 
-    async function loadScoresFromSheet(forcePrompt) {
-      const link = forcePrompt || !readStoredSheetLink().id ? askSheetLink() : readStoredSheetLink();
+    async function loadScoresFromSheet() {
+      const link = readStoredSheetLink();  
       if (!link || !link.id) return;
       setSheetStatus('Đang tải điểm từ Google Sheet…');
       try {
@@ -4356,8 +4568,8 @@
         return;
       }
       if (!readStoredSheetLink().id) {
-        setSheetStatus('Hãy bấm Tải điểm từ Sheet và dán link file trước.');
-        return;
+        setSheetStatus('Link Google Sheet trong file HTML chưa đúng.');        
+      return;
       }
       localStorage.setItem(HTML_SCRIPT_URL_KEY, url);
       closeSheetScriptModal();
@@ -4398,8 +4610,8 @@
       if (!readStoredSheetLink().id) {
         setSheetStatus(
           quiet
-            ? 'Đã lưu trên trang. Hãy bấm Tải điểm từ Sheet và dán link file trước khi ghi lên Sheet.'
-            : 'Hãy bấm Tải điểm từ Sheet và dán link file trước.',
+            ? 'Đã lưu trên trang. Link Google Sheet trong file HTML chưa đúng.'
+            : 'Link Google Sheet trong file HTML chưa đúng.';
           true,
         );
         return;
@@ -4416,7 +4628,7 @@
       restoreHtmlScores();
       fillPlayerNames();
       renderMatchesBoard();
-      if (readStoredSheetLink().id) loadScoresFromSheet(false);
+      loadScoresFromSheet();
       renderTeamsView();
       loadLocalPlayers();
 
