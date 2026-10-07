@@ -4500,7 +4500,7 @@ function sendScoresToScript(url, payload) {
   }
   return (async () => {
     for (let index = 1; index < targets.length; index += 1) {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 12000));
       opened.location.href = targets[index];
     }
   })();
