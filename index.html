@@ -2170,10 +2170,12 @@
           <table class="balance-table">
             <thead>
               <tr>
+                <th>Tiêu chí</th>
                 <th><button type="button" class="team-avatar" onclick="openAvatarZoom('team1')" title="Xem avatar Team Wårriœrs"><img src="https://lh3.googleusercontent.com/d/1XAP46tGcRmpY2K21Eu7jBIAPgMTZVNBR" alt="" referrerpolicy="no-referrer"></button>Team Wårriœrs</th>
-                <th><button type="button" class="team-avatar" onclick="openAvatarZoom('team2')" title="Xem avatar Team Tiền"><img src="https://lh3.googleusercontent.com/d/1eRNO-6INX0CnOwLkU2AN-sDZp46yOU0K" alt="" referrerpolicy="no-referrer"></button>Team Tiền</th>
+                <th><button type="button" class="team-avatar" onclick="openAvatarZoom('team2')" title="Xem avatar Team Tiền"><img src="https://lh3.googleusercontent.com/d/1eRNO-6lNX0CnOwLkU2AN-sDZp46yOU0K" alt="" referrerpolicy="no-referrer"></button>Team Tiền</th>
                 <th><button type="button" class="team-avatar" onclick="openAvatarZoom('team3')" title="Xem avatar Team Larvengers"><img src="https://lh3.googleusercontent.com/d/1M8C2LTXhevcRLWL_8Hoa9qP3osJjpJSs" alt="" referrerpolicy="no-referrer"></button>Team Larvengers</th>
-                <th><button type="button" class="team-avatar" onclick="openAvatarZoom('team4')" title="Xem avatar Team Mattari"><img src="https://lh3.googleusercontent.com/d/1K7c691tTx0DK8PzjKpeDQggs7uJWnb5d" alt="" referrerpolicy="no-referrer"></button>Team Mattari</th>
+                <th><button type="button" class="team-avatar" onclick="openAvatarZoom('team4')" title="Xem avatar Team Mattari"><img src="https://lh3.googleusercontent.com/d/1K7c691lTx0DK8PzjKpeDQggs7uJWhb5d" alt="" referrerpolicy="no-referrer"></button>Team Mattari</th>
+              <th>Cân bằng</th>
               </tr>
             </thead>
             <tbody id="balanceTableBody"></tbody>
@@ -3804,7 +3806,8 @@
     // GOOGLE SHEETS & DANH SÁCH NGƯỜI CHƠI (TAB 2)
     // =========================================================
     const PLAYER_SHEET_URL =
-      'https://docs.google.com/spreadsheets/d/18NLI0v073ElZezHwbwkX5zfrHNTarPx899hNCJBqSBg/edit?usp=sharing';    let currentPlayers = [];
+      'https://docs.google.com/spreadsheets/d/18NLI0v073EIZezHwbwKx5zfrHNTarPx899hNCJBqSBg/edit?usp=sharing';    
+    let currentPlayers = [];
 
     function publishPlayers(players) {
       currentPlayers = players;
@@ -3995,36 +3998,6 @@
         </div>
       `).join('');
     }
-    function applyFilters() {
-      const q = document.getElementById('searchInput').value.toLowerCase().trim();
-      const rank = document.getElementById('rankFilter').value;
-      const gender = document.getElementById('genderFilter').value;
-
-      let filtered = currentPlayers.filter(p => {
-        const mQ = p.name.toLowerCase().includes(q) || p.email.toLowerCase().includes(q);
-        const mR = rank === 'all' || p.rank === rank;
-        const mG = gender === 'all' || p.gender === gender;
-        return mQ && mR && mG;
-      });
-
-      document.getElementById('playerCounter').innerText = `Đang hiển thị: ${filtered.length}/${currentPlayers.length} người`;
-      const container = document.getElementById('playerListContainer');
-      container.innerHTML = filtered.map((p, i) => `
-        <div class="player-card">
-          <div class="player-main-row">
-            <div>${i + 1}</div>
-            <div style="font-weight:700;">${p.name}</div>
-            <div><span class="badge-rank rank-${p.rank.replace('+', '_plus')}">${p.rank}</span></div>
-            <div style="font-weight:800;">${p.score}</div>
-            <div>${p.gender}</div>
-            <div><span style="font-size:11.5px; padding:2px 8px; border-radius:10px; background:#DCFCE7; color:#15803D;">Đã đăng ký</span></div>
-            <div style="font-size:12px; color:var(--text-muted);">${p.email}</div>
-            <div style="font-size:12px; color:var(--text-muted);">17/10/2026</div>
-            <div style="text-align:right;"><button class="btn-detail" onclick="alert('${p.name} - Điểm: ${p.score} - Hạng: ${p.rank}')">Xem</button></div>
-          </div>
-        </div>
-      `).join('');
-    }
 
     function resetAllFilters() {
       document.getElementById('searchInput').value = '';
@@ -4058,23 +4031,23 @@
       nu: 'wd',
     };
     const HTML_SCORE_CACHE_KEY = 'nab-hbc-html-scores-v1';
-    const SCORE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1pfw6EYCp-25pLpjrm-NgDeSJGav26MUdaGFeAetPw4s/edit?usp=drive_link';
+    const SCORE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1pfw6EYCp-25pLpjrm-NgDeSJGaV26MUdaGFeAetPw4s/edit?usp=drive_link';
     const SCORE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZWmQPnCGOs9H3XUlG6tuL7WMRdRidVW0ALChThi3n_0tqxyhyAYMw1mdHOjkm-jFXwQ/exec';    
     const HTML_SCRIPT_URL_KEY = 'nab-hbc-html-score-script';
     const SHEET_APPS_SCRIPT = [
   'function doGet(e) {',
   '  if (e && e.parameter && e.parameter.payload) return writeMatchScores_(e);',
   '  return page_("Đã đăng nhập Google. Quay lại trang giải và bấm Ghi điểm lên Sheet.");',
-  '},',
+  '}',
   '',
   'function doPost(e) {',
   '  return writeMatchScores_(e);',
-  '},',
+  '}',
   '',
   'function page_(text) {',
   '  var safe = String(text || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");',
   '  return HtmlService.createHtmlOutput("<p style=\\"font:16px sans-serif;padding:24px;line-height:1.5\\">" + safe + "</p>");',
-  '},',
+  '}',
   '',
   'function writeMatchScores_(e) {',
   '  var email = "";',
