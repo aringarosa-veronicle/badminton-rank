@@ -4359,6 +4359,8 @@
         for (const url of urls) {
           try {
             const response = await fetch(url, { signal: controller.signal });
+            if (response.status === 404) throw new Error('Không tìm thấy Sheet (lỗi 404). Kiểm tra lại mã Sheet trong SCORE_SHEET_URL.');
+            if (!response.ok) throw new Error('Google Sheet trả lỗi ' + response.status + '. Kiểm tra quyền chia sẻ của file.');
             const rows = gvizTable(await response.text());
             const usable = rows.some((row) => row['Mã trận'] || row['Nhà 1'] || row['Nội dung']);
             if (usable || urls.length === 1) return rows;
