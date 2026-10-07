@@ -2611,9 +2611,9 @@
       <ol style="margin:0 0 8px 18px; font-size:13px; line-height:1.5;">
         <li>Mở Google Sheet → Tiện ích → Apps Script.</li>
         <li>Xóa code cũ, dán đoạn bên dưới, rồi lưu.</li>
-        <li>Triển khai → Triển khai mới → loại Ứng dụng web. Nếu đã triển khai rồi: Quản lý các bản triển khai → bút chì → Phiên bản: Bản mới → Triển khai. URL /exec giữ nguyên.</li>
-        <li>Thực thi với tư cách: Tôi. Quyền truy cập: Bất kỳ ai.</li>
-        <li>Dán URL kết thúc bằng <strong>/exec</strong> vào ô dưới.</li>
+        <li>Triển khai → Triển khai mới → loại Ứng dụng web. Nếu đã triển khai rồi: Quản lý các bản triển khai → bút chì → Phiên bản: Bản mới → Triển khai.</li>
+        <li>Thực thi với tư cách: <strong>Người đang truy cập ứng dụng web</strong>. Quyền truy cập: <strong>Bất kỳ ai có tài khoản Google</strong>.</li>
+        <li>Dán URL kết thúc bằng <strong>/exec</strong> vào hằng <strong>SCORE_SCRIPT_URL</strong> trong file HTML.</li>
       </ol>
       <textarea id="sheetScriptSource" class="sheet-script-box" readonly></textarea>
       <div class="modal-actions" style="margin-bottom:10px;">
@@ -4058,58 +4058,72 @@
       nu: 'wd',
     };
     const HTML_SCORE_CACHE_KEY = 'nab-hbc-html-scores-v1';
-    const SCORE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1pfw6EYCp-25pLpjrm-NgDeSJGaV26MUdaGFeAetPw4s/edit?usp=drive_link';    const HTML_SCRIPT_URL_KEY = 'nab-hbc-html-score-script';
+    const SCORE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1pfw6EYCp-25pLpjrm-NgDeSJGav26MUdaGFeAetPw4s/edit?usp=drive_link';
+    const SCORE_SCRIPT_URL = 'DÁN_URL_KẾT_THÚC_BẰNG_/exec_VÀO_ĐÂY';    const HTML_SCRIPT_URL_KEY = 'nab-hbc-html-score-script';
     const SHEET_APPS_SCRIPT = [
-      'function doGet(e) {',
-      '  if (e && e.parameter && e.parameter.payload) return writeMatchScores_(e);',
-      '  return ContentService.createTextOutput("nab-hbc-ok");',
-      '}',
-      '',
-      'function doPost(e) {',
-      '  return writeMatchScores_(e);',
-      '}',
-      '',
-      'function writeMatchScores_(e) {',
-      '  var raw = (e.parameter && e.parameter.payload) || (e.postData && e.postData.contents) || "{}";',
-      '  var body = JSON.parse(raw);',
-      '  var book = SpreadsheetApp.getActiveSpreadsheet();',
-      '  var sheet = book.getSheetByName("Thu tu tran") || book.getSheets()[0];',
-      '  var range = sheet.getDataRange();',
-      '  var values = range.getValues();',
-      '  var header = values[0].map(function (cell) { return String(cell).trim(); });',
-      '  function col(name) { return header.indexOf(name); }',
-      '  var idCol = col("Mã trận");',
-      '  if (idCol < 0) idCol = col("id");',
-      '  var scoreCols = ["Nhà 1", "Khách 1", "Nhà 2", "Khách 2", "Nhà 3", "Khách 3"].map(col);',
-      '  var byId = {};',
-      '  for (var i = 1; i < values.length; i++) {',
-      '    var id = String(values[i][idCol] || "").trim();',
-      '    if (id) byId[id] = i;',
-      '  }',
-      '  var updated = 0;',
-      '  (body.matches || []).forEach(function (match) {',
-      '    var index = byId[match.id];',
-      '    if (index == null) return;',
-      '    var sets = match.sets || [];',
-      '    var cells = [',
-      '      sets[0] ? sets[0][0] : "",',
-      '      sets[0] ? sets[0][1] : "",',
-      '      sets[1] ? sets[1][0] : (match.rr ? "—" : ""),',
-      '      sets[1] ? sets[1][1] : (match.rr ? "—" : ""),',
-      '      sets[2] ? sets[2][0] : (match.rr ? "—" : ""),',
-      '      sets[2] ? sets[2][1] : (match.rr ? "—" : "")',
-      '    ];',
-      '    cells.forEach(function (value, n) {',
-      '      if (scoreCols[n] >= 0) values[index][scoreCols[n]] = value;',
-      '    });',
-      '    updated++;',
-      '  });',
-      '  range.setValues(values);',
-      '  return ContentService.createTextOutput(JSON.stringify({ ok: true, updated: updated }))',
-      '    .setMimeType(ContentService.MimeType.JSON);',
-      '}',
-    ].join('\n');
-
+  'function doGet(e) {',
+  '  if (e && e.parameter && e.parameter.payload) return writeMatchScores_(e);',
+  '  return page_("Đã đăng nhập Google. Quay lại trang giải và bấm Ghi điểm lên Sheet.");',
+  '},',
+  '',
+  'function doPost(e) {',
+  '  return writeMatchScores_(e);',
+  '},',
+  '',
+  'function page_(text) {',
+  '  var safe = String(text || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");',
+  '  return HtmlService.createHtmlOutput("<p style=\\"font:16px sans-serif;padding:24px;line-height:1.5\\">" + safe + "</p>");',
+  '},',
+  '',
+  'function writeMatchScores_(e) {',
+  '  var email = "";',
+  '  try { email = Session.getActiveUser().getEmail() || ""; } catch (err) {}',
+  '  if (!email) return page_("Cần đăng nhập Google bằng tài khoản được phép sửa file điểm, rồi bấm Ghi điểm lên Sheet lại.");',
+  '  try {',
+  '    var raw = (e.parameter && e.parameter.payload) || (e.postData && e.postData.contents) || "{}";',
+  '    var body = JSON.parse(raw);',
+  '    var book = SpreadsheetApp.getActiveSpreadsheet();',
+  '    var sheet = book.getSheetByName("Thu tu tran") || book.getSheets()[0];',
+  '    var range = sheet.getDataRange();',
+  '    var values = range.getValues();',
+  '    var header = values[0].map(function (cell) { return String(cell).trim(); });',
+  '    function col(name) { return header.indexOf(name); }',
+  '    var idCol = col("Mã trận");',
+  '    if (idCol < 0) idCol = col("id");',
+  '    var scoreCols = ["Nhà 1", "Khách 1", "Nhà 2", "Khách 2", "Nhà 3", "Khách 3"].map(col);',
+  '    var byId = {};',
+  '    for (var i = 1; i < values.length; i++) {',
+  '      var id = String(values[i][idCol] || "").trim();',
+  '      if (id) byId[id] = i;',
+  '    }',
+  '    (body.matches || []).forEach(function (match) {',
+  '      var index = byId[match.id];',
+  '      if (index == null) return;',
+  '      var sets = match.sets || [];',
+  '      var cells = [',
+  '        sets[0] ? sets[0][0] : "",',
+  '        sets[0] ? sets[0][1] : "",',
+  '        sets[1] ? sets[1][0] : (match.rr ? "—" : ""),',
+  '        sets[1] ? sets[1][1] : (match.rr ? "—" : ""),',
+  '        sets[2] ? sets[2][0] : (match.rr ? "—" : ""),',
+  '        sets[2] ? sets[2][1] : (match.rr ? "—" : ""),',
+  '      ];',
+  '      cells.forEach(function (value, n) {',
+  '        if (scoreCols[n] >= 0) values[index][scoreCols[n]] = value;',
+  '      });',
+  '    });',
+  '    range.setValues(values);',
+  '    return page_("Đã ghi điểm lên Sheet bằng " + email + ". Có thể đóng cửa sổ này.");',
+  '  } catch (err) {',
+  '    var message = String((err && err.message) || err);',
+  '    if (/permission|quyền|access|authoriz/i.test(message)) {',
+  '      return page_("Tài khoản " + email + " không có quyền sửa file điểm. Nhờ chủ Sheet chia sẻ quyền Người chỉnh sửa.");',
+  '    }',
+  '    return page_("Không ghi được: " + message);',
+  '  }',
+  '}',
+].join('\n');
+    
     const SHEET_MATCH_IDS = {
       'nam_cc1|1|1|2': 'md-s-rr1-c1',
       'nam_cc1|1|3|4': 'md-s-rr1-c2',
@@ -4473,38 +4487,21 @@
       }).length;
     }
 
-    function sendScoresToScript(url, payload) {
-      const json = JSON.stringify(payload);
-      fetch(url, {
-        method: 'POST',
-        mode: 'no-cors',
-        cache: 'no-store',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: json,
-      }).catch(() => {});
-      const iframe = document.createElement('iframe');
-      iframe.name = 'nabSheetSink';
-      iframe.style.display = 'none';
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = url;
-      form.target = iframe.name;
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'payload';
-      input.value = json;
-      form.appendChild(input);
-      document.body.appendChild(iframe);
-      document.body.appendChild(form);
-      form.submit();
-      return new Promise((resolve) => {
-        setTimeout(resolve, 8000);
-        setTimeout(() => {
-          form.remove();
-          iframe.remove();
-        }, 25000);
-      });
-    }
+    function scriptUrl() {
+  const fixed = String(SCORE_SCRIPT_URL || '').trim();
+  if (/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(fixed)) return fixed;
+  return (localStorage.getItem(HTML_SCRIPT_URL_KEY) || '').trim();
+}
+
+function sendScoresToScript(url, payload) {
+  const json = JSON.stringify(payload);
+  const target = url + (url.includes('?') ? '&' : '?') + 'payload=' + encodeURIComponent(json);
+  const opened = window.open(target, 'nabScoreWrite');
+  if (!opened) {
+    return Promise.reject(new Error('Trình duyệt đã chặn cửa sổ Google. Hãy cho phép popup rồi bấm lại.'));
+  }
+  return Promise.resolve();
+}
 
     function openSheetScriptModal() {
       document.getElementById('sheetScriptSource').value = SHEET_APPS_SCRIPT;
@@ -4535,12 +4532,19 @@
         );
         if (!confirmed) return;
       }
-      setSheetStatus(quiet ? 'Đã lưu trên trang. Đang ghi lên Google Sheet…' : 'Đang ghi điểm lên Google Sheet…');
+      setSheetStatus(quiet
+        ? 'Đã lưu trên trang. Cửa sổ Google đang mở: hãy đăng nhập nếu được hỏi.'
+        : 'Cửa sổ Google đang mở: Hãy đăng nhập nếu được hỏi. Tài khoản phải có quyền sửa file điểm.');
       const expected = expectedSheetScores();
-      await sendScoresToScript(url, scorePayload());
+      try {
+        await sendScoresToScript(url, scorePayload());
+      } catch (error) {
+        setSheetStatus((error && error.message) || 'Không mở được cửa sổ Google.', true, true);
+        return;
+      }
       try {
         let filled = null;
-        for (let attempt = 0; attempt < 12; attempt += 1) {
+        for (let attempt = 0; attempt < 20; attempt += 1) {
           await new Promise((resolve) => setTimeout(resolve, attempt === 0 ? 2000 : 3000));
           filled = countSheetScores(await fetchSheetRows(readStoredSheetLink()));
           if (filled === expected) break;
@@ -4549,7 +4553,7 @@
           const detail = expected === 0
             ? 'Sheet vẫn còn ' + filled + ' trận có điểm, chưa xóa được.'
             : 'Sheet đang có ' + filled + ' trận có điểm, trang đang có ' + expected + '.';
-          setSheetStatus(detail + ' Hãy dán script mới và triển khai lại Bản mới. URL /exec giữ nguyên.', true, true);
+          setSheetStatus(detail + ' Xem cửa sổ Google: đăng nhập nếu được hỏi. Nếu cửa sổ báo không có quyền, tài khoản này chưa được chia sẻ quyền Người chỉnh sửa.', true, true);
           return;
         }
         setSheetStatus(
@@ -4600,15 +4604,15 @@
 
     function pushScoresToSheet(options) {
       const quiet = !!(options && options.quiet);
-      const url = localStorage.getItem(HTML_SCRIPT_URL_KEY) || '';
-      if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url)) {
-        if (quiet) {
-          setSheetStatus('Đã lưu trên trang. Chưa ghi được lên Google Sheet. Bấm Ghi điểm lên Sheet để dán URL Apps Script một lần.', true, true);
-          return;
-        }
-        openSheetScriptModal();
-        return;
-      }
+    const url = scriptUrl();
+    if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url)) {
+      setSheetStatus(
+        (quiet ? 'Đã lưu trên trang. ' : '') + 'File HTML chưa có link Apps Script. Tìm SCORE_SCRIPT_URL và dán URL kết thúc bằng /exec.',
+        true,
+        true,
+      );
+      return;
+    }
       if (!readStoredSheetLink().id) {
         setSheetStatus(
           quiet
