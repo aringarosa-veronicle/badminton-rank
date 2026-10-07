@@ -3476,7 +3476,7 @@
       closeScoreModal();
       persistHtmlScores();
       renderMatchesBoard();
-      queueSheetWrite();
+      queueSheetWrite(m.sheetKey);
     }
 
     function populateSampleScores() {
@@ -4427,21 +4427,34 @@
       }
     }
 
-    function scorePayload() {
-      return {
-        matches: MATCHES.filter((match) => match.sheetKey).map((match) => {
-          const rr = match.round !== 'Chung kết';
-          const sets = !match.played
-            ? []
-            : rr
-              ? [[match.scoreA, match.scoreB]]
-              : (match.sets || [])
-                .filter((set) => set.scoreA || set.scoreB)
-                .map((set) => [set.scoreA, set.scoreB]);
-          return { id: match.sheetKey, rr, sets };
-        }),
-      };
-    }
+function scorePayload(keys) {
+  const wanted = keys && keys.length ? new Set(keys) : null;
+  return {
+    matches: MATCHES.filter((match) => match.sheetKey && (!wanted || wanted.has(match.sheetKey))).map((match) => {
+      const rr = match.round !== 'Chung kết';
+      const sets = !match.played
+        ? []
+        : rr
+          ? [[match.scoreA, match.scoreB]]
+          : (match.sets || [])
+            .filter((set) => set.scoreA || set.scoreB)
+            .map((set) => [set.scoreA, set.scoreB]);
+      return { id: match.sheetKey, rr, sets };
+    }),
+  };
+}
+
+function sheetMatchesPayload(rows, payload) {
+  return payload.matches.every((item) => {
+    const row = rows.find((candidate) => sheetRowKey(candidate) === item.id);
+    if (!item.sets.length) return !row || ![1, 2, 3].some((number) => readSheetSet(row, number));
+    if (!row) return false;
+    return item.sets.every((set, index) => {
+      const got = readSheetSet(row, index + 1);
+      return got && got.scoreA === set[0] && got.scoreB === set[1];
+    });
+  });
+}
 
     function countSheetScores(rows) {
       let filled = 0;
@@ -4468,13 +4481,29 @@
 }
 
 function sendScoresToScript(url, payload) {
-  const json = JSON.stringify(payload);
-  const target = url + (url.includes('?') ? '&' : '?') + 'payload=' + encodeURIComponent(json);
-  const opened = window.open(target, 'nabScoreWrite');
+  const targets = [];
+  let batch = [];
+  const pack = () => url + (url.includes('?') ? '&' : '?') + 'payload=' + encodeURIComponent(JSON.stringify({ matches: batch }));
+  payload.matches.forEach((match) => {
+    batch.push(match);
+    if (pack().length > 1500 && batch.length > 1) {
+      const last = batch.pop();
+      targets.push(pack());
+      batch = [last];
+    }
+  });
+  if (batch.length) targets.push(pack());
+  if (!targets.length) return Promise.resolve();
+  const opened = window.open(targets[0], 'nabScoreWrite');
   if (!opened) {
     return Promise.reject(new Error('Trình duyệt đã chặn cửa sổ Google. Hãy cho phép popup rồi bấm lại.'));
   }
-  return Promise.resolve();
+  return (async () => {
+    for (let index = 1; index < targets.length; index += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      opened.location.href = targets[index];
+    }
+  })();
 }
 
     function openSheetScriptModal() {
@@ -4506,32 +4535,41 @@ function sendScoresToScript(url, payload) {
         );
         if (!confirmed) return;
       }
+      const matchKeys = options && options.matchKeys;
+      const payload = scorePayload(matchKeys);
       setSheetStatus(quiet
         ? 'Đã lưu trên trang. Cửa sổ Google đang mở: hãy đăng nhập nếu được hỏi.'
-        : 'Cửa sổ Google đang mở: Hãy đăng nhập nếu được hỏi. Tài khoản phải có quyền sửa file điểm.');
+        : 'Cửa sổ Google đang mở. Hãy đăng nhập nếu được hỏi. Tài khoản phải có quyền sửa file điểm.');
       const expected = expectedSheetScores();
       try {
-        await sendScoresToScript(url, scorePayload());
+        await sendScoresToScript(url, payload);
       } catch (error) {
         setSheetStatus((error && error.message) || 'Không mở được cửa sổ Google.', true, true);
         return;
       }
       try {
         let filled = null;
+        let matched = false;
         for (let attempt = 0; attempt < 20; attempt += 1) {
           await new Promise((resolve) => setTimeout(resolve, attempt === 0 ? 2000 : 3000));
-          filled = countSheetScores(await fetchSheetRows(readStoredSheetLink()));
-          if (filled === expected) break;
+          const rows = await fetchSheetRows(readStoredSheetLink());
+          filled = countSheetScores(rows);
+          matched = matchKeys ? sheetMatchesPayload(rows, payload) : filled === expected;
+          if (matched) break;
         }
-        if (filled !== expected) {
-          const detail = expected === 0
+        if (!matched) {
+          const detail = matchKeys
+            ? 'Chưa thấy tỉ số trận vừa lưu trên Sheet.'
+            : expected === 0
             ? 'Sheet vẫn còn ' + filled + ' trận có điểm, chưa xóa được.'
             : 'Sheet đang có ' + filled + ' trận có điểm, trang đang có ' + expected + '.';
           setSheetStatus(detail + ' Xem cửa sổ Google: đăng nhập nếu được hỏi. Nếu cửa sổ báo không có quyền, tài khoản này chưa được chia sẻ quyền Người chỉnh sửa.', true, true);
           return;
         }
         setSheetStatus(
-          expected
+          matchKeys
+            ? 'Đã lưu trên trang và ghi trận này lên Google Sheet.'
+            : expected
             ? (quiet ? 'Đã lưu trên trang và ghi lên Google Sheet. ' : 'Đã ghi điểm lên Google Sheet. ') + expected + ' trận có tỉ số.'
             : 'Đã xóa hết điểm trên Google Sheet.',
           true,
@@ -4557,21 +4595,22 @@ function sendScoresToScript(url, payload) {
     }
 
     let sheetWriteRunning = false;
-    let sheetWritePending = false;
+    let pendingSheetKeys = [];
 
-    function queueSheetWrite() {
-      sheetWritePending = true;
-      if (sheetWriteRunning) return;
-      sheetWriteRunning = true;
+    function queueSheetWrite(matchKey) {
+      if (matchKey) pendingSheetKeys.push(matchKey);
+      if (sheetWriterRunning) return;
+      sheetWriterRunning = true;
       (async () => {
         try {
-          while (sheetWritePending) {
-            sheetWritePending = false;
-            await pushScoresToSheet({ quiet: true });
+          while (pendingSheetKeys.length) {
+            const keys = pendingSheetKeys;
+            pendingSheetKeys = [];
+            await pushScoresToSheet({ quiet: true, matchKeys: keys });
           }
         } finally {
-          sheetWriteRunning = false;
-          if (sheetWritePending) queueSheetWrite();
+          sheetWriterRunning = false;
+          if (pendingSheetKeys.length) queueSheetWrite();
         }
       })();
     }
