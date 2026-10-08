@@ -4177,7 +4177,7 @@
     const SCORE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw_zawpsn1QICzMapTdgmUy4PNozYDuX6tJ3MUSi3_9vvtODEPpoR4j3CtYYbGkKFjjng/exec';    
     const HTML_SCRIPT_URL_KEY = 'nab-hbc-html-score-script';
     const SHEET_APPS_SCRIPT = [
-  'var SCORE_SHEET_ID = \'1pfw6EYCp-25pLpjrm-NgDeSJGaV26MUdaGfEaEtPw4s\';',
+  'var SCORE_SHEET_ID = \'1pfw6EYCp-25pLpjrm-NgDeSJGaV26MUdaGFeAetPw4s\';',
   '',
   'function doGet(e) {',
   '  var param = (e && e.parameter) || {};',
@@ -4215,7 +4215,7 @@
   '    + \'var raw=hash.slice(key.length);\'',
   '    + \'try{if(raw.charAt(0)!=="{"){raw=decodeURIComponent(raw);}}catch(err){}\'',
   '    + \'google.script.run.withSuccessHandler(show).withFailureHandler(function(err){show("Khong ghi duoc: "+((err&&err.message)||err));}).writeScoresFromPage(raw);\'',
-  '    + \'}\);\'',
+  '    + \'});\'',
   '    + \'</scr\' + \'ipt>\';',
   '  return HtmlService.createHtmlOutput(html).setTitle(\'Ghi điểm\');',
   '}',
