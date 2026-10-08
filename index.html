@@ -549,6 +549,16 @@
     .event-pair-badge.t3 { background: #059669; }
     .event-pair-badge.t4 { background: #D97706; }
 
+    .team-mark {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+      border-radius: 3px;
+      flex-shrink: 0;
+      background: #fff;
+      display: block;
+    }
+
     .event-pair-names {
       font-weight: 600;
       color: var(--text-primary);
@@ -2736,11 +2746,22 @@
     // ĐỊNH DANH TÊN CÁC ĐỘI THI ĐẤU
     // =========================================================
     const TEAM_NAMES = {
-      1: "Team Wårriœrs",
+      1: "Team Wårricers",
       2: "Team Tiền",
       3: "Team Larvengers",
       4: "Team Mattari"
     };
+    
+    const TEAM_MARKS = {
+      1: "https://lh3.googleusercontent.com/d/17hNu6Yk63eC_3xW7AIqLwnJ5BI_jgGpj=s48",
+      2: "https://lh3.googleusercontent.com/d/1IXW4ejKl2P1qs5zW8RRxc8iOCyWDIQi_=s48",
+      3: "https://lh3.googleusercontent.com/d/1y_gxuUbCVuRwm4zot0SeedE7UREff-Qr=s48", 
+      4: "https://lh3.googleusercontent.com/d/1v_w6OI-3gHkEVcjRUO0t0JFz2BAgJfVU=s48"
+    };
+    
+    function teamMark(teamId) {
+      return '<img class="team-mark" src="' + TEAM_MARKS[teamId] + '" alt="" title="' + TEAM_NAMES[teamId] + '" referrerpolicy="no-referrer">';
+    }
 
     // THEME CONTROLLER
     function applyTheme(isDark) {
@@ -3193,19 +3214,19 @@
 
             <div class="event-pairs-list">
               <div class="event-pair-item">
-                <span class="event-pair-badge t1" title="Team Wårriœrs">T1</span>
+                ${teamMark(1)}
                 <span class="event-pair-names">${pairs.t1}</span>
-              </div>
-              <div class="event-pair-item">
-                <span class="event-pair-badge t2" title="Team Tiền">T2</span>
+                </div>
+                <div class="event-pair-item">
+                ${teamMark(2)}
                 <span class="event-pair-names">${pairs.t2}</span>
-              </div>
-              <div class="event-pair-item">
-                <span class="event-pair-badge t3" title="Team Larvengers">T3</span>
+                </div>
+                <div class="event-pair-item">
+                ${teamMark(3)}
                 <span class="event-pair-names">${pairs.t3}</span>
-              </div>
-              <div class="event-pair-item">
-                <span class="event-pair-badge t4" title="Team Mattari">T4</span>
+                </div>
+                <div class="event-pair-item">
+                ${teamMark(4)}
                 <span class="event-pair-names">${pairs.t4}</span>
               </div>
             </div>
@@ -3452,14 +3473,14 @@
                     <div class="match-teams-box">
                       <div class="match-team-row">
                         <div class="match-team-info">
-                          <span class="event-pair-badge t${m.teamA}" title="${TEAM_NAMES[m.teamA]}">T${m.teamA}</span>
+                          ${teamMark(m.teamA)}
                           <span>${highlightPair(pairA, playerQuery)}</span>
                         </div>
                         <span class="match-score-pill ${isWinnerA ? 'winner' : ''}">${scoreDisplayA}</span>
                       </div>
                       <div class="match-team-row">
                         <div class="match-team-info">
-                          <span class="event-pair-badge t${m.teamB}" title="${TEAM_NAMES[m.teamB]}">T${m.teamB}</span>
+                          ${teamMark(m.teamB)}
                           <span>${highlightPair(pairB, playerQuery)}</span>
                         </div>
                         <span class="match-score-pill ${isWinnerB ? 'winner' : ''}">${scoreDisplayB}</span>
