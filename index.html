@@ -316,6 +316,67 @@
       color: var(--text-secondary);
       line-height: 1.35;
     }
+    
+    .champion-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+    
+    .champion-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px 20px;
+      cursor: pointer;
+      text-align: left;
+      color: inherit;
+      font: inherit;
+    }
+    
+    .champion-card img {
+      width: 96px;
+      height: 96px;
+      object-fit: contain;
+      border-radius: 12px;
+      background: #fff;
+    }
+    
+    .champion-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .champion-kicker {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      color: var(--nab-red);
+      text-transform: uppercase;
+    }
+    
+    .champion-name {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.15;
+    }
+    
+    .champion-meta {
+      color: var(--text-muted);
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+    
+    .champion-empty {
+      margin: 0 0 8px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
 
     /* Section Title Dark UI */
     .board-section-title {
@@ -1977,7 +2038,10 @@
 
     <div class="header-nav">
       <div class="nav-tabs">
-        <button class="nav-tab-btn active" id="tabBtnMatches" onclick="switchView('matches')">
+        <button class="nav-tab-btn active" id="tabBtnResults" onclick="switchView('results')">
+          <i class="fa-solid fa-trophy"></i> Kết quả giải đấu
+        </button>
+        <button class="nav-tab-btn" id="tabBtnMatches" onclick="switchView('matches')">
           <i class="fa-solid fa-list-ol"></i> Thứ tự trận đấu
         </button>
         <button class="nav-tab-btn" id="tabBtnTeams" onclick="switchView('teams')">
@@ -1990,7 +2054,7 @@
           <i class="fa-solid fa-book-open"></i> Quy chế & Thể thức giải
         </button>
         <button class="nav-tab-btn" id="tabBtnLocation" onclick="switchView('location')">
-          <i class="fa-solid fa-map-location-dot"></i> Hướng dẫn di chuyển
+          <i class="fa-solid fa-map-location-dot"></i> Thời gian và địa điểm
         </button>
       </div>
       <button class="btn-theme" id="themeToggleBtn" type="button" onclick="toggleTheme()" title="Đổi giao diện sáng / tối" aria-label="Đổi giao diện sáng tối">
@@ -2004,9 +2068,8 @@
     <!-- ================================================= -->
     <!-- TAB: THỨ TỰ THI ĐẤU & BẢNG ĐIỂM TRỰC TIẾP         -->
     <!-- ================================================= -->
-    <div id="viewMatches" class="tab-view active">
-      
-      <!-- Header Banner & Timeline Cards -->
+    <div id="viewResults" class="tab-view active">
+
       <div class="matches-live-header">
         <h2 class="matches-live-title">
           <span class="title-red">|</span> BẢNG ĐIỂM TRỰC TIẾP
@@ -2014,39 +2077,13 @@
         <div class="matches-live-subtitle">
           Tự động tính chuỗi qua: điểm thứ tự (1-gold -> 4-fourth) trong vòng tròn -> huy chương mỗi nội dung. Vàng 6đ, Bạc 4đ, Đồng 2đ, Hạng 4 1đ.
         </div>
-
-                <div class="timeline-cards-row">
-          <div class="timeline-card">
-            <span class="timeline-card-time"><i class="fa-solid fa-users"></i> 08:00 - 08:25</span>
-            <span class="timeline-card-desc">Các đội tập hợp, khởi động</span>
-          </div>
-          <div class="timeline-card">
-            <span class="timeline-card-time"><i class="fa-solid fa-flag"></i> 08:25 - 08:30</span>
-            <span class="timeline-card-desc">Khai mạc giải đấu NAB BADMINTON CHAMPIONSHIP 2026</span>
-          </div>
-          <div class="timeline-card">
-            <span class="timeline-card-time"><i class="fa-solid fa-bolt"></i> 08:30 - 09:38</span>
-            <span class="timeline-card-desc">Vòng tròn đợt 1 · sân 21–30 · cao cấp 1, trung cấp 1, sơ cấp 1, sơ cấp 2, đôi nữ</span>
-          </div>
-          <div class="timeline-card">
-            <span class="timeline-card-time"><i class="fa-regular fa-hourglass-half"></i> 09:38 - 09:53</span>
-            <span class="timeline-card-desc">Nghỉ 15 phút giữa hai đợt vòng tròn</span>
-          </div>
-          <div class="timeline-card">
-            <span class="timeline-card-time"><i class="fa-solid fa-bolt"></i> 09:53 - 11:01</span>
-            <span class="timeline-card-desc">Vòng tròn đợt 2 · sân 21–28 · cao cấp 2, trung cấp 2, mix cao, mix trung</span>
-          </div>
-          <div class="timeline-card">
-            <span class="timeline-card-time"><i class="fa-regular fa-hourglass-half"></i> 11:01 - 11:46</span>
-            <span class="timeline-card-desc">Nghỉ 45 phút trước khi tranh huy chương</span>
-          </div>
-          <div class="timeline-card">
-            <span class="timeline-card-time"><i class="fa-solid fa-medal"></i> 11:46 - 14:46</span>
-            <span class="timeline-card-desc">Tranh huy chương · sân 27–30 · Mix CC và Nam CC2 mỗi nội dung một khung · Nam CC1 cuối</span>
-          </div>
-        </div>
       </div>
-
+    
+      <div class="board-section-title">
+        <span class="bar-red">|</span> ĐỘI VÔ ĐỊCH
+      </div>
+      <div id="championSlot"></div>
+    
       <!-- 1. BẢNG TỔNG ĐIỂM ĐỘI -->
       <div class="board-section-title">
         <span class="bar-red">|</span> BẢNG TỔNG ĐIỂM ĐỘI
@@ -2076,6 +2113,12 @@
         <span class="bar-red">|</span> ĐỘI CHÍNH THỨC VÀ VÒNG TRÒN
       </div>
       <div class="events-grid-9" id="eventsGridContainer"></div>
+    </div>
+
+    <!-- ================================================= -->
+    <!-- TAB: THỨ TỰ TRẬN ĐẤU                              -->
+    <!-- ================================================= -->
+    <div id="viewMatches" class="tab-view">
 
       <!-- 3. THỨ TỰ THI ĐẤU -->
       <div class="board-section-title">
@@ -2565,6 +2608,40 @@
           </a>
         </div>
       </div>
+
+      <div class="board-section-title">
+        <span class="bar-red">|</span> LỊCH TRÌNH TRONG NGÀY
+      </div>
+      <div class="timeline-cards-row">
+        <div class="timeline-card">
+          <span class="timeline-card-time"><i class="fa-solid fa-users"></i> 08:00 - 08:25</span>
+          <span class="timeline-card-desc">Các đội tập hợp, khởi động</span>
+        </div>
+        <div class="timeline-card">
+          <span class="timeline-card-time"><i class="fa-solid fa-flag"></i> 08:25 - 08:30</span>
+          <span class="timeline-card-desc">Khai mạc giải đấu NAB BADMINTON CHAMPIONSHIP 2026</span>
+        </div>
+        <div class="timeline-card">
+          <span class="timeline-card-time"><i class="fa-solid fa-bolt"></i> 08:30 - 09:38</span>
+          <span class="timeline-card-desc">Vòng tròn đợt 1 · sân 21–30 · cao cấp 1, trung cấp 1, sơ cấp 1, sơ cấp 2, đôi nữ</span>
+        </div>
+        <div class="timeline-card">
+          <span class="timeline-card-time"><i class="fa-regular fa-hourglass-half"></i> 09:38 - 09:53</span>
+          <span class="timeline-card-desc">Nghỉ 15 phút giữa hai đợt vòng tròn</span>
+        </div>
+        <div class="timeline-card">
+          <span class="timeline-card-time"><i class="fa-solid fa-bolt"></i> 09:53 - 11:01</span>
+          <span class="timeline-card-desc">Vòng tròn đợt 2 · sân 21–28 · cao cấp 2, trung cấp 2, mix cao, mix trung</span>
+        </div>
+        <div class="timeline-card">
+          <span class="timeline-card-time"><i class="fa-regular fa-hourglass-half"></i> 11:01 - 11:46</span>
+          <span class="timeline-card-desc">Nghỉ 45 phút trước khi tranh huy chương</span>
+        </div>
+        <div class="timeline-card">
+          <span class="timeline-card-time"><i class="fa-solid fa-medal"></i> 11:46 - 14:46</span>
+          <span class="timeline-card-desc">Tranh huy chương · sân 27–30 · Mix CC và Nam CC2 mỗi nội dung một khung · Nam CC1 cuối</span>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -2659,7 +2736,7 @@
     }
 
     function switchView(tab) {
-      const views = ['matches', 'teams', 'players', 'rules', 'location'];
+      const views = ['results', 'matches', 'teams', 'players', 'rules', 'location'];
       views.forEach(v => {
         const viewEl = document.getElementById('view' + v.charAt(0).toUpperCase() + v.slice(1));
         const btnEl = document.getElementById('tabBtn' + v.charAt(0).toUpperCase() + v.slice(1));
@@ -3023,9 +3100,39 @@
       });
     }
 
+    function renderChampion(overallTeams) {
+      const slot = document.getElementById('championSlot');
+      if (!slot) return;
+      const medalsDone = TOURNAMENT_EVENTS.every((ev) => {
+        const gold = MATCHES.find((m) => m.eventId === ev.id && m.round === 'Chung kết' && m.medalType === 'gold');
+        const bronze = MATCHES.find((m) => m.eventId === ev.id && m.round === 'Chung kết' && m.medalType === 'bronze');
+        return !!(gold && gold.played && bronze && bronze.played);
+      });
+      if (!medalsDone || !overallTeams.length) {
+        slot.innerHTML = '<p class="champion-empty">Vô địch được vinh danh khi đủ 9 nội dung đã có trận vàng và trận đồng.</p>';
+        return;
+      }
+      const top = overallTeams[0];
+      const champs = overallTeams.filter((team) => team.totalPoints === top.totalPoints && team.gold === top.gold && team.diff === top.diff);
+      const kicker = champs.length > 1
+        ? 'Đồng vô địch NAB Hanoi Badminton Championship 2026'
+        : 'Vô địch NAB Hanoi Badminton Championship 2026';
+      slot.innerHTML = '<div class="champion-row">' + champs.map((team) => {
+        const avatar = TEAM_AVATARS['team' + team.id];
+        return '<button type="button" class="champion-card" onclick="openAvatarZoom(\'team' + team.id + '\')">'
+          + '<img src="' + avatar.src + '" alt="" referrerpolicy="no-referrer">'
+          + '<span class="champion-copy">'
+          + '<span class="champion-kicker">' + kicker + '</span>'
+          + '<span class="champion-name">' + team.name + '</span>'
+          + '<span class="champion-meta">' + team.totalPoints + ' điểm · ' + team.gold + ' vàng · ' + team.silver + ' bạc · ' + team.bronze + ' đồng</span>'
+          + '</span></button>';
+      }).join('') + '</div>';
+    }
+    
     function renderMatchesBoard() {
       const { eventStandings, overallTeams } = computeTournamentStats();
-
+      renderChampion(overallTeams);
+    
       // 1. Render Bảng tổng điểm đội
       const teamPointsTbody = document.getElementById('teamPointsTableBody');
       teamPointsTbody.innerHTML = overallTeams.map((t, idx) => `
