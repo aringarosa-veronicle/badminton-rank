@@ -3510,9 +3510,9 @@
             <div class="modal-set-row">
               <div class="modal-set-label">Séc ${idx + 1} (17 điểm)</div>
               <div class="modal-inputs-row" style="margin: 4px 0;">
-                <div><input type="number" id="modalSetA_${idx}" class="score-input-number" min="0" max="25" value="${s[idx]?.scoreA || 0}"></div>
-                <div style="font-size:18px; font-weight:800; color:var(--text-muted);">-</div>
-                <div><input type="number" id="modalSetB_${idx}" class="score-input-number" min="0" max="25" value="${s[idx]?.scoreB || 0}"></div>
+              <div><input type="number" id="modalSetA_${idx}" class="score-input-number" min="0" max="25" value="${m.played ? (s[idx] ? s[idx].scoreA : '') : ''}"></div>
+              <div style="font-size:18px; font-weight:800; color:var(--text-muted);">-</div>
+              <div><input type="number" id="modalSetB_${idx}" class="score-input-number" min="0" max="25" value="${m.played ? (s[idx] ? s[idx].scoreB : '') : ''}"></div>
               </div>
             </div>
           `).join('')}
@@ -3526,12 +3526,12 @@
           <div class="modal-inputs-row">
             <div>
               <div style="font-weight:700; font-size:12.5px; margin-bottom:4px;">${TEAM_NAMES[m.teamA]}</div>
-              <input type="number" id="modalScore1" class="score-input-number" min="0" max="30" value="${m.played ? m.scoreA : 25}">
+              <input type="number" id="modalScore1" class="score-input-number" min="0" max="30" value="${m.played ? m.scoreA : ''}">
             </div>
             <div style="font-size:20px; font-weight:800; color:var(--text-muted);">-</div>
             <div>
               <div style="font-weight:700; font-size:12.5px; margin-bottom:4px;">${TEAM_NAMES[m.teamB]}</div>
-              <input type="number" id="modalScore2" class="score-input-number" min="0" max="30" value="${m.played ? m.scoreB : 21}">
+              <input type="number" id="modalScore2" class="score-input-number" min="0" max="30" value="${m.played ? m.scoreB : ''}">
             </div>
           </div>
         `;
@@ -3573,11 +3573,17 @@
         m.scoreB = totalScoreB;
         m.played = (setsWonA > 0 || setsWonB > 0);
       } else {
-        const s1 = parseInt(document.getElementById('modalScore1').value) || 0;
-        const s2 = parseInt(document.getElementById('modalScore2').value) || 0;
-        m.scoreA = s1;
-        m.scoreB = s2;
-        m.played = true;
+        const raw1 = document.getElementById('modalScore1').value.trim();
+        const raw2 = document.getElementById('modalScore2').value.trim();
+        if (raw1 === '' && raw2 === '') {
+          m.scoreA = 0;
+          m.scoreB = 0;
+          m.played = false;
+        } else {
+          m.scoreA = parseInt(raw1, 10) || 0;
+          m.scoreB = parseInt(raw2, 10) || 0;
+          m.played = true;
+        }
       }
 
       closeScoreModal();
