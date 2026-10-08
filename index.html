@@ -321,7 +321,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 16px;
-      margin-bottom: 8px;
+      margin-bottom: 36px;
     }
     
     .champion-card {
@@ -367,13 +367,35 @@
     }
     
     .champion-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
       color: var(--text-muted);
       font-size: 13.5px;
       font-weight: 600;
     }
     
+    .champion-medal {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 800;
+    }
+    
+    .champion-medal.gold { color: #F5C518; }
+    .champion-medal.silver { color: #D6D6D6; }
+    .champion-medal.bronze { color: #CD7F32; }
+    
+    .champion-trophy {
+      margin-left: auto;
+      font-size: 54px;
+      color: #F5C518;
+      line-height: 1;
+    }
+    
     .champion-empty {
-      margin: 0 0 8px;
+      margin: 0 0 36px;
       color: var(--text-muted);
       font-weight: 600;
     }
@@ -3124,10 +3146,14 @@
           + '<span class="champion-copy">'
           + '<span class="champion-kicker">' + kicker + '</span>'
           + '<span class="champion-name">' + team.name + '</span>'
-          + '<span class="champion-meta">' + team.totalPoints + ' điểm · ' + team.gold + ' vàng · ' + team.silver + ' bạc · ' + team.bronze + ' đồng</span>'
-          + '</span></button>';
-      }).join('') + '</div>';
-    }
+          + '<span class="champion-meta"><span>' + team.totalPoints + ' điểm</span>'
+          + '<span class="champion-medal gold"><i class="fa-solid fa-medal"></i>' + team.gold + '</span>'
+          + '<span class="champion-medal silver"><i class="fa-solid fa-medal"></i>' + team.silver + '</span>'
+          + '<span class="champion-medal bronze"><i class="fa-solid fa-medal"></i>' + team.bronze + '</span>'
+          + '</span></span>'
+          + '<i class="fa-solid fa-trophy champion-trophy" aria-hidden="true"></i></button>';
+          }).join('') + '</div>';
+        }
     
     function renderMatchesBoard() {
       const { eventStandings, overallTeams } = computeTournamentStats();
