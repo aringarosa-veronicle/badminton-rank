@@ -232,6 +232,21 @@
       border-color: var(--nab-red);
       color: var(--nab-red);
     }
+    
+    .nav-toggle {
+      display: none;
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
 
     .container {
       max-width: 1280px;
@@ -2054,8 +2069,63 @@
       .rules-score-grid { grid-template-columns: 1fr; }
       .player-main-row { grid-template-columns: 1fr 1fr; gap: 8px; }
     }
-    @media (max-width: 700px) {
-      .events-grid-9 { grid-template-columns: 1fr; }
+@media (max-width: 700px) {
+  html, body { overflow-x: hidden; }
+  header {
+    flex-wrap: wrap;
+    row-gap: 8px;
+    padding: 8px 12px;
+  }
+  .header-nav {
+    display: contents;
+  }
+  .brand-title { order: 1; flex: 1 1 0; min-width: 0; }
+  h1 { font-size: 13px; }
+  .nav-toggle { display: inline-flex; order: 2; }
+  .btn-theme { order: 3; margin-left: 0; }
+  .nav-tabs {
+    order: 4;
+    flex: 1 1 100%;
+    width: 100%;
+    display: none;
+    flex-direction: column;
+    overflow: visible;
+  }
+  header.nav-open .nav-tabs { display: flex; }
+  .nav-tab-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    justify-content: flex-start;
+  }
+  .container { padding: 0 12px; margin-top: 14px; }
+  .matches-live-title { font-size: 21px; gap: 8px; }
+  .matches-live-subtitle { font-size: 12.5px; overflow-wrap: anywhere; }
+  .board-section-title { font-size: 16px; }
+  .events-grid-9,
+  .teams-grid-4,
+  .rules-stats-row,
+  .rules-stepper-grid,
+  .rules-discipline-grid,
+  .matches-grid { grid-template-columns: minmax(0, 1fr); }
+  .player-main-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .event-card,
+  .team-col,
+  .match-item-card { min-width: 0; }
+  .champion-row { display: block; }
+  .champion-card { width: 100%; padding: 14px; gap: 12px; }
+  .champion-card img { width: 64px; height: 64px; }
+  .champion-card img.champion-trophy { width: 52px; height: 64px; }
+  .champion-copy { flex: 1 1 auto; min-width: 0; }
+  .champion-kicker { font-size: 10.5px; }
+  .champion-name { font-size: 21px; overflow-wrap: anywhere; }
+  #playerFilter { min-width: 0; width: 100%; }
+  .filter-input,
+  .filter-select { min-width: 0; flex: 1 1 100%; }
+  .score-bar-label { width: 96px; min-width: 96px; }
+  .score-bar-val { width: auto; }
+  .rules-hero { padding: 18px; }
+}
       .teams-grid-4 { grid-template-columns: 1fr; }
       .rules-stats-row { grid-template-columns: 1fr; }
       .rules-stepper-grid { grid-template-columns: 1fr; }
@@ -2092,7 +2162,10 @@
           <i class="fa-solid fa-map-location-dot"></i> Thời gian và địa điểm
         </button>
       </div>
-      <button class="btn-theme" id="themeToggleBtn" type="button" onclick="toggleTheme()" title="Đổi giao diện sáng / tối" aria-label="Đổi giao diện sáng tối">
+        <button class="nav-toggle" id="navToggle" type="button" onclick="toggleNav()" aria-label="Mở menu" aria-expanded="false">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <button class="btn-theme" id="themeToggleBtn" type="button" onclick="toggleTheme()" title="Đổi giao diện sáng / tối" aria-label="Đổi giao diện sáng tối">
         <i class="fa-solid fa-moon" id="themeIcon"></i>
       </button>
     </div>
@@ -2781,7 +2854,17 @@
       applyTheme(savedTheme ? savedTheme === 'dark' : true);
     }
 
+    function toggleNav(force) {
+      const header = document.querySelector('header');
+      const open = typeof force === 'boolean' ? force : !header.classList.contains('nav-open');
+      header.classList.toggle('nav-open', open);
+      const button = document.getElementById('navToggle');
+      button.setAttribute('aria-expanded', open ? 'true' : 'false');
+      button.innerHTML = open ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+    }
+    
     function switchView(tab) {
+      toggleNav(false);
       const views = ['results', 'matches', 'teams', 'players', 'rules', 'location'];
       views.forEach(v => {
         const viewEl = document.getElementById('view' + v.charAt(0).toUpperCase() + v.slice(1));
