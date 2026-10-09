@@ -2846,7 +2846,7 @@
       </div>
       <div class="modal-subtitle">
         Trang HTML không ghi thẳng được vào Sheet, kể cả khi file để “Bất kỳ ai có đường liên kết” được sửa.
-        Gắn Apps Script một lần trên chính file Thứ tự trận. Sau đó nút này ghi các ô Nhà 1, Khách 1... theo điểm trên trang. Trận huy chương còn ghi Đội nhà, Đôi nhà, Đội khách, Đôi khách.
+        Gắn Apps Script một lần trên chính file Thứ tự trận. Sau đó nút này ghi các ô Nhà 1, Khách 1... theo điểm trên trang. Trận huy chương còn ghi Đội nhà, Đôi nhà, Đội khách và Đôi khách.
       </div>
       <ol style="margin:0 0 8px 18px; font-size:13px; line-height:1.5;">
         <li>Mở Google Sheet → Tiện ích → Apps Script.</li>
@@ -4200,7 +4200,7 @@ function renderMatchesBoard() {
         .then(r => r.text())
         .then(t => {
           const m = t.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/);
-          if (!m) throw new Error('Google Sheet không trả dữ liệu. Kiểm tra file đã chia sẻ "Bất kỳ ai có đường liên kết."');
+          if (!m) throw new Error('Google Sheet không trả dữ liệu. Kiểm tra file đã chia sẻ "Bất kỳ ai có đường liên kết".');
           const json = JSON.parse(m[1]);
           if (json.status === 'error') throw new Error('Google Sheet báo lỗi: ' + ((json.errors && json.errors[0] && json.errors[0].detailed_message) || 'không đọc được'));
           let headers = json.table.cols.map(c => (c && c.label) || '');
@@ -4498,7 +4498,7 @@ function renderMatchesBoard() {
   '  });',
   '  if (!updated) return { text: \'Không tìm thấy mã trận trên Sheet. Kiểm tra cột Mã trận.\' };',
   '  range.setValues(values);',
-  '  return { text: \'Đã ghi \' + updated + \' trận lên Sheet\' + (email ? (\' (bằng \' + email) : \'\') + (named ? \'. Đã ghi đội và đôi cho \' + named + \' trận huy chương\' : \'\') + \'. Có thể đóng cửa sổ này.\' };',
+  '  return { text: \'Đã ghi \' + updated + \' trận lên Sheet\' + (email ? (\' bằng \' + email) : \'\') + (named ? \'. Đã ghi đội và đôi cho \' + named + \' trận huy chương\' : \'\') + \'. Có thể đóng cửa sổ này.\' };',
   '  } catch (err) {',
   '    var message = String((err && err.message) || err);',
   '    if (/permission|quyền|access|authoriz/i.test(message)) {',
