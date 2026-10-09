@@ -286,6 +286,8 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        line-height: 1.4;
+        padding: 0.12em 0;
       }
       
       .matches-live-title .btn-icon-only {
@@ -632,11 +634,17 @@
       border-radius: 8px;
       padding: 14px 16px;
       display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 10px;
+      align-items: stretch;
       margin-bottom: 18px;
+    }
+    
+    .matches-filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
     }
 
     .match-pills-group {
@@ -2172,11 +2180,6 @@
   .score-bar-val { width: auto; }
   .rules-hero { padding: 18px; }
 }
-      .teams-grid-4 { grid-template-columns: 1fr; }
-      .rules-stats-row { grid-template-columns: 1fr; }
-      .rules-stepper-grid { grid-template-columns: 1fr; }
-      .rules-discipline-grid { grid-template-columns: 1fr; }
-    }
   </style>
 </head>
 <body>
@@ -2286,6 +2289,7 @@
 
       <!-- Filter Bar -->
       <div class="matches-filter-bar">
+        <div class="matches-filter-row">
         <select class="matches-select-filter" id="roundFilter" onchange="renderMatchesList()">
           <option value="all">Tất cả 72 trận</option>
           <option value="Lượt 1">Vòng tròn - Lượt 1 (18)</option>
@@ -2293,9 +2297,8 @@
           <option value="Lượt 3">Vòng tròn - Lượt 3 (18)</option>
           <option value="Chung kết">Tranh Huy Chương (18)</option>
         </select>
-      
-        <div class="matches-filter-actions">
-          <select class="matches-select-filter" id="courtFilter" onchange="renderMatchesList()">
+        
+        <select class="matches-select-filter" id="courtFilter" onchange="renderMatchesList()">
             <option value="all">Tất cả các sân (21 - 30)</option>
             <option value="Sân 21">Sân 21</option>
             <option value="Sân 22">Sân 22</option>
@@ -2332,13 +2335,14 @@
 
           <input id="playerFilter" list="playerNameList" placeholder="Lọc theo vận động viên" oninput="renderMatchesList()" />
           <datalist id="playerNameList"></datalist>
-
-          <button class="btn-dark-tool" onclick="toggleAllRounds(false)" title="Mở rộng tất cả lượt trận"><i class="fa-solid fa-angles-down"></i> Mở tất cả</button>
-          <button class="btn-dark-tool" onclick="toggleAllRounds(true)" title="Thu gọn tất cả lượt trận"><i class="fa-solid fa-angles-up"></i> Thu gọn</button>
-          <button class="btn-dark-tool" onclick="populateSampleScores()" title="Tự động điền điểm mẫu mô phỏng"><i class="fa-solid fa-wand-magic-sparkles"></i> Điểm mẫu</button>
-          <button class="btn-dark-tool" onclick="resetAllScores()" title="Đặt lại điểm số về 0-0"><i class="fa-solid fa-arrows-rotate"></i> Reset</button>
-          <button class="btn-dark-tool" onclick="loadScoresFromSheet()" title="Tải lại điểm từ Google Sheet Thứ tự trận"><i class="fa-solid fa-cloud-arrow-down"></i> Tải điểm từ Sheet</button>
-          <button class="btn-dark-export" onclick="pushScoresToSheet()" title="Ghi điểm đang có trên trang vào Google Sheet"><i class="fa-solid fa-cloud-arrow-up"></i> Ghi điểm lên Sheet</button>
+          </div>
+          
+          <div class="matches-filter-actions">
+          <button class="btn-dark-tool btn-icon-only" id="roundsToggleBtn" type="button" onclick="toggleRoundsButton()" title="Thu gọn" aria-label="Thu gọn"><i class="fa-solid fa-angles-up"></i></button>
+          <button class="btn-dark-tool" type="button" onclick="populateSampleScores()" title="Tự động điền điểm mẫu mô phỏng"><i class="fa-solid fa-wand-magic-sparkles"></i> Điểm mẫu</button>
+          <button class="btn-dark-tool btn-icon-only" type="button" onclick="resetAllScores()" title="Reset" aria-label="Reset"><i class="fa-solid fa-arrows-rotate"></i></button>
+          <button class="btn-dark-tool btn-icon-only" type="button" onclick="loadScoresFromSheet()" title="Tải điểm từ Sheet" aria-label="Tải điểm từ Sheet"><i class="fa-solid fa-cloud-arrow-down"></i></button>
+          <button class="btn-dark-export" type="button" onclick="pushScoresToSheet()" title="Ghi điểm đang có trên trang vào Google Sheet"><i class="fa-solid fa-cloud-arrow-up"></i> Lưu</button>
         </div>
       </div>
       <p id="sheetScoreStatus" class="sheet-score-status"></p>
@@ -2355,7 +2359,7 @@
       <div class="teams-container">
         <div class="teams-top-bar">
           <div class="teams-top-left">
-            <h2><span class="bar-red">|</span> 3. KẾT QUẢ PHÂN BỔ ĐỘI</h2>
+            <h2><span class="bar-red">|</span> KẾT QUẢ PHÂN BỔ ĐỘI</h2>
             <div class="teams-top-desc">
               Kéo tên người chơi sang bảng khác để điều chỉnh; điểm, nam/nữ và bảng cân bằng cập nhật ngay. Hoàn tác / Làm lại chỉ áp dụng cho kéo thả (⌘Z / ⇧⌘Z).
             </div>
