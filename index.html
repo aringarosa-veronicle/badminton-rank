@@ -581,6 +581,16 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+    
+    .event-pair-medal {
+      margin-left: auto;
+      flex-shrink: 0;
+      font-size: 14px;
+    }
+    .event-pair-medal.gold { color: #F5C518; }
+    .event-pair-medal.silver { color: #A8ADB4; }
+    .event-pair-medal.bronze { color: #CD7F32; }
+    body.dark-mode .event-pair-medal.silver { color: #D6D6D6; }
 
     .event-standing-mini {
       width: 100%;
@@ -3262,8 +3272,24 @@
           }).join('') + '</div>';
         }
     
-    function renderMatchesBoard() {
-      const { eventStandings, overallTeams } = computeTournamentStats();
+    const MEDAL_LABELS = { gold: 'Huy chương vàng', silver: 'Huy chương bạc', bronze: 'Huy chương đồng' };
+
+function eventPlacement(eventId, standings) {
+  const order = standings.map(st => ({ team: st.team, medal: '' }));
+  const final = (type, top, bottom) => {
+    const m = MATCHES.find(x => x.eventId === eventId && x.round === 'Chung kết' && x.medalType === type);
+    if (!m || !m.played) return;
+    const winA = m.setsWonA > m.setsWonB;
+    order[top] = { team: winA ? m.teamA : m.teamB, medal: top === 0 ? 'gold' : 'bronze' };
+    order[bottom] = { team: winA ? m.teamB : m.teamA, medal: top === 0 ? 'silver' : '' };
+  };
+  final('gold', 0, 1);
+  final('bronze', 2, 3);
+  return order;
+}
+
+function renderMatchesBoard() {
+  const { eventStandings, overallTeams } = computeTournamentStats();
       renderChampion(overallTeams);
     
       // 1. Render Bảng tổng điểm đội
@@ -3296,22 +3322,12 @@
             </div>
 
             <div class="event-pairs-list">
-              <div class="event-pair-item">
-                ${teamMark(1)}
-                <span class="event-pair-names">${pairs.t1}</span>
-                </div>
+              ${eventPlacement(ev.id, standings).map(p => `
                 <div class="event-pair-item">
-                ${teamMark(2)}
-                <span class="event-pair-names">${pairs.t2}</span>
+                  ${teamMark(p.team)}
+                  <span class="event-pair-names">${pairs['t' + p.team]}</span>${p.medal ? `<i class="fa-solid fa-medal event-pair-medal ${p.medal}" title="${MEDAL_LABELS[p.medal]}"></i>` : ''}
                 </div>
-                <div class="event-pair-item">
-                ${teamMark(3)}
-                <span class="event-pair-names">${pairs.t3}</span>
-                </div>
-                <div class="event-pair-item">
-                ${teamMark(4)}
-                <span class="event-pair-names">${pairs.t4}</span>
-              </div>
+              `).join('')}
             </div>
 
             <table class="event-standing-mini">
