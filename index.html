@@ -173,15 +173,18 @@
 
     .nav-tabs {
       display: flex;
+      flex: 1 1 auto;
       background: var(--tab-nav-bg);
       padding: 3px;
       border-radius: 8px;
       border: 1px solid var(--border-color);
       overflow-x: auto;
-      min-width: 0;
-    }
-
-    .nav-tab-btn {
+        min-width: 0;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+      }
+      
+      .nav-tab-btn {
       padding: 6px 10px;
       border-radius: 6px;
       border: none;
@@ -685,18 +688,13 @@
       font-size: 12px;
       outline: none;
       }
-
-#matchFilter {
-  flex: 1 1 240px;
-  min-width: 0;
-}
-
-.matches-filter-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: wrap;
-}
+    
+    .matches-filter-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
 
     /* Matches Section Accordions / Cards */
 
@@ -2883,7 +2881,7 @@
     const TEAM_MARKS = {
       1: "https://lh3.googleusercontent.com/d/17hNu6Yk63eC_3xW7AIqLwnJ5BI_jgGpj=s48",
       2: "https://lh3.googleusercontent.com/d/1IXW4ejKl2P1qs5zW8RRxc8iOCyWDIQi_=s48",
-      3: "https://lh3.googleusercontent.com/d/1y_gxuUbCVuRwm4zot0SeedE7UREff-Qr=s48", 
+      3: "https://lh3.googleusercontent.com/d/1y_gxuUbCVuRwm4zot0SeedE7UREff-Qr=s48",
       4: "https://lh3.googleusercontent.com/d/1v_w6OI-3gHkEVcjRUO0t0JFz2BAgJfVU=s48"
     };
     
@@ -4050,7 +4048,7 @@ function renderMatchesBoard() {
         return `
           <div class="team-col" ondragover="event.preventDefault()" ondrop="handleDrop(event, '${t.id}')">
             <div class="team-col-header">
-              <div class="team-header-title"><button type="button" class="team-avatar" onclick="openAvatarZoom('${t.id}')" title="Xem avatar ${t.name}"><img src="${TEAM_AVATARS[t.id].src}" alt="" referrerpolicy="no-referrer"></button><span class="team-num-badge">${t.badge}</span>${t.name}</div>
+              <div class="team-header-title"><button type="button" class="team-avatar" onclick="openAvatarZoom('${t.id}')" title="Xem avatar ${t.name}"><img src="${TEAM_AVATARS[t.id].src}" alt="" referrerpolicy="no-referrer"></button><span class="team-num-badge">${t.badge}</span> ${t.name}</div>
               <div class="team-header-subtitle">${stats.total} người · ${stats.nam} nam / ${stats.nu} nữ</div>
               <div class="team-header-scores">
                 <div><strong>Điểm ${stats.sumScore.toFixed(2)}</strong></div>
@@ -4116,8 +4114,7 @@ function renderMatchesBoard() {
     // =========================================================
     // GOOGLE SHEETS & DANH SÁCH NGƯỜI CHƠI (TAB 2)
     // =========================================================
-    const PLAYER_SHEET_URL =
-      'https://docs.google.com/spreadsheets/d/18NLI0v073EIZezHwbwKx5zfrHNTarPx899hNCJBqSBg/edit?usp=sharing';    
+    const PLAYER_SHEET_URL ='https://docs.google.com/spreadsheets/d/18NLI0v073EIZezHwbwKx5zfrHNTarPx899hNCJBqSBg/edit?usp=sharing';
     let currentPlayers = [];
 
     function publishPlayers(players) {
@@ -4203,7 +4200,7 @@ function renderMatchesBoard() {
         .then(r => r.text())
         .then(t => {
           const m = t.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/);
-          if (!m) throw new Error('Google Sheet không trả dữ liệu. Kiểm tra file đã chia sẻ "Bất kỳ ai có đường liên kết"');
+          if (!m) throw new Error('Google Sheet không trả dữ liệu. Kiểm tra file đã chia sẻ "Bất kỳ ai có đường liên kết."');
           const json = JSON.parse(m[1]);
           if (json.status === 'error') throw new Error('Google Sheet báo lỗi: ' + ((json.errors && json.errors[0] && json.errors[0].detailed_message) || 'không đọc được'));
           let headers = json.table.cols.map(c => (c && c.label) || '');
@@ -4343,7 +4340,7 @@ function renderMatchesBoard() {
     };
     const HTML_SCORE_CACHE_KEY = 'nab-hbc-html-scores-v1';
     const SCORE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1pfw6EYCp-25pLpjrm-NgDeSJGaV26MUdaGFeAetPw4s/edit?usp=drive_link';
-    const SCORE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw_zawpsn1QICzMapTdgmUy4PNozYDuX6tJ3MUSi3_9vvtODEPpoR4j3CtYYbGkKFjjng/exec';    
+    const SCORE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw_zawpsn1QICzMapTdgmUy4PNozYDuX6tJ3MUSi3_9vvtODEPpoR4j3CtYYbGkKFjjng/exec';
     const HTML_SCRIPT_URL_KEY = 'nab-hbc-html-score-script';
     const SHEET_APPS_SCRIPT = [
   'var SCORE_SHEET_ID = \'1pfw6EYCp-25pLpjrm-NgDeSJGaV26MUdaGFeAetPw4s\';',
@@ -4802,7 +4799,7 @@ function renderMatchesBoard() {
     }
 
     async function loadScoresFromSheet() {
-      const link = readStoredSheetLink();  
+      const link = readStoredSheetLink();
       if (!link || !link.id) return;
       setSheetStatus('Đang tải điểm từ Google Sheet…');
       try {
@@ -4989,7 +4986,7 @@ function sendScoresToScript(url, payload) {
         return;
       }
       if (!readStoredSheetLink().id) {
-        setSheetStatus('Link Google Sheet trong file HTML chưa đúng.');        
+        setSheetStatus('Link Google Sheet trong file HTML chưa đúng.');
       return;
       }
       localStorage.setItem(HTML_SCRIPT_URL_KEY, url);
