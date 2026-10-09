@@ -279,9 +279,21 @@
       display: flex;
       align-items: center;
       gap: 12px;
-    }
-
-    .matches-live-title span.title-red {
+      }
+      
+      .matches-live-heading {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      
+      .matches-live-title .btn-icon-only {
+        margin-left: auto;
+        flex-shrink: 0;
+      }
+      
+      .matches-live-title span.title-red {
       color: var(--nab-red);
     }
 
@@ -664,7 +676,19 @@
       color: var(--text-primary);
       font-size: 12px;
       outline: none;
-    }
+      }
+
+#matchFilter {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.matches-filter-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
 
     /* Matches Section Accordions / Cards */
 
@@ -1059,6 +1083,10 @@
       font-size: 13px;
       line-height: 1.45;
       color: var(--text-muted);
+    }
+    
+    .sheet-score-status:empty {
+      display: none;
     }
 
     .sheet-score-status button {
@@ -1615,7 +1643,15 @@
     }
 
     .btn-dark-export:hover {
-      background: var(--nab-red-dark);
+  background: var(--nab-red-dark);
+    }
+    
+    .btn-dark-tool.btn-icon-only {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      justify-content: center;
+      flex-shrink: 0;
     }
 
     .balance-table-wrapper {
@@ -2190,11 +2226,16 @@
 
       <div class="matches-live-header">
         <h2 class="matches-live-title">
-          <span class="title-red">|</span> BẢNG ĐIỂM TRỰC TIẾP
+          <span class="title-red">|</span>
+          <span class="matches-live-heading">BẢNG ĐIỂM TRỰC TIẾP</span>
+          <button class="btn-dark-tool btn-icon-only" type="button" onclick="loadScoresFromSheet()" title="Tải điểm từ Sheet" aria-label="Tải điểm từ Sheet">
+            <i class="fa-solid fa-cloud-arrow-down"></i>
+          </button>
         </h2>
         <div class="matches-live-subtitle">
           Tự động tính chuỗi qua: điểm thứ tự (1-gold -> 4-fourth) trong vòng tròn -> huy chương mỗi nội dung. Vàng 6đ, Bạc 4đ, Đồng 2đ, Hạng 4 1đ.
         </div>
+        <p class="sheet-score-status"></p>
       </div>
     
       <div class="board-section-title">
@@ -2245,15 +2286,15 @@
 
       <!-- Filter Bar -->
       <div class="matches-filter-bar">
-        <div class="match-pills-group" id="roundPillsContainer">
-          <button class="pill-btn active" onclick="filterMatchesRound('all')">Tất cả 72 trận</button>
-          <button class="pill-btn" onclick="filterMatchesRound('Lượt 1')">Vòng tròn - Lượt 1 (18)</button>
-          <button class="pill-btn" onclick="filterMatchesRound('Lượt 2')">Vòng tròn - Lượt 2 (18)</button>
-          <button class="pill-btn" onclick="filterMatchesRound('Lượt 3')">Vòng tròn - Lượt 3 (18)</button>
-          <button class="pill-btn" onclick="filterMatchesRound('Chung kết')">Tranh Huy Chương (18)</button>
-        </div>
-
-        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <select class="matches-select-filter" id="roundFilter" onchange="renderMatchesList()">
+          <option value="all">Tất cả 72 trận</option>
+          <option value="Lượt 1">Vòng tròn - Lượt 1 (18)</option>
+          <option value="Lượt 2">Vòng tròn - Lượt 2 (18)</option>
+          <option value="Lượt 3">Vòng tròn - Lượt 3 (18)</option>
+          <option value="Chung kết">Tranh Huy Chương (18)</option>
+        </select>
+      
+        <div class="matches-filter-actions">
           <select class="matches-select-filter" id="courtFilter" onchange="renderMatchesList()">
             <option value="all">Tất cả các sân (21 - 30)</option>
             <option value="Sân 21">Sân 21</option>
@@ -3200,15 +3241,18 @@
     // =========================================================
     // RENDER UI THỨ TỰ TRẬN ĐẤU & BẢNG ĐIỂM
     // =========================================================
-    let currentRoundFilter = 'all';
     let collapsedRounds = {};
-
-    function filterMatchesRound(round) {
-      currentRoundFilter = round;
-      document.querySelectorAll('#roundPillsContainer .pill-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.innerText.includes(round === 'all' ? 'Tất cả' : round));
-      });
-      renderMatchesList();
+    let roundsCollapsed = false;
+    
+    function toggleRoundsButton() {
+      roundsCollapsed = !roundsCollapsed;
+      toggleAllRounds(roundsCollapsed);
+      const button = document.getElementById('roundsToggleBtn');
+      const icon = button.querySelector('i');
+      icon.className = roundsCollapsed ? 'fa-solid fa-angles-down' : 'fa-solid fa-angles-up';
+      const label = roundsCollapsed ? 'Mở tất cả' : 'Thu gọn';
+      button.title = label;
+      button.setAttribute('aria-label', label);
     }
 
     function toggleRoundGroup(encodedLabel, groupId) {
@@ -3414,6 +3458,7 @@ function renderMatchesBoard() {
     }
 
     function renderMatchesList() {
+      const roundFilter = document.getElementById('roundFilter').value;
       const courtFilter = document.getElementById('courtFilter').value;
       const eventFilter = document.getElementById('eventFilter').value;
       const teamFilter = document.getElementById('teamFilter').value;
@@ -3421,7 +3466,7 @@ function renderMatchesBoard() {
       const container = document.getElementById('matchesListContainer');
 
       let filtered = MATCHES.filter(m => {
-        const matchRound = (currentRoundFilter === 'all') || (m.round === currentRoundFilter);
+        const matchRound = (roundFilter === 'all') || (m.round === roundFilter);
         const matchCourt = (courtFilter === 'all') || (m.court === courtFilter);
         const matchEvent = (eventFilter === 'all') || (m.eventId === eventFilter);
         const matchTeam = (teamFilter === 'all') || (m.teamA == teamFilter || m.teamB == teamFilter);
@@ -4532,23 +4577,23 @@ function renderMatchesBoard() {
     }
 
     function setSheetStatus(message, withChangeLink, withScriptLink) {
-      const el = document.getElementById('sheetScoreStatus');
-      if (!el) return;
-      el.textContent = message || '';
-      if (withChangeLink) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.textContent = 'Tải lại điểm';
-        button.onclick = () => loadScoresFromSheet();
-        el.appendChild(button);
-      }
-      if (withScriptLink) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.textContent = 'Cập nhật script';
-        button.onclick = () => openSheetScriptModal();
-        el.appendChild(button);
-      }
+      document.querySelectorAll('.sheet-score-status').forEach((el) => {
+        el.textContent = message || '';
+        if (withChangeLink) {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.textContent = 'Tải lại điểm';
+          button.onclick = () => loadScoresFromSheet();
+          el.appendChild(button);
+        }
+        if (withScriptLink) {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.textContent = 'Cập nhật script';
+          button.onclick = () => openSheetScriptModal();
+          el.appendChild(button);
+        }
+      });
     }
 
     function parseSheetLink(value) {
