@@ -4588,7 +4588,11 @@ function renderMatchesBoard() {
       return SHEET_MATCH_IDS[eventId + '|' + kind + '|' + teamA + '|' + teamB] || '';
     }
 
+    let sheetStatusToken = 0;
+
     function setSheetStatus(message, withChangeLink, withScriptLink) {
+      sheetStatusToken += 1;
+      const token = sheetStatusToken;
       document.querySelectorAll('.sheet-score-status').forEach((el) => {
         el.textContent = message || '';
         if (withChangeLink) {
@@ -4606,8 +4610,9 @@ function renderMatchesBoard() {
           el.appendChild(button);
         }
       });
+      return token;
     }
-
+    
     function parseSheetLink(value) {
       const text = String(value || '').trim();
       const id = text.match(/spreadsheets\/d\/([a-zA-Z0-9-_]+)/)?.[1] || (/^[a-zA-Z0-9-_]{20,}$/.test(text) ? text : '');
@@ -4899,6 +4904,9 @@ function sheetMatchesPayload(rows, payload) {
   return (localStorage.getItem(HTML_SCRIPT_URL_KEY) || '').trim();
 }
 
+let scoreWriteWindow = null;
+let scoreWriteGeneration = 0;
+
 function sendScoresToScript(url, payload) {
   const body = JSON.stringify(payload);
   const hash = '#scores=' + encodeURIComponent(body);
@@ -4924,11 +4932,22 @@ function sendScoresToScript(url, payload) {
     target += '?' + params.toString();
   }
   target += hash;
-  const opened = window.open(target, 'nabScoreWrite');
-  if (!opened) {
+  scoreWriteGeneration += 1;
+  scoreWriteWindow = window.open(target, 'nabScoreWrite');
+  if (!scoreWriteWindow) {
     return Promise.reject(new Error('Trình duyệt đã chặn cửa sổ Google. Hãy cho phép popup rồi bấm lại.'));
   }
   return Promise.resolve();
+}
+
+function closeScoreWriteWindow() {
+  const popup = scoreWriteWindow;
+  const generation = scoreWriteGeneration;
+  if (!popup) return;
+  setTimeout(() => {
+    if (generation !== scoreWriteGeneration) return;
+    try { popup.close(); } catch (err) {}
+  }, 1500);
 }
 
     function openSheetScriptModal() {
@@ -5006,16 +5025,22 @@ function sendScoresToScript(url, payload) {
         if (!medalNamesOnSheet(rows, payload)) {
           setSheetStatus('Điểm đã ghi lên Sheet, nhưng tên Đội nhà, Đôi nhà, Đội khách và Đôi khách chưa đổi. Cửa sổ hướng dẫn đang mở. Sao chép script, dán vào Apps Script, rồi triển khai Bản mới của cùng đường dẫn /exec.', true, true);
           openSheetScriptModal();
+          closeScoreWriteWindow();
           return;
         }
-        setSheetStatus(
+        const statusToken = setSheetStatus(
           matchKeys
             ? 'Đã lưu trên trang và ghi trận này lên Google Sheet.'
             : expected
-            ? (quiet ? 'Đã lưu trên trang và ghi lên Google Sheet. ' : 'Đã ghi điểm lên Google Sheet. ') + expected + ' trận có tỉ số.'
+            ? (quiet ? 'Đã lưu trên trang và ghi lên Google Sheet.' : 'Đã ghi điểm lên Google Sheet. ') + expected + ' trận có tỉ số.'
             : 'Đã xóa hết điểm trên Google Sheet.',
           true,
         );
+  closeScoreWriteWindow();
+  setTimeout(() => {
+    if (statusToken !== sheetStatusToken) return;
+    document.querySelectorAll('.sheet-score-status').forEach((el) => { el.textContent = ''; });
+  }, 4000);
       } catch (error) {
         setSheetStatus('Không kiểm tra lại được Sheet sau khi ghi. ' + ((error && error.message) || ''), true, true);
       }
