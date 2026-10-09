@@ -4949,6 +4949,17 @@ function sendScoresToScript(url, payload) {
       setSheetStatus(copied ? 'Đã chép Apps Script. Dán vào Google Sheet → Tiện ích → Apps Script.' : 'Bôi đen ô script rồi sao chép thủ công.');
     }
 
+    function medalNamesOnSheet(rows, payload) {
+      const named = (payload.matches || []).filter((item) => item.home);
+      if (!named.length) return true;
+      return named.every((item) => {
+        const row = rows.find((candidate) => sheetRowKey(candidate) === item.id);
+        if (!row) return false;
+        const same = (column, value) => foldName(row[column]) === foldName(value);
+        return same('Đội nhà', item.home) && same('Đôi nhà', item.pairHome) && same('Đội khách', item.away) && same('Đôi khách', item.pairAway);
+      });
+    }
+    
     async function writeScores(url, options) {
       const quiet = !!(options && options.quiet);
       const played = MATCHES.filter((match) => match.played).length;
@@ -4975,9 +4986,10 @@ function sendScoresToScript(url, payload) {
       try {
         let filled = null;
         let matched = false;
+        let rows = [];
         for (let attempt = 0; attempt < 20; attempt += 1) {
           await new Promise((resolve) => setTimeout(resolve, attempt === 0 ? 2000 : 3000));
-          const rows = await fetchSheetRows(readStoredSheetLink());
+          rows = await fetchSheetRows(readStoredSheetLink());
           filled = countSheetScores(rows);
           matched = matchKeys ? sheetMatchesPayload(rows, payload) : filled === expected;
           if (matched) break;
@@ -4989,6 +5001,11 @@ function sendScoresToScript(url, payload) {
             ? 'Sheet vẫn còn ' + filled + ' trận có điểm, chưa xóa được.'
             : 'Sheet đang có ' + filled + ' trận có điểm, trang đang có ' + expected + '.';
           setSheetStatus(detail + ' Xem cửa sổ Google: đăng nhập nếu được hỏi. Nếu cửa sổ báo không có quyền, tài khoản này chưa được chia sẻ quyền Người chỉnh sửa.', true, true);
+          return;
+        }
+        if (!medalNamesOnSheet(rows, payload)) {
+          setSheetStatus('Điểm đã ghi lên Sheet, nhưng tên Đội nhà, Đôi nhà, Đội khách và Đôi khách chưa đổi. Cửa sổ hướng dẫn đang mở. Sao chép script, dán vào Apps Script, rồi triển khai Bản mới của cùng đường dẫn /exec.', true, true);
+          openSheetScriptModal();
           return;
         }
         setSheetStatus(
