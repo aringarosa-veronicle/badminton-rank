@@ -488,6 +488,24 @@
     .team-points-table tr:hover td {
       background: var(--table-row-hover);
     }
+    
+    .team-points-table tr.playoff-row td {
+      background: rgba(245, 158, 11, 0.16);
+      cursor: grab;
+    }
+    
+    .team-points-table tr.playoff-row:hover td {
+      background: rgba(245, 158, 11, 0.24);
+    }
+    
+    .team-points-table tr.playoff-row.dragging td {
+      opacity: 0.45;
+    }
+    
+    .team-points-table-wrap .event-playoff-note {
+      margin: 0;
+      border-radius: 0;
+    }
 
     .team-points-table td:nth-child(2) {
       text-align: left;
@@ -2332,6 +2350,7 @@
           </thead>
           <tbody id="teamPointsTableBody"></tbody>
         </table>
+        <p id="teamRankNote" class="event-playoff-note" hidden></p>
       </div>
 
       <!-- 2. ĐỘI CHÍNH THỨC VÀ VÒNG TRÒN (9 NỘI DUNG) -->
@@ -3499,7 +3518,82 @@
       });
 
       overallTeams.sort((a, b) => b.totalPoints - a.totalPoints || b.gold - a.gold || b.silver - a.silver || b.bronze - a.bronze || b.won - a.won || b.setDiff - a.setDiff || b.diff - a.diff);
+      applyTeamRankOrder(overallTeams);
       return { eventStandings, overallTeams };
+    }
+    
+    const TEAM_RANK_ORDER_KEY = 'nabTeamRankOrder';
+    
+    function readTeamRankOrders() {
+      try {
+        const data = JSON.parse(localStorage.getItem(TEAM_RANK_ORDER_KEY) || '{}');
+        return data && typeof data === 'object' ? data : {};
+      } catch (error) {
+        return {};
+      }
+    }
+    
+    function writeTeamRankOrders(data) {
+      localStorage.setItem(TEAM_RANK_ORDER_KEY, JSON.stringify(data));
+    }
+    
+    function teamTieKey(group) {
+      return group.map((team) => team.id).slice().sort((a, b) => a - b).join('|');
+    }
+    
+    function applyTeamRankOrder(teams) {
+      const orders = readTeamRankOrders();
+      const groups = [];
+      const used = new Set();
+      let index = 0;
+      while (index < teams.length) {
+        let end = index + 1;
+        while (end < teams.length && sameTeamRank(teams[index], teams[end])) end += 1;
+        if (end - index >= 2) {
+          const slice = teams.slice(index, end);
+          const key = teamTieKey(slice);
+          used.add(key);
+          const saved = orders[key];
+          let ordered = false;
+          if (Array.isArray(saved)) {
+            const byId = new Map(slice.map((team) => [team.id, team]));
+            const next = [];
+            const seen = new Set();
+            saved.forEach((id) => {
+              const row = byId.get(Number(id));
+              if (!row || seen.has(row.id)) return;
+              next.push(row);
+              seen.add(row.id);
+            });
+            slice.forEach((row) => {
+              if (!seen.has(row.id)) next.push(row);
+            });
+            next.forEach((row, offset) => { teams[index + offset] = row; });
+            ordered = seen.size > 0;
+          }
+          groups.push({ start: index, end, key, ordered });
+        }
+        index = end;
+      }
+      let dirty = false;
+      Object.keys(orders).forEach((key) => {
+        if (!used.has(key)) {
+          delete orders[key];
+          dirty = true;
+        }
+      });
+      if (dirty) writeTeamRankOrders(orders);
+      teams.tieGroups = groups;
+      return teams;
+    }
+    
+    function teamRankNote(groups) {
+      if (!groups.length) return '';
+      const lead = groups.some((group) => group.start === 0)
+        ? ' Đội ở vị trí số 1 của nhóm đứng đầu là đội vô địch.'
+        : '';
+      return 'Các đội được tô đang hòa điểm đội, huy chương vàng, bạc, đồng, tổng trận thắng, hiệu số set và hiệu số điểm. Cần đánh set 21 điểm, phải hơn 2 điểm. Nếu tỉ số đạt 29–29 thì bên đạt 30 điểm trước thắng. Ba hoặc bốn đội thì bốc thăm đấu loại. Kéo dòng hoặc bấm ▲ ▼ để chốt thứ tự.' + lead;
+    }
     }
 
     // =========================================================
@@ -3560,7 +3654,10 @@
         return;
       }
       const top = overallTeams[0];
-      const champs = overallTeams.filter((team) => sameTeamRank(team, top));
+      const topGroup = (overallTeams.tieGroups || []).find((group) => group.start === 0);
+      const champs = topGroup && topGroup.ordered
+        ? [top]
+        : overallTeams.filter((team) => sameTeamRank(team, top));
       const kicker = champs.length > 1
         ? 'Đồng vô địch NAB Hanoi Badminton Championship 2026'
         : 'Vô địch NAB Hanoi Badminton Championship 2026';
@@ -3604,10 +3701,19 @@ function renderMatchesBoard() {
     
       // 1. Render Bảng tổng điểm đội
       const teamPointsTbody = document.getElementById('teamPointsTableBody');
-      teamPointsTbody.innerHTML = overallTeams.map((t, idx) => `
-        <tr>
-          <td style="font-weight:700;">${idx + 1}</td>
-          <td>${t.name}</td>
+      const tieGroups = overallTeams.tieGroups || [];
+      teamPointsTbody.innerHTML = overallTeams.map((t, idx) => {
+        const group = tieGroups.find((item) => idx >= item.start && idx < item.end);
+        const drag = group
+          ? ` class="playoff-row" draggable="true" data-team-tie="1" data-tie-key="${group.key}" data-team="${t.id}" ondragstart="teamRankDragStart(event)" ondragover="teamRankDragOver(event)" ondrop="teamRankDrop(event)" ondragend="teamRankDragEnd(event)"`
+          : '';
+        const tools = group
+          ? ` <span class="playoff-tools"><button type="button" class="playoff-move" draggable="false" onclick="event.stopPropagation(); moveTeamRank('${group.key}',${t.id}, -1)" aria-label="Đưa lên">▲</button><button type="button" class="playoff-move" draggable="false" onclick="event.stopPropagation(); moveTeamRank('${group.key}',${t.id}, 1)" aria-label="Đưa xuống">▼</button></span>`
+          : '';
+        return `
+          <tr${drag}>
+            <td style="font-weight:700;">${idx + 1}</td>
+            <td>${tools}${t.name}</td>
           <td style="color:#F59E0B; font-weight:800;">${t.gold}</td>
           <td style="color:#94A3B8; font-weight:800;">${t.silver}</td>
           <td style="color:#D97706; font-weight:800;">${t.bronze}</td>
@@ -3617,7 +3723,14 @@ function renderMatchesBoard() {
           <td style="font-weight:600; color:${t.diff >= 0 ? '#10B981' : '#EF4444'};">${t.diff > 0 ? '+' : ''}${t.diff}</td>
           <td>${t.played}</td>
         </tr>
-      `).join('');
+      `;
+    }).join('');
+    const teamRankNoteEl = document.getElementById('teamRankNote');
+    if (teamRankNoteEl) {
+      const note = teamRankNote(tieGroups);
+      teamRankNoteEl.hidden = !note;
+      teamRankNoteEl.textContent = note;
+    }
 
       // 2. Render 9 thẻ nội dung & vòng tròn
       const eventsContainer = document.getElementById('eventsGridContainer');
@@ -3683,6 +3796,63 @@ function renderMatchesBoard() {
       }
       
       let playoffDragTeam = null;
+      let teamRankDragId = null;
+      
+      function teamRankRows(key) {
+        return [...document.querySelectorAll('#teamPointsTableBody tr[data-team-tie="1"][data-tie-key="' + key + '"]')];
+      }
+      
+      function reorderTeamRank(key, team, targetTeam) {
+        const ids = teamRankRows(key).map((row) => Number(row.dataset.team));
+        const from = ids.indexOf(Number(team));
+        const to = ids.indexOf(Number(targetTeam));
+        if (from < 0 || to < 0 || from === to) return;
+        ids.splice(from, 1);
+        ids.splice(to, 0, Number(team));
+        const orders = readTeamRankOrders();
+        orders[key] = ids;
+        writeTeamRankOrders(orders);
+        renderMatchesBoard();
+      }
+      
+      function moveTeamRank(key, team, delta) {
+        const ids = teamRankRows(key).map((row) => Number(row.dataset.team));
+        const from = ids.indexOf(Number(team));
+        const to = from + delta;
+        if (from < 0 || to < 0 || to >= ids.length) return;
+        reorderTeamRank(key, team, ids[to]);
+      }
+      
+      function teamRankDragStart(event) {
+        teamRankDragId = Number(event.currentTarget.dataset.team);
+        event.currentTarget.classList.add('dragging');
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/plain', String(teamRankDragId));
+      }
+      
+      function teamRankDragOver(event) {
+        const row = event.currentTarget;
+        const source = document.querySelector('#teamPointsTableBody tr.dragging');
+        if (row.dataset.teamTie !== '1' || !source || source.dataset.tieKey !== row.dataset.tieKey) return;
+        if (Number(row.dataset.team) === teamRankDragId) return;
+        event.preventDefault();
+      }
+      
+      function teamRankDrop(event) {
+        event.preventDefault();
+        const row = event.currentTarget;
+        const key = row.dataset.tieKey;
+        const target = Number(row.dataset.team);
+        const team = teamRankDragId;
+        teamRankDragId = null;
+        if (!team || team === target) return;
+        reorderTeamRank(key, team, target);
+      }
+      
+      function teamRankDragEnd(event) {
+        event.currentTarget.classList.remove('dragging');
+        teamRankDragId = null;
+      }
       
       function playoffRows(eventId) {
         return [...document.querySelectorAll('#eventsGridContainer tr[data-playoff="1"][data-event="' + eventId + '"]')];
