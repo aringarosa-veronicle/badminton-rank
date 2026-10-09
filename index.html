@@ -1549,6 +1549,30 @@
       margin-top: 3px;
       font-size: 11px;
     }
+    
+    .rules-rank-lead,
+    .rules-rank-note {
+      margin: 0;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    
+    .rules-rank-list {
+      margin: 8px 0 10px;
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    
+    .rules-rank-lead + .rules-rank-lead,
+    .rules-rank-note + .rules-rank-note {
+      margin-top: 8px;
+    }
 
     /* Discipline Grid */
     .rules-discipline-grid {
@@ -2739,6 +2763,47 @@
         </div>
       </div>
 
+      <!-- Xếp hạng nội dung và đội vô địch (Điều 12 & 15) -->
+      <div class="rules-card-section">
+        <div class="rules-section-heading">
+          <i class="fa-solid fa-list-ol" style="color:var(--nab-red);"></i> Xếp hạng nội dung và đội vô địch (Điều 12 & 15)
+        </div>
+        <div class="rules-section-subheading">Thứ tự xét từ trên xuống. Chỉ chuyển sang tiêu chí sau khi tiêu chí trước vẫn bằng nhau.</div>
+      
+        <div class="rules-score-grid">
+          <div class="rules-score-card round">
+            <div class="rules-score-title"><i class="fa-solid fa-list-ol" style="color:#10B981;"></i> Điều 12. Xếp hạng vòng tròn của một nội dung</div>
+            <p class="rules-rank-lead">Mỗi trận vòng tròn là một set.</p>
+            <ol class="rules-rank-list">
+              <li>Số trận thắng.</li>
+              <li>Hiệu số điểm thắng trừ điểm thua của toàn bộ các trận vòng tròn.</li>
+              <li>Nếu đúng hai đội vẫn bằng nhau: kết quả trận đối đầu trực tiếp giữa hai đội đó.</li>
+              <li>Nếu ba hoặc bốn đội vẫn bằng nhau: hiệu số điểm của các trận giữa những đội đang bằng nhau.</li>
+              <li>Nếu vẫn bằng nhau, và việc bằng nhau đó làm thay đổi đội nào vào tranh vàng hay tranh đồng: các đội liên quan đánh thêm một set 11 điểm, phải hơn 2 điểm, trần 15 điểm. Ban tổ chức ghi nhận thứ tự sau set phân định.</li>
+            </ol>
+            <p class="rules-rank-note">Hạng 1 gặp hạng 2 ở trận tranh vàng. Hạng 3 gặp hạng 4 ở trận tranh đồng. Set phân định chỉ dùng khi thứ tự còn lại làm đổi thành phần hai trận này. Hai đội đã cùng vào một trận huy chương thì không đánh thêm set chỉ để đổi vị trí trong trận đó.</p>
+            <p class="rules-rank-note">Nếu không còn thời gian sân để đánh set phân định, ban tổ chức bốc thăm trước sự có mặt của các đội liên quan, rồi ghi nhận thứ tự như trên.</p>
+            <p class="rules-rank-note">Kết quả vòng tròn chỉ dùng để xếp hạng trong nội dung và để phân nhánh tranh huy chương. Kết quả này không cộng trực tiếp vào điểm đội.</p>
+          </div>
+      
+          <div class="rules-score-card medal">
+            <div class="rules-score-title"><i class="fa-solid fa-trophy" style="color:#F59E0B;"></i> Điều 15. Xếp hạng đội và đội vô địch</div>
+            <p class="rules-rank-lead">Sau khi hoàn thành 9 nội dung, điểm đội của mỗi nội dung là 6 điểm cho hạng nhất, 4 điểm cho hạng nhì, 2 điểm cho hạng ba và 1 điểm cho hạng tư. Đội có tổng điểm đội cao nhất là đội vô địch.</p>
+            <p class="rules-rank-lead">Nếu hai hoặc nhiều đội bằng điểm, xét lần lượt:</p>
+            <ol class="rules-rank-list">
+              <li>Số huy chương vàng.</li>
+              <li>Số huy chương bạc.</li>
+              <li>Số huy chương đồng.</li>
+              <li>Tổng số trận thắng của toàn bộ các trận trong giải, gồm cả vòng tròn.</li>
+              <li>Hiệu số set của toàn bộ các trận trong giải.</li>
+              <li>Hiệu số điểm của toàn bộ các trận trong giải.</li>
+            </ol>
+            <p class="rules-rank-note">Nếu vẫn bằng nhau, mỗi đội liên quan cử một đôi bất kỳ trong danh sách đội để đánh một set 21 điểm, phải hơn 2 điểm. Nếu tỉ số đạt 29–29 thì bên đạt 30 điểm trước thắng. Tên đôi phải gửi ban tổ chức trước giờ đánh 5 phút và không được đổi sau đó. Đội không cử được đôi bị xử thua.</p>
+            <p class="rules-rank-note">Trường hợp ba hoặc bốn đội bằng nhau ở bước set 21 điểm, các đội bốc thăm đấu loại trực tiếp bằng set 21 điểm, phải hơn 2 điểm. Nếu tỉ số đạt 29–29 thì bên đạt 30 điểm trước thắng.</p>
+          </div>
+        </div>
+      </div>
+      
       <!-- Quy định Kỷ luật, Walk-over & Fair-Play (Điều 4, 8, 16, 21) -->
       <div class="rules-card-section">
         <div class="rules-section-heading">
