@@ -2537,8 +2537,8 @@
           </select>
           <button class="btn-dark-export" id="playerSyncBtn" type="button" onclick="syncFromGoogleSheet()" title="Đồng bộ danh sách người chơi từ Google Sheet đã gắn trong file"><i class="fa-solid fa-rotate"></i> Đồng bộ Sheet</button>
         </div>
-        <div id="playerCounter" style="margin-top: 10px; font-size: 12.5px; color: var(--text-muted);">Đang hiển thị: 0 người</div>
-        <div id="playerSyncStatus" style="margin-top: 6px; font-size: 12.5px; color: var(--text-muted);"></div>
+        <div id="playerCounter" style="margin-top:10px; font-size:12.5px; color:var(--text-muted);">Đang hiển thị: 0 người</div>
+        <div id="playerSyncStatus" style="margin-top:6px; font-size:12.5px; color:var(--text-muted);"></div>
       </div>
 
       <div id="loadingSpinner">
@@ -2914,7 +2914,7 @@
 
   </div>
     <div id="avatarZoom" class="avatar-zoom" hidden onclick="if (event.target === this) closeAvatarZoom()">
-    <button type="button" class="avatar-zoom-close" onclick="closeAvatarZoom()" aria-label="Đóng">&times;</button>
+    <button type="button" class="avatar-zoom-close" onclick="closeAvatarZoom()" aria-label="Đóng">×</button>
     <figure onclick="event.stopPropagation()">
       <img id="avatarZoomImg" alt="" referrerpolicy="no-referrer" />
       <figcaption id="avatarZoomName"></figcaption>
@@ -2953,7 +2953,7 @@
       </div>
       <div class="modal-subtitle">
         Trang HTML không ghi thẳng được vào Sheet, kể cả khi file để “Bất kỳ ai có đường liên kết” được sửa.
-        Gắn Apps Script một lần trên chính file Thứ tự trận. Sau đó nút này ghi các ô Nhà 1, Khách 1... theo điểm trên trang. Trận huy chương còn ghi Đội nhà, Đôi nhà, Đội khách và Đôi khách.
+        Gắn Apps Script một lần trên chính file Thứ tự trận. Sau đó nút này ghi các ô Nhà 1, Khách 1… theo điểm trên trang. Trận huy chương còn ghi Đội nhà, Đôi nhà, Đội khách và Đôi khách.
       </div>
       <ol style="margin:0 0 8px 18px; font-size:13px; line-height:1.5;">
         <li>Mở Google Sheet → Tiện ích → Apps Script.</li>
@@ -3405,7 +3405,7 @@
     }
     
     function computeTournamentStats() {
-    // 1. Xếp hạng vòng tròn: thắng, đối đầu hoặc bảng phụ, hiệu số set, hiệu số điểm
+    // 1. Xếp hạng vòng tròn: thắng, hiệu số điểm, đối đầu hoặc điểm giữa các đôi hòa
       const eventStandings = {};
       TOURNAMENT_EVENTS.forEach(ev => {
         eventStandings[ev.id] = applyPlayoffOrder(rankRoundRobin(ev.id), ev.id);
@@ -3636,7 +3636,8 @@ function renderMatchesBoard() {
               ${eventPlacement(ev.id, standings).map(p => `
                 <div class="event-pair-item">
                   ${teamMark(p.team)}
-                  <span class="event-pair-names">${pairs['t' + p.team]}</span>${p.medal ? `<i class="fa-solid fa-medal event-pair-medal ${p.medal}" title="${MEDAL_LABELS[p.medal]}"></i>` : ''}
+                  <span class="event-pair-names">${pairs['t' + p.team]}</span>
+                  ${p.medal ? `<i class="fa-solid fa-medal event-pair-medal ${p.medal}" title="${MEDAL_LABELS[p.medal]}"></i>` : ''}
                 </div>
               `).join('')}
             </div>
@@ -3658,7 +3659,7 @@ function renderMatchesBoard() {
                     ? ` class="playoff-row" draggable="true" data-playoff="1" data-event="${ev.id}" data-team="${st.team}" ondragstart="playoffDragStart(event)" ondragover="playoffDragOver(event)" ondrop="playoffDrop(event)" ondragend="playoffDragEnd(event)"`
                     : '';
                   const tools = tied
-                    ? ` <span class="playoff-tools"><button type="button" class="playoff-move" draggable="false" onclick="event.stopPropagation(); movePlayoff('${ev.id}', ${st.team}, -1)" aria-label="Đưa lên">▲</button><button type="button" class="playoff-move" draggable="false" onclick="event.stopPropagation(); movePlayoff('${ev.id}', ${st.team}, 1)" aria-label="Đưa xuống">▼</button></span>`
+                    ? `<span class="playoff-tools"><button type="button" class="playoff-move" draggable="false" onclick="event.stopPropagation(); movePlayoff('${ev.id}', ${st.team}, -1)" aria-label="Đưa lên">▲</button><button type="button" class="playoff-move" draggable="false" onclick="event.stopPropagation(); movePlayoff('${ev.id}', ${st.team}, 1)" aria-label="Đưa xuống">▼</button></span>`
                     : '';
                   return `
                     <tr${drag}>
@@ -4523,7 +4524,7 @@ function renderMatchesBoard() {
     function syncFromGoogleSheet() {
       const button = document.getElementById('playerSyncBtn');
       if (button) button.disabled = true;
-      setPlayerSyncStatus('Đang đồng bộ danh sách người chơi từ Google Sheet...');
+      setPlayerSyncStatus('Đang đồng bộ danh sách người chơi từ Google Sheet…');
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 12000);
       const sheetId = parseSheetLink(PLAYER_SHEET_URL).id;
@@ -5365,7 +5366,7 @@ function closeScoreWriteWindow() {
           matchKeys
             ? 'Đã lưu trên trang và ghi trận này lên Google Sheet.'
             : expected
-            ? (quiet ? 'Đã lưu trên trang và ghi lên Google Sheet.' : 'Đã ghi điểm lên Google Sheet. ') + expected + ' trận có tỉ số.'
+            ? (quiet ? 'Đã lưu trên trang và ghi lên Google Sheet. ' : 'Đã ghi điểm lên Google Sheet. ') + expected + ' trận có tỉ số.'
             : 'Đã xóa hết điểm trên Google Sheet.',
           true,
         );
