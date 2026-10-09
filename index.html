@@ -4114,7 +4114,7 @@ function renderMatchesBoard() {
     // =========================================================
     // GOOGLE SHEETS & DANH SÁCH NGƯỜI CHƠI (TAB 2)
     // =========================================================
-    const PLAYER_SHEET_URL ='https://docs.google.com/spreadsheets/d/18NLI0v073EIZezHwbwKx5zfrHNTarPx899hNCJBqSBg/edit?usp=sharing';
+    const PLAYER_SHEET_URL = 'https://docs.google.com/spreadsheets/d/18NLI0v073EIZezHwbwKx5zfrHNTarPx899hNCJBqSBg/edit?usp=sharing';
     let currentPlayers = [];
 
     function publishPlayers(players) {
@@ -4194,8 +4194,7 @@ function renderMatchesBoard() {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 12000);
       const sheetId = parseSheetLink(PLAYER_SHEET_URL).id;
-      const gvizUrl =
-        `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&headers=1&tq=&timestamp=${Date.now()}`;
+      const gvizUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&headers=1&tq=&timestamp=${Date.now()}`;
       fetch(gvizUrl, { signal: controller.signal, cache: 'no-store' })
         .then(r => r.text())
         .then(t => {
