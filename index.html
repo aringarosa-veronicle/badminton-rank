@@ -614,7 +614,6 @@
       border-collapse: collapse;
       font-size: 11.5px;
       text-align: center;
-      margin-top: auto;
     }
 
     .event-standing-mini th {
@@ -628,6 +627,49 @@
       padding: 5px 6px;
       border-bottom: 1px solid var(--table-border);
       color: var(--text-primary);
+    }
+    
+    .event-standing-mini tr.playoff-row td {
+      background: rgba(245, 158, 11, 0.16);
+      cursor: grab;
+    }
+    
+    .event-standing-mini tr.playoff-row.dragging td {
+      opacity: 0.45;
+    }
+    
+    .event-standing-mini td.playoff-team {
+      text-align: left;
+    }
+    
+    .playoff-tools {
+      display: inline-flex;
+      gap: 2px;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+    
+    .playoff-move {
+      width: 18px;
+      height: 18px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      cursor: pointer;
+      padding: 0;
+      line-height: 16px;
+      font-size: 11px;
+    }
+    
+    .event-playoff-note {
+      margin: 10px 0 0;
+      padding: 8px 10px;
+      border-radius: 6px;
+      background: rgba(245, 158, 11, 0.14);
+      color: var(--text-primary);
+      font-size: 12px;
+      line-height: 1.45;
     }
 
     /* 72 Matches Filtering and Layout */
@@ -3158,7 +3200,134 @@
       return table;
     }
     
-    function bySetThenPoints(group) {
+    function splitTied(list, same) {
+      const chunks = [];
+      let index = 0;
+      while (index < list.length) {
+        let end = index + 1;
+        while (end < list.length && same(list[index], list[end])) end += 1;
+        chunks.push(list.slice(index, end));
+        index = end;
+      }
+      return chunks;
+    }
+    
+    function rankRoundRobin(eventId) {
+      const matches = roundRobinMatches(eventId);
+      const teams = [1, 2, 3, 4].map((team) => ({
+        team,
+        name: TEAM_NAMES[team],
+        won: 0,
+        lost: 0,
+        diff: 0,
+        tieId: 0
+      }));
+      matches.forEach((match) => {
+        const home = teams.find((item) => item.team === match.teamA);
+        const away = teams.find((item) => item.team === match.teamB);
+        if (!home || !away) return;
+        home.diff += match.scoreA - match.scoreB;
+        away.diff += match.scoreB - match.scoreA;
+        if (match.scoreA > match.scoreB) {
+          home.won += 1;
+          away.lost += 1;
+        } else {
+          away.won += 1;
+          home.lost += 1;
+        }
+      });
+      const sorted = teams.slice().sort((a, b) => b.won - a.won || b.diff - a.diff || a.team - b.team);
+      const ranked = [];
+      let tieSerial = 0;
+      splitTied(sorted, (a, b) => a.won === b.won && a.diff === b.diff).forEach((group) => {
+        if (group.length === 2) {
+          const face = headToHead(matches, group[0].team, group[1].team);
+          const ordered = face > 0 ? [group[1], group[0]] : [group[0], group[1]];
+          const tieId = face === 0 && ordered.every((row) => row.won + row.lost >= 3) ? ++tieSerial : 0;
+          ordered.forEach((row) => { row.tieId = tieId; });
+          ranked.push(...ordered);
+          return;
+        }
+        if (group.length >= 3) {
+          const table = miniTable(matches, group);
+          const ordered = group.slice().sort((a, b) => table[b.team].diff - table[a.team].diff || a.team - b.team);
+          splitTied(ordered, (a, b) => table[a.team].diff === table[b.team].diff).forEach((chunk) => {
+            const tieId = chunk.length >= 2 && chunk.every((row) => row.won + row.lost >= 3) ? ++tieSerial : 0;
+            chunk.forEach((row) => { row.tieId = tieId; });
+            ranked.push(...chunk);
+          });
+          return;
+        }
+        ranked.push(...group);
+      });
+      let index = 0;
+      while (index < ranked.length) {
+        const tieId = ranked[index].tieId;
+        let end = index + 1;
+        if (tieId) {
+          while (end < ranked.length && ranked[end].tieId === tieId) end += 1;
+          if (index <= 1 && end >= 3) {
+            ranked.playoff = { start: index, end };
+            break;
+          }
+        }
+        index = end;
+      }
+      return ranked;
+    }
+    
+    const PLAYOFF_ORDER_KEY = 'nabPlayoffOrder';
+    
+    function readPlayoffOrders() {
+      try {
+        const data = JSON.parse(localStorage.getItem(PLAYOFF_ORDER_KEY) || '{}');
+        return data && typeof data === 'object' ? data : {};
+      } catch (error) {
+        return {};
+      }
+    }
+    
+    function writePlayoffOrders(data) {
+      localStorage.setItem(PLAYOFF_ORDER_KEY, JSON.stringify(data));
+    }
+    
+    function applyPlayoffOrder(rows, eventId) {
+      const orders = readPlayoffOrders();
+      const playoff = rows.playoff;
+      if (!playoff) {
+        if (orders[eventId]) {
+          delete orders[eventId];
+          writePlayoffOrders(orders);
+        }
+        return rows;
+      }
+      const saved = orders[eventId];
+      if (!Array.isArray(saved)) return rows;
+      const slice = rows.slice(playoff.start, playoff.end);
+      const byTeam = new Map(slice.map((row) => [row.team, row]));
+      const next = [];
+      const seen = new Set();
+      saved.forEach((team) => {
+        const row = byTeam.get(Number(team));
+        if (!row || seen.has(row.team)) return;
+        next.push(row);
+        seen.add(row.team);
+      });
+      slice.forEach((row) => {
+        if (!seen.has(row.team)) next.push(row);
+      });
+      const merged = rows.slice(0, playoff.start).concat(next, rows.slice(playoff.end));
+      merged.playoff = playoff;
+      return merged;
+    }
+    
+    function playoffNoteText(start, end) {
+      const gold = Math.max(0, Math.min(end, 2) - start);
+      const bronze = (end - start) - gold;
+      const upper = gold === 1 ? 'Vị trí đầu của nhóm vào tranh vàng.' : 'Hai vị trí đầu của nhóm vào tranh vàng.';
+      const lower = bronze === 1 ? 'Vị trí cuối của nhóm vào tranh đồng.' : 'Các vị trí còn lại của nhóm vào tranh đồng.';
+      return 'Các đội được tô đang hòa số trận thắng và hiệu số điểm, kể cả các trận giữa họ. Cần đánh set 11 điểm, phải hơn 2 điểm, trần 15. Hết giờ sân thì bốc thăm. Kéo dòng hoặc bấm ▲ ▼ để chốt thứ tự sau khi phân định. ' + upper + ' ' + lower;
+    }
       return group.slice().sort((a, b) => b.setDiff - a.setDiff || b.diff - a.diff);
     }
     
@@ -3246,7 +3415,7 @@
     // 1. Xếp hạng vòng tròn: thắng, đối đầu hoặc bảng phụ, hiệu số set, hiệu số điểm
       const eventStandings = {};
       TOURNAMENT_EVENTS.forEach(ev => {
-        eventStandings[ev.id] = rankRoundRobin(ev.id);
+        eventStandings[ev.id] = applyPlayoffOrder(rankRoundRobin(ev.id), ev.id);
       });
 
       // 2. Gán các cặp tranh huy chương dựa trên BXH vòng tròn
@@ -3425,6 +3594,8 @@ function eventPlacement(eventId, standings) {
   const final = (type, top, bottom) => {
     const m = MATCHES.find(x => x.eventId === eventId && x.round === 'Chung kết' && x.medalType === type);
     if (!m || !m.played) return;
+    const seeds = [order[top].team, order[bottom].team];
+    if (!seeds.includes(m.teamA) || !seeds.includes(m.teamB)) return;
     const winA = m.setsWonA > m.setsWonB;
     order[top] = { team: winA ? m.teamA : m.teamB, medal: top === 0 ? 'gold' : 'bronze' };
     order[bottom] = { team: winA ? m.teamB : m.teamA, medal: top === 0 ? 'silver' : '' };
@@ -3460,6 +3631,7 @@ function renderMatchesBoard() {
       eventsContainer.innerHTML = TOURNAMENT_EVENTS.map(ev => {
         const pairs = EVENT_PAIRS[ev.id];
         const standings = eventStandings[ev.id];
+        const playoff = standings.playoff;
         return `
           <div class="event-card">
             <div class="event-card-header">
@@ -3487,24 +3659,92 @@ function renderMatchesBoard() {
                 </tr>
               </thead>
               <tbody>
-                ${standings.map((st, i) => `
-                  <tr>
-                    <td style="font-weight:700;">${i + 1}</td>
-                    <td>${st.name}</td>
-                    <td>${st.won}</td>
-                    <td>${st.lost}</td>
-                    <td style="color:${st.diff >= 0 ? '#10B981' : '#EF4444'}; font-weight:600;">${st.diff > 0 ? '+' : ''}${st.diff}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
+                ${standings.map((st, i) => {
+                  const tied = !!(playoff && i >= playoff.start && i < playoff.end);
+                  const drag = tied
+                    ? ` class="playoff-row" draggable="true" data-playoff="1" data-event="${ev.id}" data-team="${st.team}" ondragstart="playoffDragStart(event)" ondragover="playoffDragOver(event)" ondrop="playoffDrop(event)" ondragend="playoffDragEnd(event)"`
+                    : '';
+                  const tools = tied
+                    ? ` <span class="playoff-tools"><button type="button" class="playoff-move" draggable="false" onclick="event.stopPropagation(); movePlayoff('${ev.id}', ${st.team}, -1)" aria-label="Đưa lên">▲</button><button type="button" class="playoff-move" draggable="false" onclick="event.stopPropagation(); movePlayoff('${ev.id}', ${st.team}, 1)" aria-label="Đưa xuống">▼</button></span>`
+                    : '';
+                  return `
+                    <tr${drag}>
+                      <td style="font-weight:700;">${i + 1}</td>
+                      <td${tied ? ' class="playoff-team"' : ''}>${tools}${st.name}</td>
+                      <td>${st.won}</td>
+                      <td>${st.lost}</td>
+                      <td style="color:${st.diff >= 0 ? '#10B981' : '#EF4444'}; font-weight:600;">${st.diff > 0 ? '+' : ''}${st.diff}</td>
+                    </tr>
+                  `;
+                }).join('')}
+                </tbody>
+                </table>
+                ${playoff ? `<p class="event-playoff-note">${playoffNoteText(playoff.start, playoff.end)}</p>` : ''}
           </div>
         `;
       }).join('');
 
       // 3. Render danh sách trận
       renderMatchesList();
-    }
+      }
+      
+      let playoffDragTeam = null;
+      
+      function playoffRows(eventId) {
+        return [...document.querySelectorAll('#eventsGridContainer tr[data-playoff="1"][data-event="' + eventId + '"]')];
+      }
+      
+      function reorderPlayoff(eventId, team, targetTeam) {
+        const ids = playoffRows(eventId).map((row) => Number(row.dataset.team));
+        const from = ids.indexOf(Number(team));
+        const to = ids.indexOf(Number(targetTeam));
+        if (from < 0 || to < 0 || from === to) return;
+        ids.splice(from, 1);
+        ids.splice(to, 0, Number(team));
+        const orders = readPlayoffOrders();
+        orders[eventId] = ids;
+        writePlayoffOrders(orders);
+        renderMatchesBoard();
+      }
+      
+      function movePlayoff(eventId, team, delta) {
+        const ids = playoffRows(eventId).map((row) => Number(row.dataset.team));
+        const from = ids.indexOf(Number(team));
+        const to = from + delta;
+        if (from < 0 || to < 0 || to >= ids.length) return;
+        reorderPlayoff(eventId, team, ids[to]);
+      }
+      
+      function playoffDragStart(event) {
+        playoffDragTeam = Number(event.currentTarget.dataset.team);
+        event.currentTarget.classList.add('dragging');
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/plain', String(playoffDragTeam));
+      }
+      
+      function playoffDragOver(event) {
+        const row = event.currentTarget;
+        const source = document.querySelector('#eventsGridContainer tr.dragging');
+        if (row.dataset.playoff !== '1' || !source || source.dataset.event !== row.dataset.event) return;
+        if (Number(row.dataset.team) === playoffDragTeam) return;
+        event.preventDefault();
+      }
+      
+      function playoffDrop(event) {
+        event.preventDefault();
+        const row = event.currentTarget;
+        const eventId = row.dataset.event;
+        const target = Number(row.dataset.team);
+        const team = playoffDragTeam;
+        playoffDragTeam = null;
+        if (!team || team === target) return;
+        reorderPlayoff(eventId, team, target);
+      }
+      
+      function playoffDragEnd(event) {
+        event.currentTarget.classList.remove('dragging');
+        playoffDragTeam = null;
+      }
 
     function foldName(value) {
       return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/\s+/g, ' ').trim();
