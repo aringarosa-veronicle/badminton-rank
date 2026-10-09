@@ -2846,7 +2846,7 @@
       </div>
       <div class="modal-subtitle">
         Trang HTML không ghi thẳng được vào Sheet, kể cả khi file để “Bất kỳ ai có đường liên kết” được sửa.
-        Gắn Apps Script một lần trên chính file Thứ tự trận. Sau đó nút này ghi các ô Nhà 1, Khách 1… theo điểm trên trang.
+        Gắn Apps Script một lần trên chính file Thứ tự trận. Sau đó nút này ghi các ô Nhà 1, Khách 1... theo điểm trên trang. Trận huy chương còn ghi Đội nhà, Đôi nhà, Đội khách, Đôi khách.
       </div>
       <ol style="margin:0 0 8px 18px; font-size:13px; line-height:1.5;">
         <li>Mở Google Sheet → Tiện ích → Apps Script.</li>
@@ -4395,13 +4395,16 @@ function renderMatchesBoard() {
   '    if ((a == null || String(a) === \'\') && (b == null || String(b) === \'\')) continue;',
   '    sets.push([Number(a || 0), Number(b || 0)]);',
   '  }',
-  '  return JSON.stringify({',
-  '    matches: [{',
-  '      id: String(param.id || \'\'),',
-  '      rr: String(param.rr || \'1\') !== \'0\',',
-  '      sets: sets',
-  '    }]',
-  '  });',
+  '  var item = {',
+  '    id: String(param.id || \'\'),',
+  '    rr: String(param.rr || \'1\') !== \'0\',',
+  '    sets: sets',
+  '  };',
+  '  if (param.home) item.home = String(param.home);',
+  '  if (param.away) item.away = String(param.away);',
+  '  if (param.ph) item.pairHome = String(param.ph);',
+  '  if (param.pa) item.pairAway = String(param.pa);',
+  '  return JSON.stringify({ matches: [item] });',
   '}',
   '',
   'function parseBody_(raw) {',
@@ -4459,7 +4462,11 @@ function renderMatchesBoard() {
   '    var idCol = col(\'Mã trận\');',
   '    if (idCol < 0) idCol = col(\'id\');',
   '    if (idCol < 0) return { text: \'Sheet không có cột Mã trận.\' };',
-  '    var scoreCols = [\'Nhà 1\', \'Khách 1\', \'Nhà 2\', \'Khách 2\', \'Nhà 3\', \'Khách 3\'].map(col);',
+  '  var scoreCols = [\'Nhà 1\', \'Khách 1\', \'Nhà 2\', \'Khách 2\', \'Nhà 3\', \'Khách 3\'].map(col);',
+  '  var homeCol = col(\'Đội nhà\');',
+  '  var pairHomeCol = col(\'Đôi nhà\');',
+  '  var awayCol = col(\'Đội khách\');',
+  '  var pairAwayCol = col(\'Đôi khách\');',
   '    var byId = {};',
   '    var i;',
   '    for (i = 1; i < values.length; i++) {',
@@ -4467,6 +4474,7 @@ function renderMatchesBoard() {
   '      if (id) byId[id] = i;',
   '    }',
   '    var updated = 0;',
+  '  var named = 0;',
   '    (body.matches || []).forEach(function (match) {',
   '      var index = byId[match.id];',
   '      if (index == null) return;',
@@ -4480,13 +4488,17 @@ function renderMatchesBoard() {
   '        sets[2] ? sets[2][0] : (match.rr ? \'—\' : \'\'),',
   '        sets[2] ? sets[2][1] : (match.rr ? \'—\' : \'\')',
   '      ];',
-  '      cells.forEach(function (value, n) {',
-  '        if (scoreCols[n] >= 0) values[index][scoreCols[n]] = value;',
-  '      });',
+  '    cells.forEach(function (value, n) {',
+  '      if (scoreCols[n] >= 0) values[index][scoreCols[n]] = value;',
   '    });',
-  '    if (!updated) return { text: \'Không tìm thấy mã trận trên Sheet. Kiểm tra cột Mã trận.\' };',
-  '    range.setValues(values);',
-  '    return { text: \'Đã ghi \' + updated + \' trận lên Sheet\' + (email ? (\' bằng \' + email) : \'\') + \'. Có thể đóng cửa sổ này.\' };',
+  '    if (match.home != null && homeCol >= 0) { values[index][homeCol] = match.home; named++; }',
+  '    if (match.pairHome != null && pairHomeCol >= 0) values[index][pairHomeCol] = match.pairHome;',
+  '    if (match.away != null && awayCol >= 0) values[index][awayCol] = match.away;',
+  '    if (match.pairAway != null && pairAwayCol >= 0) values[index][pairAwayCol] = match.pairAway;',
+  '  });',
+  '  if (!updated) return { text: \'Không tìm thấy mã trận trên Sheet. Kiểm tra cột Mã trận.\' };',
+  '  range.setValues(values);',
+  '  return { text: \'Đã ghi \' + updated + \' trận lên Sheet\' + (email ? (\' (bằng \' + email) : \'\') + (named ? \'. Đã ghi đội và đôi cho \' + named + \' trận huy chương\' : \'\') + \'. Có thể đóng cửa sổ này.\' };',
   '  } catch (err) {',
   '    var message = String((err && err.message) || err);',
   '    if (/permission|quyền|access|authoriz/i.test(message)) {',
@@ -4839,7 +4851,15 @@ function scorePayload(keys) {
           : (match.sets || [])
             .filter((set) => set.scoreA || set.scoreB)
             .map((set) => [set.scoreA, set.scoreB]);
-      return { id: match.sheetKey, rr, sets };
+      const item = { id: match.sheetKey, rr, sets };
+      if (!rr) {
+        const pairs = EVENT_PAIRS[match.eventId] || {};
+        item.home = TEAM_NAMES[match.teamA] || '';
+        item.away = TEAM_NAMES[match.teamB] || '';
+        item.pairHome = pairs['t' + match.teamA] || '';
+        item.pairAway = pairs['t' + match.teamB] || '';
+      }
+      return item;
     }),
   };
 }
@@ -4891,6 +4911,12 @@ function sendScoresToScript(url, payload) {
       const match = payload.matches[0];
       params.set('id', match.id);
       params.set('rr', match.rr ? '1' : '0');
+      if (!match.rr) {
+        params.set('home', match.home || '');
+        params.set('away', match.away || '');
+        params.set('ph', match.pairHome || '');
+        params.set('pa', match.pairAway || '');
+      }
       (match.sets || []).forEach((set, index) => {
         params.set('a' + (index + 1), String(set[0]));
         params.set('b' + (index + 1), String(set[1]));
@@ -4930,7 +4956,7 @@ function sendScoresToScript(url, payload) {
       if (!quiet) {
         const confirmed = window.confirm(
           played
-            ? 'Ghi ' + played + ' trận có điểm lên Google Sheet? Trận chưa có điểm sẽ bị xóa ô điểm trên Sheet.'
+            ? 'Ghi ' + played + ' trận có điểm lên Google Sheet? Trận huy chương cũng ghi lại đội và đôi. Trận chưa có điểm sẽ bị xóa ô điểm trên Sheet.'
             : 'Trang chưa có điểm. Ghi lên Sheet sẽ xóa hết ô điểm. Tiếp tục?',
         );
         if (!confirmed) return;
