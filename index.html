@@ -3812,6 +3812,9 @@ function renderMatchesBoard() {
         orders[key] = ids;
         writeTeamRankOrders(orders);
         renderMatchesBoard();
+        const standings = computeTournamentStats().overallTeams;
+        const topGroup = (standings.tieGroups || []).find((group) => group.start === 0);
+        if (topGroup && topGroup.key === key && topGroup.ordered) queueChampionWrite();
       }
       
       function moveTeamRank(key, team, delta) {
@@ -4944,6 +4947,24 @@ function renderMatchesBoard() {
   '  return sheets[0];',
   '}',
   '',
+  'function writeChampion_(book, champion) {',
+  '  if (!champion) return \'\';',
+  '  var sheetName = \'Đội vô địch\';',
+  '  var sheet = book.getSheetByName(sheetName);',
+  '  if (!sheet) sheet = book.insertSheet(sheetName, book.getSheets().length);',
+  '  var order = champion.order || [];',
+  '  var names = champion.names || [];',
+  '  var last = sheet.getLastRow();',
+  '  if (last > 1) sheet.getRange(2, 1, last - 1, 3).clearContent();',
+  '  sheet.getRange(1, 1, 1, 3).setValues([[\'Thứ tự\', \'Mã đội\', \'Đội\']]);',
+  '  if (!order.length) return \' Chưa chốt đội vô địch.\';',
+  '  var rows = [];',
+  '  var i;',
+  '  for (i = 0; i < order.length; i++) rows.push([i + 1, Number(order[i]), names[i] || \'\']);',
+  '  sheet.getRange(2, 1, rows.length, 3).setValues(rows);',
+  '  return \' Đội vô địch: \' + (names[0] || order[0]) + \'.\';',
+  '},',
+  '',
   'function applyScores_(raw) {',
   '  var email = \'\';',
   '  try { email = Session.getActiveUser().getEmail() || \'\'; } catch (err) {}',
@@ -4951,11 +4972,12 @@ function renderMatchesBoard() {
   '    try { email = Session.getEffectiveUser().getEmail() || \'\'; } catch (err2) {}',
   '  }',
   '  try {',
-  '    var body = parseBody_(raw);',
-  '    if (!body.matches || !body.matches.length) {',
-  '      return { text: \'Không nhận được điểm để ghi. Quay lại trang giải và bấm lại.\' };',
-  '    }',
-  '    var book = openBook_();',
+  '  var body = parseBody_(raw);',
+  '  var book = openBook_();',
+  '  var championNote = writeChampion_(book, body.champion);',
+  '  if (!body.matches || !body.matches.length) {',
+  '    return { text: championNote || \'Không nhận được điểm để ghi. Quay lại trang giải và bấm lại.\' };',
+  '  }',
   '    var sheet = findSheet_(book);',
   '    var range = sheet.getDataRange();',
   '    var values = range.getValues();',
@@ -5000,7 +5022,7 @@ function renderMatchesBoard() {
   '  });',
   '  if (!updated) return { text: \'Không tìm thấy mã trận trên Sheet. Kiểm tra cột Mã trận.\' };',
   '  range.setValues(values);',
-  '  return { text: \'Đã ghi \' + updated + \' trận lên Sheet\' + (email ? (\' bằng \' + email) : \'\') + (named ? \'. Đã ghi đội và đôi cho \' + named + \' trận huy chương\' : \'\') + \'. Có thể đóng cửa sổ này.\' };',
+  '    return { text: \'Đã ghi \' + updated + \' trận lên Sheet\' + (email ? (\' (bằng \' + email) : \'\') + (named ? \'. Đã ghi đội và đôi cho \' + named + \' trận huy chương\' : \'\') + championNote + \'. Có thể đóng cửa sổ này.\' };',
   '  } catch (err) {',
   '    var message = String((err && err.message) || err);',
   '    if (/permission|quyền|access|authoriz/i.test(message)) {',
@@ -5335,9 +5357,10 @@ function renderMatchesBoard() {
           setSheetStatus('File này không có cột Mã trận hoặc Nhà 1. Hãy dùng file Xuất Excel thứ tự trận.', true);
           return;
         }
+        await loadChampionFromSheet();
         persistHtmlScores();
         renderMatchesBoard();
-        setSheetStatus('Đã tải ' + filled + ' trận có điểm từ Google Sheet. ' + (known - filled) + ' trận chưa có điểm.', true);
+        setSheetStatus('Đã tải ' + filled + ' trận có điểm từ Google Sheet.' + (known - filled) + ' trận chưa có điểm.', true);
       } catch (error) {
         const message = error && error.name === 'AbortError'
           ? 'Google Sheet không phản hồi. Kiểm tra mạng hoặc quyền chia sẻ công khai.'
@@ -5348,7 +5371,7 @@ function renderMatchesBoard() {
 
 function scorePayload(keys) {
   const wanted = keys && keys.length ? new Set(keys) : null;
-  return {
+  const payload = {
     matches: MATCHES.filter((match) => match.sheetKey && (!wanted || wanted.has(match.sheetKey))).map((match) => {
       const rr = match.round !== 'Chung kết';
       const sets = !match.played
@@ -5369,6 +5392,94 @@ function scorePayload(keys) {
       return item;
     }),
   };
+  const champion = championSheetPayload();
+  if (champion) payload.champion = champion;
+  return payload;
+}
+
+function championSheetPayload() {
+  const standings = computeTournamentStats().overallTeams;
+  const top = (standings.tieGroups || []).find((group) => group.start === 0 && group.ordered);
+  if (!top || top.end - top.start < 2) return null;
+  const slice = standings.slice(top.start, top.end);
+  return {
+    order: slice.map((team) => team.id),
+    names: slice.map((team) => team.name),
+  };
+}
+
+async function fetchChampionRows() {
+  const link = readStoredSheetLink();
+  if (!link || !link.id) return [];
+  const url = 'https://docs.google.com/spreadsheets/d/' + link.id + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent('Đội vô địch') + '&timestamp=' + Date.now();
+  const response = await fetch(url);
+  if (!response.ok) return [];
+  return gvizTable(await response.text());
+}
+
+function championIdsFromRows(rows) {
+  return (rows || [])
+    .map((row) => ({ place: Number(row['Thứ tự']), id: Number(row['Mã đội']) }))
+    .filter((row) => Number.isInteger(row.place) && Number.isInteger(row.id) && row.id >= 1 && row.id <= 4)
+    .sort((a, b) => a.place - b.place)
+    .map((row) => row.id);
+}
+
+async function loadChampionFromSheet() {
+  try {
+    const ids = championIdsFromRows(await fetchChampionRows());
+    if (ids.length < 2) return false;
+    const key = ids.slice().sort((a, b) => a - b).join('|');
+    const orders = readTeamRankOrders();
+    orders[key] = ids;
+    writeTeamRankOrders(orders);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+let championWriteTimer = 0;
+
+function queueChampionWrite() {
+  clearTimeout(championWriteTimer);
+  championWriteTimer = setTimeout(() => { pushChampionToSheet(); }, 400);
+}
+
+async function pushChampionToSheet() {
+  const champion = championSheetPayload();
+  if (!champion) return;
+  const url = scriptUrl();
+  if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url)) {
+    setSheetStatus('Đã lưu đội vô địch trên trang này. Chưa ghi lên Google Sheet vì file HTML chưa có link Apps Script.', true, true);
+    return;
+  }
+  setSheetStatus('Đang ghi đội vô địch lên Google Sheet...');
+  try {
+    await sendScoresToScript(url, { matches: [], champion });
+  } catch (error) {
+    setSheetStatus((error && error.message) || 'Không mở được cửa sổ Google.', true, true);
+    return;
+  }
+  try {
+    let saved = false;
+    for (let attempt = 0; attempt < 12; attempt += 1) {
+      await new Promise((resolve) => setTimeout(resolve, attempt === 0 ? 2000 : 2500));
+      const ids = championIdsFromRows(await fetchChampionRows());
+      saved = ids.length === champion.order.length && ids.every((id, index) => id === champion.order[index]);
+      if (saved) break;
+    }
+    if (!saved) {
+      setSheetStatus('Chưa thấy đội vô địch trên Sheet. Sao chép script, dán vào Apps Script, rồi triển khai Bản mới của cùng đường dẫn /exec.', true, true);
+      openSheetScriptModal();
+      closeScoreWriteWindow();
+      return;
+    }
+    setSheetStatus('Đã ghi đội vô địch ' + champion.names[0] + ' lên Google Sheet.', true);
+    closeScoreWriteWindow();
+  } catch (error) {
+    setSheetStatus('Không kiểm tra lại được đội vô địch trên Sheet. ' + ((error && error.message) || ''), true, true);
+  }
 }
 
 function sheetMatchesPayload(rows, payload) {
