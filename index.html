@@ -3707,7 +3707,7 @@ function renderMatchesBoard() {
           ? ` class="playoff-row" draggable="true" data-team-tie="1" data-tie-key="${group.key}" data-team="${t.id}" ondragstart="teamRankDragStart(event)" ondragover="teamRankDragOver(event)" ondrop="teamRankDrop(event)" ondragend="teamRankDragEnd(event)"`
           : '';
         const tools = group
-          ? `<span class="playoff-tools"><button type="button" class="playoff-move" draggable="false" onclick="event.stopPropagation(); moveTeamRank('${group.key}',${t.id}, -1)" aria-label="Đưa lên">▲</button><button type="button" class="playoff-move" draggable="false" onclick="event.stopPropagation(); moveTeamRank('${group.key}',${t.id}, 1)" aria-label="Đưa xuống">▼</button></span>`
+          ? `<span class="playoff-tools"><button type="button" class="playoff-move" draggable="false" onclick="event.stopPropagation(); moveTeamRank('${group.key}', ${t.id}, -1)" aria-label="Đưa lên">▲</button><button type="button" class="playoff-move" draggable="false" onclick="event.stopPropagation(); moveTeamRank('${group.key}',${t.id}, 1)" aria-label="Đưa xuống">▼</button></span>`
           : '';
         return `
           <tr${drag}>
@@ -4963,7 +4963,7 @@ function renderMatchesBoard() {
   '  for (i = 0; i < order.length; i++) rows.push([i + 1, Number(order[i]), names[i] || \'\']);',
   '  sheet.getRange(2, 1, rows.length, 3).setValues(rows);',
   '  return \' Đội vô địch: \' + (names[0] || order[0]) + \'.\';',
-  '},',
+  '}',
   '',
   'function applyScores_(raw) {',
   '  var email = \'\';',
@@ -5022,7 +5022,7 @@ function renderMatchesBoard() {
   '  });',
   '  if (!updated) return { text: \'Không tìm thấy mã trận trên Sheet. Kiểm tra cột Mã trận.\' };',
   '  range.setValues(values);',
-  '    return { text: \'Đã ghi \' + updated + \' trận lên Sheet\' + (email ? (\' (bằng \' + email) : \'\') + (named ? \'. Đã ghi đội và đôi cho \' + named + \' trận huy chương\' : \'\') + championNote + \'. Có thể đóng cửa sổ này.\' };',
+  '    return { text: \'Đã ghi \' + updated + \' trận lên Sheet\' + (email ? (\' bằng \' + email) : \'\') + (named ? \'. Đã ghi đội và đôi cho \' + named + \' trận huy chương\' : \'\') + championNote + \'. Có thể đóng cửa sổ này.\' };',
   '  } catch (err) {',
   '    var message = String((err && err.message) || err);',
   '    if (/permission|quyền|access|authoriz/i.test(message)) {',
@@ -5360,7 +5360,7 @@ function renderMatchesBoard() {
         await loadChampionFromSheet();
         persistHtmlScores();
         renderMatchesBoard();
-        setSheetStatus('Đã tải ' + filled + ' trận có điểm từ Google Sheet.' + (known - filled) + ' trận chưa có điểm.', true);
+        setSheetStatus('Đã tải ' + filled + ' trận có điểm từ Google Sheet. ' + (known - filled) + ' trận chưa có điểm.', true);
       } catch (error) {
         const message = error && error.name === 'AbortError'
           ? 'Google Sheet không phản hồi. Kiểm tra mạng hoặc quyền chia sẻ công khai.'
@@ -5454,7 +5454,7 @@ async function pushChampionToSheet() {
     setSheetStatus('Đã lưu đội vô địch trên trang này. Chưa ghi lên Google Sheet vì file HTML chưa có link Apps Script.', true, true);
     return;
   }
-  setSheetStatus('Đang ghi đội vô địch lên Google Sheet...');
+  setSheetStatus('Đang ghi đội vô địch lên Google Sheet…');
   try {
     await sendScoresToScript(url, { matches: [], champion });
   } catch (error) {
