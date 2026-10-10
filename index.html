@@ -3594,7 +3594,6 @@
         : '';
       return 'Các đội được tô đang hòa điểm đội, huy chương vàng, bạc, đồng, tổng trận thắng, hiệu số set và hiệu số điểm. Cần đánh set 21 điểm, phải hơn 2 điểm. Nếu tỉ số đạt 29–29 thì bên đạt 30 điểm trước thắng. Ba hoặc bốn đội thì bốc thăm đấu loại. Kéo dòng hoặc bấm ▲ ▼ để chốt thứ tự.' + lead;
     }
-    }
 
     // =========================================================
     // RENDER UI THỨ TỰ TRẬN ĐẤU & BẢNG ĐIỂM
@@ -3708,7 +3707,7 @@ function renderMatchesBoard() {
           ? ` class="playoff-row" draggable="true" data-team-tie="1" data-tie-key="${group.key}" data-team="${t.id}" ondragstart="teamRankDragStart(event)" ondragover="teamRankDragOver(event)" ondrop="teamRankDrop(event)" ondragend="teamRankDragEnd(event)"`
           : '';
         const tools = group
-          ? ` <span class="playoff-tools"><button type="button" class="playoff-move" draggable="false" onclick="event.stopPropagation(); moveTeamRank('${group.key}',${t.id}, -1)" aria-label="Đưa lên">▲</button><button type="button" class="playoff-move" draggable="false" onclick="event.stopPropagation(); moveTeamRank('${group.key}',${t.id}, 1)" aria-label="Đưa xuống">▼</button></span>`
+          ? `<span class="playoff-tools"><button type="button" class="playoff-move" draggable="false" onclick="event.stopPropagation(); moveTeamRank('${group.key}',${t.id}, -1)" aria-label="Đưa lên">▲</button><button type="button" class="playoff-move" draggable="false" onclick="event.stopPropagation(); moveTeamRank('${group.key}',${t.id}, 1)" aria-label="Đưa xuống">▼</button></span>`
           : '';
         return `
           <tr${drag}>
