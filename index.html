@@ -2995,7 +2995,7 @@
 
       <div class="modal-vs">
         <div class="modal-side">
-          <span id="modalTeam1Header" class="modal-side-name" style="color:var(--nab-red);">Team Wårricers</span>
+          <span id="modalTeam1Header" class="modal-side-name" style="color:var(--nab-red);">Team Wårriœrs</span>
           <span id="modalPair1" class="modal-pair-name"></span>
         </div>
         <span class="modal-vs-label">VS</span>
@@ -3755,7 +3755,7 @@ function renderMatchesBoard() {
           ? ` class="playoff-row" draggable="true" data-team-tie="1" data-tie-key="${group.key}" data-team="${t.id}" ondragstart="teamRankDragStart(event)" ondragover="teamRankDragOver(event)" ondrop="teamRankDrop(event)" ondragend="teamRankDragEnd(event)"`
           : '';
         const tools = group
-          ? `<span class="playoff-tools"><button type="button" class="playoff-move" draggable="false" onclick="event.stopPropagation(); moveTeamRank('${group.key}', ${t.id}, -1)" aria-label="Đưa lên">▲</button><button type="button" class="playoff-move" draggable="false" onclick="event.stopPropagation(); moveTeamRank('${group.key}',${t.id}, 1)" aria-label="Đưa xuống">▼</button></span>`
+          ? `<span class="playoff-tools"><button type="button" class="playoff-move" draggable="false" onclick="event.stopPropagation(); moveTeamRank('${group.key}', ${t.id}, -1)" aria-label="Đưa lên">▲</button><button type="button" class="playoff-move" draggable="false" onclick="event.stopPropagation(); moveTeamRank('${group.key}', ${t.id}, 1)" aria-label="Đưa xuống">▼</button></span>`
           : '';
         return `
           <tr${drag}>
@@ -4286,7 +4286,6 @@ function renderMatchesBoard() {
             <div>
               <input type="number" id="modalScore2" class="score-input-number" min="0" max="30" value="${m.played ? m.scoreB : ''}">
             </div>
-          </div>
           </div>
         `;
       }
