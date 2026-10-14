@@ -1778,7 +1778,11 @@
     }
 
     .btn-dark-export:hover {
-  background: var(--nab-red-dark);
+      background: var(--nab-red-dark);
+    }
+    
+    button[hidden].btn-dark-export {
+      display: none;
     }
     
     .btn-dark-tool.btn-icon-only {
@@ -2470,7 +2474,8 @@
           <button class="btn-dark-tool" type="button" onclick="populateSampleScores()" title="Tự động điền điểm mẫu mô phỏng"><i class="fa-solid fa-wand-magic-sparkles"></i> Điểm mẫu</button>
           <button class="btn-dark-tool btn-icon-only" type="button" onclick="resetAllScores()" title="Reset" aria-label="Reset"><i class="fa-solid fa-arrows-rotate"></i></button>
           <button class="btn-dark-tool" type="button" onclick="loadScoresFromSheet()" title="Đồng bộ điểm từ Google Sheet" aria-label="Đồng bộ điểm"><i class="fa-solid fa-cloud-arrow-down"></i> Đồng bộ điểm</button>
-          <button class="btn-dark-export" type="button" onclick="pushScoresToSheet()" title="Ghi điểm đang có trên trang vào Google Sheet"><i class="fa-solid fa-cloud-arrow-up"></i> Lưu</button>
+          <!-- Nút Lưu ghi cả file. Có chữ hidden là ẩn. Xóa chữ hidden để hiện lại. -->
+          <button class="btn-dark-export" type="button" hidden onclick="pushScoresToSheet()" title="Ghi điểm đang có trên trang vào Google Sheet"><i class="fa-solid fa-cloud-arrow-up"></i> Lưu</button>
         </div>
       </div>
       <p id="sheetScoreStatus" class="sheet-score-status"></p>
