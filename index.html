@@ -3488,33 +3488,30 @@
         const goldMatch = MATCHES.find(m => m.eventId === ev.id && m.round === 'Chung kết' && m.medalType === 'gold');
         const bronzeMatch = MATCHES.find(m => m.eventId === ev.id && m.round === 'Chung kết' && m.medalType === 'bronze');
 
-        let goldTeam = goldMatch?.teamA;
-        let silverTeam = goldMatch?.teamB;
-        let bronzeTeam = bronzeMatch?.teamA;
-        let fourthTeam = bronzeMatch?.teamB;
-
         if (goldMatch && goldMatch.played) {
-          if (goldMatch.setsWonB > goldMatch.setsWonA) {
-            goldTeam = goldMatch.teamB;
-            silverTeam = goldMatch.teamA;
-          }
+        let goldTeam = goldMatch.teamA;
+        let silverTeam = goldMatch.teamB;
+        if (goldMatch.setsWonB > goldMatch.setsWonA) {
+          goldTeam = goldMatch.teamB;
+          silverTeam = goldMatch.teamA;
         }
-        if (bronzeMatch && bronzeMatch.played) {
-          if (bronzeMatch.setsWonB > bronzeMatch.setsWonA) {
-            bronzeTeam = bronzeMatch.teamB;
-            fourthTeam = bronzeMatch.teamA;
-          }
-        }
-
         const g = overallTeams.find(t => t.id === goldTeam);
         const s = overallTeams.find(t => t.id === silverTeam);
-        const b = overallTeams.find(t => t.id === bronzeTeam);
-        const f = overallTeams.find(t => t.id === fourthTeam);
-
         if (g) { g.gold++; g.totalPoints += 6; }
         if (s) { s.silver++; s.totalPoints += 4; }
+      }
+      if (bronzeMatch && bronzeMatch.played) {
+        let bronzeTeam = bronzeMatch.teamA;
+        let fourthTeam = bronzeMatch.teamB;
+        if (bronzeMatch.setsWonB > bronzeMatch.setsWonA) {
+          bronzeTeam = bronzeMatch.teamB;
+          fourthTeam = bronzeMatch.teamA;
+        }
+        const b = overallTeams.find(t => t.id === bronzeTeam);
+        const f = overallTeams.find(t => t.id === fourthTeam);
         if (b) { b.bronze++; b.totalPoints += 2; }
         if (f) { f.fourth++; f.totalPoints += 1; }
+      }
       });
 
       overallTeams.sort((a, b) => b.totalPoints - a.totalPoints || b.gold - a.gold || b.silver - a.silver || b.bronze - a.bronze || b.won - a.won || b.setDiff - a.setDiff || b.diff - a.diff);
@@ -3549,7 +3546,7 @@
       while (index < teams.length) {
         let end = index + 1;
         while (end < teams.length && sameTeamRank(teams[index], teams[end])) end += 1;
-        if (end - index >= 2) {
+        if (end - index >= 2 && teams.slice(index, end).some((team) => team.played || team.totalPoints)) {
           const slice = teams.slice(index, end);
           const key = teamTieKey(slice);
           used.add(key);
