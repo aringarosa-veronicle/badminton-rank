@@ -4931,7 +4931,7 @@ function renderMatchesBoard() {
   '',
   'function clientPage_() {',
   '  var html = \'\'',
-  '    + \'<p id="msg" style="font:16px sans-serif;padding:24px;line-height:1.5">Dang ghi diem len Sheet...</p>\'',
+  '    + \'<p id="msg" style="font:16px sans-serif;padding:24px;line-height:1.5">Dang ghi diem len Sheet…</p>\'',
   '    + \'<script>\'',
   '    + \'function show(text){document.getElementById("msg").textContent=text;}\'',
   '    + \'google.script.url.getLocation(function(location){\'',
@@ -5366,7 +5366,6 @@ function renderMatchesBoard() {
     function persistHtmlScores() {
       htmlScoreRevision += 1;
       const data = {};
-      const data = {};
       MATCHES.forEach((match) => {
         if (!match.played || !match.sheetKey) return;
         data[match.sheetKey] = {
@@ -5404,11 +5403,11 @@ function renderMatchesBoard() {
     async function loadScoresFromSheet() {
       const link = readStoredSheetLink();
       if (!link || !link.id) return;
-      setSheetStatus('Đang tải điểm từ Google Sheet...');
+      setSheetStatus('Đang tải điểm từ Google Sheet…');
       const scoreRevision = htmlScoreRevision;
       try {
         const rows = await fetchSheetRows(link);
-        if (scoreRevision !== htmlScoreRevision || sheetWriterRunning) {
+        if (scoreRevision !== htmlScoreRevision || sheetWriteRunning) {
           setSheetStatus('Giữ điểm vừa lưu trên trang. Bấm Đồng bộ điểm lại sau khi trận vừa lưu ghi xong.', true);
           return;
         }
@@ -5723,7 +5722,7 @@ function closeScoreWriteWindow() {
           return;
         }
         if (!medalNamesOnSheet(rows, payload)) {
-          setSheetStatus((matchKeys ? 'Đã ghi tỉ số trận này lên Google Sheet. ' : 'Đã ghi tỉ số lên Google Sheet. ') + 'Tên đội và đôi trên Sheet chưa đổi. Có thể nhập trận tiếp. Bấm Cập nhật script nếu cần ghi tên đổi.', true, true);
+          setSheetStatus((matchKeys ? 'Đã ghi tỉ số trận này lên Google Sheet. ' : 'Đã ghi tỉ số lên Google Sheet. ') + 'Tên đội và đôi trên Sheet chưa đổi. Có thể nhập trận tiếp. Bấm Cập nhật script nếu cần ghi tên đôi.', true, true);
           closeScoreWriteWindow();
           return;
         }
